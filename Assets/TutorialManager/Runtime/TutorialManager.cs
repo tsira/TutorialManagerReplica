@@ -1,0 +1,70 @@
+using UnityEngine;
+using System.Collections;
+using UnityEngine.Analytics;
+using System.Collections.Generic;
+
+/// <summary>
+/// Tutorial manager configures the ABTester for the Tutorial test,
+/// and encapsulates some key functionality.
+/// </summary>
+public class TutorialManager
+{
+    static string testName = "tutorial_test";
+    static string tutorialKey = "show_tutorial";
+    static float percentage_a = .1f;
+    static float percentage_b = .1f;
+    static float percentage_default = .8f;
+    static int tutorialStep = 0;
+    static bool tutorialShowDefaultValue = true;
+
+    /// <summary>
+    /// Determine whether to show the tutorial.
+    /// </summary>
+    /// <description>
+    ///     <code>
+    ///     if (TutorialManager.ShowTutorial()) {
+    ///         // show the tutorial
+    ///     } else {
+    ///         // skip the tutorial
+    ///     }
+    ///     </code>
+    /// </description>
+    /// <returns><c>true</c>, if tutorial should be shown, <c>false</c> otherwise.</returns>
+    public static bool ShowTutorial() {
+        ABTestingWrapper.Configure(testName, percentage_a, percentage_b, percentage_default);
+        bool toShow = ABTestingWrapper.GetBool(tutorialKey, tutorialShowDefaultValue);
+        if (toShow) {
+            Analytics.CustomEvent("tutorial_start", new Dictionary<string, object>{ {"tutorial_id", tutorialKey} });
+        }
+        tutorialStep = 0;
+        return toShow;
+    }
+
+    /// <summary>
+    /// Call this when the player completes the tutorial.
+    /// </summary>
+    public static AnalyticsResult CompleteTutorial()
+    {
+        return Analytics.CustomEvent("tutorial_complete", new Dictionary<string, object> { { "tutorial_id", tutorialKey } });
+    }
+
+    /// <summary>
+    /// Call this if the player skips the tutorial.
+    /// </summary>
+    public static AnalyticsResult SkipTutorial()
+    {
+        return Analytics.CustomEvent("tutorial_skip", new Dictionary<string, object> { { "tutorial_id", tutorialKey } });
+    }
+
+    /// <summary>
+    /// Call this each time the player advances a step in the tutorial.
+    /// </summary>
+    public static AnalyticsResult AdvanceTutorial()
+    {
+        tutorialStep++;
+        return Analytics.CustomEvent("tutorial_step", new Dictionary<string, object> {
+            { "tutorial_id", tutorialKey },
+            {"step_id", tutorialStep}
+        });
+    }
+}
