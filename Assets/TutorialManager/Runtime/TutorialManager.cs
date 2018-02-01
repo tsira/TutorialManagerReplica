@@ -13,14 +13,12 @@ public class TutorialManager
     static string tutorialKey = "show_tutorial";
     static float percentage_a = .1f;
     static float percentage_b = .1f;
-    static float percentage_default = .8f;
     static int tutorialStep = 0;
-    static bool tutorialShowDefaultValue = true;
 
     /// <summary>
     /// Determine whether to show the tutorial.
     /// </summary>
-    /// <description>
+    /// <remarks>
     ///     <code>
     ///     if (TutorialManager.ShowTutorial()) {
     ///         // show the tutorial
@@ -28,11 +26,15 @@ public class TutorialManager
     ///         // skip the tutorial
     ///     }
     ///     </code>
-    /// </description>
+    /// </remarks>
     /// <returns><c>true</c>, if tutorial should be shown, <c>false</c> otherwise.</returns>
     public static bool ShowTutorial() {
-        ABTestingWrapper.Configure(testName, percentage_a, percentage_b, percentage_default);
-        bool toShow = ABTestingWrapper.GetBool(tutorialKey, tutorialShowDefaultValue);
+        ABTestingWrapper.Configure(testName, percentage_a, percentage_b);
+        ABTestingWrapper.EnsureBucket(tutorialKey);
+        string bucket = PlayerPrefs.GetString("unity_analytics_ab_test_bucket");
+        bool tutorialValue = (bucket == "_b") ? false : true;
+
+        bool toShow = ABTestingWrapper.GetBool(tutorialKey, tutorialValue);
         if (toShow) {
             Analytics.CustomEvent("tutorial_start", new Dictionary<string, object>{ {"tutorial_id", tutorialKey} });
         }

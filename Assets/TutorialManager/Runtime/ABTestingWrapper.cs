@@ -10,17 +10,21 @@ public static class ABTestingWrapper
     const string bucketB = "_b";
     const string bucketDefault = "default";
 
-    static string PlayerBucket = PlayerPrefs.GetString("unity_analytics_ab_test_bucket");
-    static string testName = "missing";
+    public static string PlayerBucket = PlayerPrefs.GetString("unity_analytics_ab_test_bucket");
+    static string defaultTestName = "missing";
+    public static string testName = defaultTestName;
     static float percentage_a;
     static float percentage_b;
     static float percentage_default;
 
-    public static void Configure(string tn, float pa, float pb, float pd) {
+    static bool hasLocalPercentages = false;
+
+    public static void Configure(string tn, float pa, float pb) {
         testName = tn;
         percentage_a = pa;
         percentage_b = pb;
-        percentage_default = pd;
+
+        hasLocalPercentages = true;
     }
 
     /// <summary>
@@ -76,7 +80,7 @@ public static class ABTestingWrapper
     }
 
     // Make sure we have a bucket.
-    private static void EnsureBucket(string key)
+    public static void EnsureBucket(string key)
     {
         if (NeedsBucket())
         {
@@ -108,17 +112,21 @@ public static class ABTestingWrapper
     private static bool PercentageABKeyExists()
     {
         bool result = false;
-        if (UnityEngine.RemoteSettings.HasKey("percentage_a") && UnityEngine.RemoteSettings.HasKey("percentage_b"))
+
+        bool hasA = UnityEngine.RemoteSettings.HasKey("percentage_a");
+        bool hasB = UnityEngine.RemoteSettings.HasKey("percentage_b");
+
+        if ((hasA && hasB) || hasLocalPercentages)
         {
             result = true;
         }
         else
         {
-            if (!UnityEngine.RemoteSettings.HasKey("percentage_a"))
+            if (!hasA)
             {
                 Debug.LogWarning("Warning: the 'percentage_a' key was not found in your Remote Settings. Default value will be returned");
             }
-            if (!UnityEngine.RemoteSettings.HasKey("percentage_b"))
+            if (!hasB)
             {
                 Debug.LogWarning("Warning: the 'percentage_b' key was not found in your Remote Settings. Default value will be returned");
             }
@@ -158,6 +166,7 @@ public static class ABTestingWrapper
         };
         string bucket = ChooseByRandom(bucketList);
         SetBucketPlayerPrefs(bucket);
+        SendBucketingEvent(bucket);
     }
 
     // Save the player's bucket both locally and to the Analytics server
@@ -166,9 +175,14 @@ public static class ABTestingWrapper
         PlayerPrefs.SetString("unity_analytics_ab_test_bucket", bucketSuffix);
         PlayerPrefs.Save();
         PlayerBucket = PlayerPrefs.GetString("unity_analytics_ab_test_bucket");
-        testName = UnityEngine.RemoteSettings.GetString("ab_test_name", "missing");
-        if (testName == "missing") { Debug.LogWarning("Warning: ab_test_name key was not found in your Remote Settings.  The default value 'missing' will be assigned "); }
+        testName = UnityEngine.RemoteSettings.GetString("ab_test_name", testName);
+        if (testName == defaultTestName)
+        {
+            Debug.LogWarningFormat("Warning: ab_test_name key was not found in your Remote Settings.  The default value {0} will be assigned.", defaultTestName);
+        }
+    }
 
+    private static void SendBucketingEvent(string bucketSuffix) {
         Analytics.CustomEvent("ab_test_bucket_assignment", new Dictionary<string, object>
         {
             { "bucket_name", bucketSuffix },
@@ -179,8 +193,8 @@ public static class ABTestingWrapper
     // Ensure percentage_a and percentage_b sum up to values between 0f-1f.
     private static void SanitizeBucketProbabilities()
     {
-        percentage_a = UnityEngine.RemoteSettings.GetFloat("percentage_a", 0f);
-        percentage_b = UnityEngine.RemoteSettings.GetFloat("percentage_b", 0f);
+        percentage_a = UnityEngine.RemoteSettings.GetFloat("percentage_a", percentage_a);
+        percentage_b = UnityEngine.RemoteSettings.GetFloat("percentage_b", percentage_b);
 
         if (AreNotValidPercentages(percentage_a, percentage_b))
         {
