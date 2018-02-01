@@ -11,8 +11,8 @@ public class TutorialManager
 {
     static string testName = "tutorial_test";
     static string tutorialKey = "show_tutorial";
-    static float percentage_a = .1f;
-    static float percentage_b = .1f;
+    static float percentage_a = 0f;
+    static float percentage_b = .2f;
     static int tutorialStep = 0;
 
     /// <summary>
