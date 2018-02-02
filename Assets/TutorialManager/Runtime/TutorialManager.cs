@@ -66,7 +66,7 @@ public class TutorialManager
         tutorialStep++;
         return Analytics.CustomEvent("tutorial_step", new Dictionary<string, object> {
             { "tutorial_id", tutorialKey },
-            {"step_id", tutorialStep}
+            {"step_index", tutorialStep}
         });
     }
 }
