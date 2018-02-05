@@ -79,7 +79,7 @@ public class TutorialManager
         PlayerPrefs.Save();
         return Analytics.CustomEvent("tutorial_step", new Dictionary<string, object> {
             { tutorialIdKey, tutorialKey },
-            {"step_id", tutorialStep}
+            {"step_index", tutorialStep}
         });
     }
 }
