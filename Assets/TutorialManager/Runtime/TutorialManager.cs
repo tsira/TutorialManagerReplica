@@ -72,7 +72,7 @@ public class TutorialManager
     {
         if(PlayerPrefs.HasKey(tutorialStepPlayerPrefsKey))
         {
-            tutorialStep = PlayerPrefs.GetInt(tutorialStepPlayerPrefsKey)
+            tutorialStep = PlayerPrefs.GetInt(tutorialStepPlayerPrefsKey);
         }
         tutorialStep++;
         PlayerPrefs.SetInt(tutorialStepPlayerPrefsKey, tutorialStep);
