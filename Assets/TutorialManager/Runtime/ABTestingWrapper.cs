@@ -35,7 +35,7 @@ public static class ABTestingWrapper
     /// <param name="defaultValue">Default value.</param>
     public static int GetInt(string key, int defaultValue = 0)
     {
-        EnsureBucket(key);
+        EnsureBucket();
         string bucketKey = GetBucketKey(key);
         return UnityEngine.RemoteSettings.GetInt(bucketKey, defaultValue);
     }
@@ -48,7 +48,7 @@ public static class ABTestingWrapper
     /// <param name="defaultValue">Default value.</param>
     public static float GetFloat(string key, float defaultValue = 0f)
     {
-        EnsureBucket(key);
+        EnsureBucket();
         string bucketKey = GetBucketKey(key);
         return UnityEngine.RemoteSettings.GetFloat(bucketKey, defaultValue);
     }
@@ -61,7 +61,7 @@ public static class ABTestingWrapper
     /// <param name="defaultValue">Default value.</param>
     public static string GetString(string key, string defaultValue = "")
     {
-        EnsureBucket(key);
+        EnsureBucket();
         string bucketKey = GetBucketKey(key);
         return UnityEngine.RemoteSettings.GetString(bucketKey, defaultValue);
     }
@@ -74,24 +74,24 @@ public static class ABTestingWrapper
     /// <param name="defaultValue">If set to <c>true</c> default value.</param>
     public static bool GetBool(string key, bool defaultValue = false)
     {
-        EnsureBucket(key);
+        EnsureBucket();
         string bucketKey = GetBucketKey(key);
         return UnityEngine.RemoteSettings.GetBool(bucketKey, defaultValue);
     }
 
     // Make sure we have a bucket.
-    public static void EnsureBucket(string key)
+    public static void EnsureBucket(bool verboseWarnings = true)
     {
-        if (NeedsBucket())
+        if (NeedsBucket(verboseWarnings))
         {
             AssignBucket();
         }
     }
 
     // Do we need a bucket or does it already exist?
-    private static bool NeedsBucket()
+    private static bool NeedsBucket(bool verboseWarnings = true)
     {
-        return (PercentageABKeyExists() && !PlayerBucketExists());
+        return (PercentageABKeyExists(verboseWarnings) && !PlayerBucketExists());
     }
 
     // Take a key and return it with the correct bucket suffix
@@ -109,7 +109,7 @@ public static class ABTestingWrapper
     }
 
     // Do BOTH percentage_a and perentage_b exist?
-    private static bool PercentageABKeyExists()
+    private static bool PercentageABKeyExists(bool verboseWarnings = true)
     {
         bool result = false;
 
@@ -120,7 +120,7 @@ public static class ABTestingWrapper
         {
             result = true;
         }
-        else
+        else if(verboseWarnings)
         {
             if (!hasA)
             {
