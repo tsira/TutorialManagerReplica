@@ -44,8 +44,7 @@ public class TutorialManager
             Analytics.CustomEvent("tutorial_start", new Dictionary<string, object> { { tutorialIdKey, tutorialKey } });
         }
         tutorialStep = 0;
-        PlayerPrefs.SetInt(tutorialStepPlayerPrefsKey, tutorialStep);
-        PlayerPrefs.Save();
+        SetTutorialStep(tutorialStep);
         return toShow;
     }
 
@@ -70,16 +69,28 @@ public class TutorialManager
     /// </summary>
     public static AnalyticsResult AdvanceTutorial()
     {
-        if (PlayerPrefs.HasKey(tutorialStepPlayerPrefsKey))
-        {
-            tutorialStep = PlayerPrefs.GetInt(tutorialStepPlayerPrefsKey);
-        }
+        tutorialStep = GetTutorialStep();
         tutorialStep++;
-        PlayerPrefs.SetInt(tutorialStepPlayerPrefsKey, tutorialStep);
-        PlayerPrefs.Save();
+        SetTutorialStep(tutorialStep);
         return Analytics.CustomEvent("tutorial_step", new Dictionary<string, object> {
             { tutorialIdKey, tutorialKey },
             {"step_index", tutorialStep}
         });
     }
+
+    static void SetTutorialStep(int newTutorialStep)
+    {
+        PlayerPrefs.SetInt(tutorialStepPlayerPrefsKey, newTutorialStep);
+        PlayerPrefs.Save();
+    }
+
+    static int GetTutorialStep()
+    {
+        if (PlayerPrefs.HasKey(tutorialStepPlayerPrefsKey))
+        {
+            return tutorialStep = PlayerPrefs.GetInt(tutorialStepPlayerPrefsKey);
+        }
+        return 0;
+    }
+
 }
