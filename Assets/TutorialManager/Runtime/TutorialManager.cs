@@ -34,7 +34,7 @@ public class TutorialManager
     public static bool ShowTutorial()
     {
         ABTestingWrapper.Configure(testName, percentage_a, percentage_b);
-        ABTestingWrapper.EnsureBucket(false);
+        ABTestingWrapper.EnsureBucket();
         string bucket = PlayerPrefs.GetString("unity_analytics_ab_test_bucket");
         bool tutorialValue = (bucket == "_b") ? false : true;
 

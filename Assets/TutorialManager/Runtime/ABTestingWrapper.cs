@@ -80,18 +80,18 @@ public static class ABTestingWrapper
     }
 
     // Make sure we have a bucket.
-    public static void EnsureBucket(bool verboseWarnings = true)
+    public static void EnsureBucket()
     {
-        if (NeedsBucket(verboseWarnings))
+        if (NeedsBucket())
         {
             AssignBucket();
         }
     }
 
     // Do we need a bucket or does it already exist?
-    private static bool NeedsBucket(bool verboseWarnings = true)
+    private static bool NeedsBucket()
     {
-        return (PercentageABKeyExists(verboseWarnings) && !PlayerBucketExists());
+        return (PercentageABKeyExists() && !PlayerBucketExists());
     }
 
     // Take a key and return it with the correct bucket suffix
@@ -109,7 +109,7 @@ public static class ABTestingWrapper
     }
 
     // Do BOTH percentage_a and perentage_b exist?
-    private static bool PercentageABKeyExists(bool verboseWarnings = true)
+    private static bool PercentageABKeyExists()
     {
         bool result = false;
 
@@ -120,7 +120,7 @@ public static class ABTestingWrapper
         {
             result = true;
         }
-        else if(verboseWarnings)
+        else
         {
             if (!hasA)
             {
@@ -137,19 +137,22 @@ public static class ABTestingWrapper
     // Do <variable>, <variable>_a and <variable>_b exist?
     private static void VariableABKeysExist(string key)
     {
-        if (!UnityEngine.RemoteSettings.HasKey(key))
+        if(!hasLocalPercentages)
         {
-            Debug.LogWarning("Warning: the key " + key + " was not found in your Remote Settings.  Default value will be returned");
-        }
+            if (!UnityEngine.RemoteSettings.HasKey(key))
+            {
+                Debug.LogWarning("Warning: the key " + key + " was not found in your Remote Settings.  Default value will be returned");
+            }
 
-        if (!UnityEngine.RemoteSettings.HasKey(key + bucketA))
-        {
-            Debug.LogWarning("Warning: the key " + key + "_a was not found in your Remote Settings.  Default value will be returned");
-        }
+            if (!UnityEngine.RemoteSettings.HasKey(key + bucketA))
+            {
+                Debug.LogWarning("Warning: the key " + key + "_a was not found in your Remote Settings.  Default value will be returned");
+            }
 
-        if (!UnityEngine.RemoteSettings.HasKey(key + bucketB))
-        {
-            Debug.LogWarning("Warning: the key " + key + "_b was not found in your Remote Settings.  Default value will be returned");
+            if (!UnityEngine.RemoteSettings.HasKey(key + bucketB))
+            {
+                Debug.LogWarning("Warning: the key " + key + "_b was not found in your Remote Settings.  Default value will be returned");
+            }
         }
     }
 
