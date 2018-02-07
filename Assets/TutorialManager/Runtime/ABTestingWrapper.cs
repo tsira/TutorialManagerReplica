@@ -35,7 +35,7 @@ public static class ABTestingWrapper
     /// <param name="defaultValue">Default value.</param>
     public static int GetInt(string key, int defaultValue = 0)
     {
-        EnsureBucket(key);
+        EnsureBucket();
         string bucketKey = GetBucketKey(key);
         return UnityEngine.RemoteSettings.GetInt(bucketKey, defaultValue);
     }
@@ -48,7 +48,7 @@ public static class ABTestingWrapper
     /// <param name="defaultValue">Default value.</param>
     public static float GetFloat(string key, float defaultValue = 0f)
     {
-        EnsureBucket(key);
+        EnsureBucket();
         string bucketKey = GetBucketKey(key);
         return UnityEngine.RemoteSettings.GetFloat(bucketKey, defaultValue);
     }
@@ -61,7 +61,7 @@ public static class ABTestingWrapper
     /// <param name="defaultValue">Default value.</param>
     public static string GetString(string key, string defaultValue = "")
     {
-        EnsureBucket(key);
+        EnsureBucket();
         string bucketKey = GetBucketKey(key);
         return UnityEngine.RemoteSettings.GetString(bucketKey, defaultValue);
     }
@@ -74,13 +74,13 @@ public static class ABTestingWrapper
     /// <param name="defaultValue">If set to <c>true</c> default value.</param>
     public static bool GetBool(string key, bool defaultValue = false)
     {
-        EnsureBucket(key);
+        EnsureBucket();
         string bucketKey = GetBucketKey(key);
         return UnityEngine.RemoteSettings.GetBool(bucketKey, defaultValue);
     }
 
     // Make sure we have a bucket.
-    public static void EnsureBucket(string key)
+    public static void EnsureBucket()
     {
         if (NeedsBucket())
         {
@@ -137,19 +137,22 @@ public static class ABTestingWrapper
     // Do <variable>, <variable>_a and <variable>_b exist?
     private static void VariableABKeysExist(string key)
     {
-        if (!UnityEngine.RemoteSettings.HasKey(key))
+        if(!hasLocalPercentages)
         {
-            Debug.LogWarning("Warning: the key " + key + " was not found in your Remote Settings.  Default value will be returned");
-        }
+            if (!UnityEngine.RemoteSettings.HasKey(key))
+            {
+                Debug.LogWarning("Warning: the key " + key + " was not found in your Remote Settings.  Default value will be returned");
+            }
 
-        if (!UnityEngine.RemoteSettings.HasKey(key + bucketA))
-        {
-            Debug.LogWarning("Warning: the key " + key + "_a was not found in your Remote Settings.  Default value will be returned");
-        }
+            if (!UnityEngine.RemoteSettings.HasKey(key + bucketA))
+            {
+                Debug.LogWarning("Warning: the key " + key + "_a was not found in your Remote Settings.  Default value will be returned");
+            }
 
-        if (!UnityEngine.RemoteSettings.HasKey(key + bucketB))
-        {
-            Debug.LogWarning("Warning: the key " + key + "_b was not found in your Remote Settings.  Default value will be returned");
+            if (!UnityEngine.RemoteSettings.HasKey(key + bucketB))
+            {
+                Debug.LogWarning("Warning: the key " + key + "_b was not found in your Remote Settings.  Default value will be returned");
+            }
         }
     }
 

@@ -15,6 +15,9 @@ public class TutorialManager
     static float percentage_b = .2f;
     static int tutorialStep = 0;
 
+    const string tutorialIdKey = "tutorial_id";
+    const string tutorialStepPlayerPrefsKey = "unity_analytics_tutorial_test_current_step";
+
     /// <summary>
     /// Determine whether to show the tutorial.
     /// </summary>
@@ -28,17 +31,20 @@ public class TutorialManager
     ///     </code>
     /// </remarks>
     /// <returns><c>true</c>, if tutorial should be shown, <c>false</c> otherwise.</returns>
-    public static bool ShowTutorial() {
+    public static bool ShowTutorial()
+    {
         ABTestingWrapper.Configure(testName, percentage_a, percentage_b);
-        ABTestingWrapper.EnsureBucket(tutorialKey);
+        ABTestingWrapper.EnsureBucket();
         string bucket = PlayerPrefs.GetString("unity_analytics_ab_test_bucket");
         bool tutorialValue = (bucket == "_b") ? false : true;
 
         bool toShow = ABTestingWrapper.GetBool(tutorialKey, tutorialValue);
-        if (toShow) {
-            Analytics.CustomEvent("tutorial_start", new Dictionary<string, object>{ {"tutorial_id", tutorialKey} });
+        if (toShow)
+        {
+            Analytics.CustomEvent("tutorial_start", new Dictionary<string, object> { { tutorialIdKey, tutorialKey } });
         }
         tutorialStep = 0;
+        SetTutorialStep(tutorialStep);
         return toShow;
     }
 
@@ -47,7 +53,7 @@ public class TutorialManager
     /// </summary>
     public static AnalyticsResult CompleteTutorial()
     {
-        return Analytics.CustomEvent("tutorial_complete", new Dictionary<string, object> { { "tutorial_id", tutorialKey } });
+        return Analytics.CustomEvent("tutorial_complete", new Dictionary<string, object> { { tutorialIdKey, tutorialKey } });
     }
 
     /// <summary>
@@ -55,7 +61,7 @@ public class TutorialManager
     /// </summary>
     public static AnalyticsResult SkipTutorial()
     {
-        return Analytics.CustomEvent("tutorial_skip", new Dictionary<string, object> { { "tutorial_id", tutorialKey } });
+        return Analytics.CustomEvent("tutorial_skip", new Dictionary<string, object> { { tutorialIdKey, tutorialKey } });
     }
 
     /// <summary>
@@ -63,10 +69,28 @@ public class TutorialManager
     /// </summary>
     public static AnalyticsResult AdvanceTutorial()
     {
+        tutorialStep = GetTutorialStep();
         tutorialStep++;
+        SetTutorialStep(tutorialStep);
         return Analytics.CustomEvent("tutorial_step", new Dictionary<string, object> {
-            { "tutorial_id", tutorialKey },
+            { tutorialIdKey, tutorialKey },
             {"step_index", tutorialStep}
         });
     }
+
+    static void SetTutorialStep(int newTutorialStep)
+    {
+        PlayerPrefs.SetInt(tutorialStepPlayerPrefsKey, newTutorialStep);
+        PlayerPrefs.Save();
+    }
+
+    static int GetTutorialStep()
+    {
+        if (PlayerPrefs.HasKey(tutorialStepPlayerPrefsKey))
+        {
+            return tutorialStep = PlayerPrefs.GetInt(tutorialStepPlayerPrefsKey);
+        }
+        return 0;
+    }
+
 }
