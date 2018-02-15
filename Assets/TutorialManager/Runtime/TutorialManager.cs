@@ -17,6 +17,11 @@ public class TutorialManager
 
     const string tutorialIdKey = "tutorial_id";
     const string tutorialStepPlayerPrefsKey = "unity_analytics_tutorial_test_current_step";
+    const string adaptiveOnboardingEventName = "adaptive_onboarding";
+    const string tutorialOnKey = "tutorial_on";
+    const string tutorialTestGroupKey = "test_group";
+    const string testGroupValue = "test";
+    const string controlGroupValue = "control";
 
     /// <summary>
     /// Determine whether to show the tutorial.
@@ -39,6 +44,13 @@ public class TutorialManager
         bool tutorialValue = (bucket == "_b") ? false : true;
 
         bool toShow = ABTestingWrapper.GetBool(tutorialKey, tutorialValue);
+        Analytics.CustomEvent(adaptiveOnboardingEventName, 
+            new Dictionary<string, object>{ 
+                { tutorialOnKey, toShow },
+                { tutorialTestGroupKey, bucket == "_b" ? testGroupValue : controlGroupValue } 
+            }
+        );
+        
         if (toShow)
         {
             Analytics.CustomEvent("tutorial_start", new Dictionary<string, object> { { tutorialIdKey, tutorialKey } });
