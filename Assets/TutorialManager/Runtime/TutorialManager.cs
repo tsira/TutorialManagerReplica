@@ -22,6 +22,8 @@ public class TutorialManager
     const string tutorialTestGroupKey = "test_group";
     const string testGroupValue = "test";
     const string controlGroupValue = "control";
+    const string adaptiveOnboardingSentPrefsKey = "adaptive_onboarding_event_sent";
+    static int adaptiveOnboardingEventSent = 0;
 
     /// <summary>
     /// Determine whether to show the tutorial.
@@ -44,12 +46,7 @@ public class TutorialManager
         bool tutorialValue = (bucket == "_b") ? false : true;
 
         bool toShow = ABTestingWrapper.GetBool(tutorialKey, tutorialValue);
-        Analytics.CustomEvent(adaptiveOnboardingEventName, 
-            new Dictionary<string, object>{ 
-                { tutorialOnKey, toShow },
-                { tutorialTestGroupKey, bucket == "_b" ? testGroupValue : controlGroupValue } 
-            }
-        );
+        HandleAdaptiveOnboardingEvent(toShow, bucket);
         
         if (toShow)
         {
@@ -58,6 +55,23 @@ public class TutorialManager
         tutorialStep = 0;
         SetTutorialStep(tutorialStep);
         return toShow;
+    }
+
+    static void HandleAdaptiveOnboardingEvent (bool toShow, string bucket)
+    {
+        adaptiveOnboardingEventSent = PlayerPrefs.GetInt(adaptiveOnboardingSentPrefsKey, adaptiveOnboardingEventSent);
+        if(adaptiveOnboardingEventSent == 0) 
+        {
+            Analytics.CustomEvent(adaptiveOnboardingEventName,
+                new Dictionary<string, object>{
+                    { tutorialOnKey, toShow },
+                    { tutorialTestGroupKey, bucket == "_b" ? testGroupValue : controlGroupValue }
+                }
+            );
+            adaptiveOnboardingEventSent = 1;
+            PlayerPrefs.SetInt(adaptiveOnboardingSentPrefsKey, adaptiveOnboardingEventSent);
+            PlayerPrefs.Save();
+        }
     }
 
     /// <summary>
