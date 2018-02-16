@@ -60,12 +60,15 @@ public class TutorialManager
     /// <returns><c>true</c>, if tutorial should be shown, <c>false</c> otherwise.</returns>
     public static bool ShowTutorial()
     {
-        ABTestingWrapper.Configure(testName, percentage_a, percentage_b);
-        ABTestingWrapper.EnsureBucket();
-        string bucket = PlayerPrefs.GetString("unity_analytics_ab_test_bucket");
-        bool tutorialValue = (bucket == "_b") ? false : true;
+        bool toShow = true;
+        string bucket = controlGroupValue;
+        bool playerInTestGroup = RemoteSettings.GetBool("adapative_onboarding_test_group", false);
+        if(playerInTestGroup)
+        {
+            toShow = PlayerPrefs.GetInt("adaptive_onboarding_show_tutorial") == 1;
+            bucket = testGroupValue;
+        }
 
-        bool toShow = ABTestingWrapper.GetBool(tutorialKey, tutorialValue);
         HandleAdaptiveOnboardingEvent(toShow, bucket);
         
         if (toShow)
@@ -85,7 +88,7 @@ public class TutorialManager
             Analytics.CustomEvent(adaptiveOnboardingEventName,
                 new Dictionary<string, object>{
                     { tutorialOnKey, toShow },
-                    { tutorialTestGroupKey, bucket == "_b" ? testGroupValue : controlGroupValue }
+                    { tutorialTestGroupKey, bucket}
                 }
             );
             adaptiveOnboardingEventSent = 1;

@@ -50,7 +50,7 @@ public class TutorialManagerTests : MonoBehaviour {
             else if (PlayerPrefs.GetString("unity_analytics_ab_test_bucket") == "default")
                 db++;
 
-            ABTestingWrapper.PlayerBucket = null;
+            //ABTestingWrapper.PlayerBucket = null;
                 
             PlayerPrefs.DeleteKey("unity_analytics_ab_test_bucket");
             PlayerPrefs.Save();
