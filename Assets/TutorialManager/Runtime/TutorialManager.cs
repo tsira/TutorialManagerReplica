@@ -25,6 +25,26 @@ public class TutorialManager
     const string adaptiveOnboardingSentPrefsKey = "adaptive_onboarding_event_sent";
     static int adaptiveOnboardingEventSent = 0;
 
+    [RuntimeInitializeOnLoadMethod]
+    static void InitializeRemoteSettingsHandler ()
+    {
+        RemoteSettings.Updated += RemoteSettings_Updated;
+    }
+
+    static void RemoteSettings_Updated()
+    {
+        //player has already been allocated. Do nothing.
+        if(PlayerPrefs.HasKey("adaptive_onboarding_show_tutorial"))
+        {
+            return;
+        }
+        bool playerInTestGroup = RemoteSettings.GetBool("adapative_onboarding_test_group", false);
+        if(playerInTestGroup)
+        {
+            //send device info
+        }
+    }
+
     /// <summary>
     /// Determine whether to show the tutorial.
     /// </summary>
