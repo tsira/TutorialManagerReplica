@@ -25,6 +25,70 @@ public class TutorialManager
     const string adaptiveOnboardingSentPrefsKey = "adaptive_onboarding_event_sent";
     static int adaptiveOnboardingEventSent = 0;
 
+    private class DeviceInfo
+    {
+        public string model;
+        public int ram;
+        public string cpu;
+        public string gfx_name;
+        public string gfx_vendor;
+        public string device_id;
+        public int cpu_count;
+        public float dpi;
+        public string screen;
+        public string project_id;
+        public int platform_id;
+        public string os_ver;
+        public int gfx_shader;
+        public string gfx_ver;
+        public int max_texture_size;
+        public string app_build_version;
+        public bool in_editor;
+        public string network;
+        public string screenOrientation;
+        public float realtimeSinceStartup;
+        public float batterLevel;
+
+        public DeviceInfo(string projectId /*, string app_build_version*/)
+        {
+            this.project_id = projectId;
+            //this.app_build_version = app_build_version;
+            this.model = GetDeviceModel();
+            this.device_id = SystemInfo.deviceUniqueIdentifier;
+            this.ram = SystemInfo.systemMemorySize;
+            this.cpu = SystemInfo.processorType;
+            this.cpu_count = SystemInfo.processorCount;
+            this.gfx_name = SystemInfo.graphicsDeviceName;
+            this.gfx_vendor = SystemInfo.graphicsDeviceVendor;
+            this.screen = Screen.currentResolution.ToString();
+            this.dpi = Screen.dpi;
+            this.in_editor = Application.isEditor;
+            this.platform_id = (int)Application.platform;
+            this.os_ver = SystemInfo.operatingSystem;
+            this.gfx_shader = SystemInfo.graphicsShaderLevel;
+            this.gfx_ver = SystemInfo.graphicsDeviceVersion;
+            this.max_texture_size = SystemInfo.maxTextureSize;
+            this.network = Application.internetReachability.ToString();
+            this.screenOrientation = Screen.orientation.ToString();
+            this.realtimeSinceStartup = Time.realtimeSinceStartup;
+            this.batterLevel = SystemInfo.batteryLevel;
+        }
+
+        private string GetDeviceModel()
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            // get manufacturer/model/device
+            AndroidJavaClass jc = new AndroidJavaClass("android.os.Build");
+            string manufacturer = jc.GetStatic<string>("MANUFACTURER");
+            string model = jc.GetStatic<string>("MODEL");
+            string device = jc.GetStatic<string>("DEVICE");
+            return String.Format("{0}/{1}/{2}", manufacturer, model, device);
+#else
+            return SystemInfo.deviceModel;
+#endif
+        }
+    }
+
     [RuntimeInitializeOnLoadMethod]
     static void InitializeRemoteSettingsHandler ()
     {
