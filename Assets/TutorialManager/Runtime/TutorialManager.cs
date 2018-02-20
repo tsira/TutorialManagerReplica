@@ -105,6 +105,8 @@ public class TutorialManager
         bool playerInTestGroup = RemoteSettings.GetBool("adapative_onboarding_test_group", false);
         if(playerInTestGroup)
         {
+            var deviceInfo = new DeviceInfo(Application.cloudProjectId);
+
             //send device info
         }
     }
