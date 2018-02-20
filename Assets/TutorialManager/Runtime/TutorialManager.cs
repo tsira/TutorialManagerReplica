@@ -47,7 +47,7 @@ public class TutorialManager
         public string network;
         public string screenOrientation;
         public float realtimeSinceStartup;
-        public float batterLevel;
+        public float batteryLevel;
 
         public DeviceInfo(string projectId /*, string app_build_version*/)
         {
@@ -71,7 +71,7 @@ public class TutorialManager
             this.network = Application.internetReachability.ToString();
             this.screenOrientation = Screen.orientation.ToString();
             this.realtimeSinceStartup = Time.realtimeSinceStartup;
-            this.batterLevel = SystemInfo.batteryLevel;
+            this.batteryLevel = SystemInfo.batteryLevel;
         }
 
         private string GetDeviceModel()
