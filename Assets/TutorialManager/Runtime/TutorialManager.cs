@@ -45,14 +45,21 @@ public class TutorialManager
         public string app_build_version;
         public bool in_editor;
         public string network;
-        public string screenOrientation;
-        public float realtimeSinceStartup;
-        public float batteryLevel;
+        public string screen_orientation;
+        public float realtime_since_startup;
+        public float battery_level;
+        public string battery_status;
+        public string advertising_id;
+        public bool advertising_tracking_enabled;
+        public string lang;
+        public string build_guid;
+        public string install_mode;
+        public string app_install_store;
 
-        public DeviceInfo(string projectId /*, string app_build_version*/)
+        public DeviceInfo(string projectId)
         {
             this.project_id = projectId;
-            //this.app_build_version = app_build_version;
+            this.app_build_version = Application.version;
             this.model = GetDeviceModel();
             this.device_id = SystemInfo.deviceUniqueIdentifier;
             this.ram = SystemInfo.systemMemorySize;
@@ -69,9 +76,14 @@ public class TutorialManager
             this.gfx_ver = SystemInfo.graphicsDeviceVersion;
             this.max_texture_size = SystemInfo.maxTextureSize;
             this.network = Application.internetReachability.ToString();
-            this.screenOrientation = Screen.orientation.ToString();
-            this.realtimeSinceStartup = Time.realtimeSinceStartup;
-            this.batteryLevel = SystemInfo.batteryLevel;
+            this.screen_orientation = Screen.orientation.ToString();
+            this.realtime_since_startup = Time.realtimeSinceStartup;
+            this.battery_level = SystemInfo.batteryLevel;
+            this.battery_status = SystemInfo.batteryStatus.ToString();
+            this.lang = Application.systemLanguage.ToString();
+            this.build_guid = Application.buildGUID;
+            this.install_mode = Application.installMode.ToString();
+            this.app_install_store = Application.installerName;
         }
 
         private string GetDeviceModel()
@@ -92,11 +104,14 @@ public class TutorialManager
     [RuntimeInitializeOnLoadMethod]
     static void InitializeRemoteSettingsHandler ()
     {
+        Debug.Log(Application.installMode);
+        Debug.Log(Application.installerName);
         RemoteSettings.Updated += RemoteSettings_Updated;
     }
 
     static void RemoteSettings_Updated()
     {
+        Debug.Log("Remote settings updated");
         //player has already been allocated. Do nothing.
         if(PlayerPrefs.HasKey("adaptive_onboarding_show_tutorial"))
         {
@@ -106,9 +121,22 @@ public class TutorialManager
         if(playerInTestGroup)
         {
             var deviceInfo = new DeviceInfo(Application.cloudProjectId);
-
+            if(Application.RequestAdvertisingIdentifierAsync(HandleAdvertisingIdentifierCallback))
+            {
+                Debug.Log("Have ad id");
+            }
+            else 
+            {
+                //advertising ID unsupported
+                Debug.Log("Don't have ad id");
+            }
             //send device info
         }
+    }
+
+    static void HandleAdvertisingIdentifierCallback(string advertisingId, bool trackingEnabled, string errorMsg)
+    {
+
     }
 
     /// <summary>
