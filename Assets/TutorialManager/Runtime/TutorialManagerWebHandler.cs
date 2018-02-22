@@ -1,10 +1,11 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class TutorialManagerWebHandler : MonoBehaviour {
     public delegate void HandleWebResponse(WWW webRequest);
     public static event HandleWebResponse WebRequestReturned;
+    const string url = "https://stg-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
+
     void Awake()
     {
         DontDestroyOnLoad(transform.gameObject);
@@ -17,7 +18,7 @@ public class TutorialManagerWebHandler : MonoBehaviour {
 
     IEnumerator SendWebRequest(WWWForm webForm)
     {
-        using (WWW webRequest = new WWW("https://stg-adaptive-onboarding.uca.cloud.unity3d.com/tutorial", webForm))
+        using (WWW webRequest = new WWW(url, webForm))
         {
             yield return webRequest;
 
