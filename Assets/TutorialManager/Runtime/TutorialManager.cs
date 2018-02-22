@@ -9,10 +9,7 @@ using System.Collections.Generic;
 /// </summary>
 public class TutorialManager
 {
-    static string testName = "tutorial_test";
     static string tutorialKey = "show_tutorial";
-    static float percentage_a = 0f;
-    static float percentage_b = .2f;
     static int tutorialStep = 0;
 
     const string tutorialIdKey = "tutorial_id";
@@ -23,7 +20,6 @@ public class TutorialManager
     const string testGroupValue = "test";
     const string controlGroupValue = "control";
     const string adaptiveOnboardingSentPrefsKey = "adaptive_onboarding_event_sent";
-    static int adaptiveOnboardingEventSent = 0;
     const string adaptiveOnboardingShowTutorialPrefsKey = "adaptive_onboarding_show_tutorial";
 
     private class DeviceInfo
