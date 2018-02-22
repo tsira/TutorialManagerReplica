@@ -85,6 +85,8 @@ public class TutorialManager
             this.app_install_store = Application.installerName;
             this.user_id = AnalyticsSessionInfo.userId;
             this.sessiond_id = AnalyticsSessionInfo.sessionId;
+            this.advertising_id = "";
+            this.advertising_tracking_enabled = false;
         }
 
         private string GetDeviceModel()
@@ -113,21 +115,21 @@ public class TutorialManager
             return;
         }
         var deviceInfo = new DeviceInfo();
-        if (Application.RequestAdvertisingIdentifierAsync(HandleAdvertisingIdentifierCallback))
+        var advertisingSupported = Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string errorMsg) => {
+            deviceInfo.advertising_id = advertisingId;
+            deviceInfo.advertising_tracking_enabled = trackingEnabled;
+            CallTutorialManagerService(deviceInfo);
+        });
+        if(!advertisingSupported)
         {
-            Debug.Log("Have ad id");
-        }
-        else
-        {
-            //advertising ID unsupported
-            Debug.Log("Don't have ad id");
+            CallTutorialManagerService(deviceInfo);
         }
         //send device info
     }
 
-    static void HandleAdvertisingIdentifierCallback(string advertisingId, bool trackingEnabled, string errorMsg)
+    static void CallTutorialManagerService(DeviceInfo data)
     {
-        Debug.Log("ad id callback being invoked");
+        
     }
 
     /// <summary>
