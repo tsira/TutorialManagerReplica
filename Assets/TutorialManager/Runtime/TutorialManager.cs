@@ -29,38 +29,39 @@ public class TutorialManager
         public string cpu;
         public string gfx_name;
         public string gfx_vendor;
-        public string device_id;
+        public string deviceid;
         public int cpu_count;
         public float dpi;
         public string screen;
-        public string project_id;
-        public int platform_id;
+        public string appid;
+        public int platform;
         public string os_ver;
         public int gfx_shader;
         public string gfx_ver;
         public int max_texture_size;
-        public string app_build_version;
+        public string app_ver;
         public bool in_editor;
         public string network;
         public string screen_orientation;
         public float realtime_since_startup;
         public float battery_level;
         public string battery_status;
-        public string advertising_id;
-        public bool advertising_tracking_enabled;
+        public string adsid;
+        public bool ads_tracking;
         public string lang;
         public string build_guid;
         public string install_mode;
         public string app_install_store;
-        public string user_id;
-        public long sessiond_id;
+        public string userid;
+        public long sessionid;
+        public string device_name;
 
         public DeviceInfo()
         {
-            this.project_id = Application.cloudProjectId;
-            this.app_build_version = Application.version;
+            this.appid = Application.cloudProjectId;
+            this.app_ver = Application.version;
             this.model = GetDeviceModel();
-            this.device_id = SystemInfo.deviceUniqueIdentifier;
+            this.deviceid = SystemInfo.deviceUniqueIdentifier;
             this.ram = SystemInfo.systemMemorySize;
             this.cpu = SystemInfo.processorType;
             this.cpu_count = SystemInfo.processorCount;
@@ -69,7 +70,7 @@ public class TutorialManager
             this.screen = Screen.currentResolution.ToString();
             this.dpi = Screen.dpi;
             this.in_editor = Application.isEditor;
-            this.platform_id = (int)Application.platform;
+            this.platform = (int)Application.platform;
             this.os_ver = SystemInfo.operatingSystem;
             this.gfx_shader = SystemInfo.graphicsShaderLevel;
             this.gfx_ver = SystemInfo.graphicsDeviceVersion;
@@ -83,10 +84,11 @@ public class TutorialManager
             this.build_guid = Application.buildGUID;
             this.install_mode = Application.installMode.ToString();
             this.app_install_store = Application.installerName;
-            this.user_id = AnalyticsSessionInfo.userId;
-            this.sessiond_id = AnalyticsSessionInfo.sessionId;
-            this.advertising_id = "";
-            this.advertising_tracking_enabled = false;
+            this.userid = AnalyticsSessionInfo.userId;
+            this.sessionid = AnalyticsSessionInfo.sessionId;
+            this.adsid = "";
+            this.ads_tracking = false;
+            this.device_name = SystemInfo.deviceName;
         }
 
         private string GetDeviceModel()
@@ -105,7 +107,7 @@ public class TutorialManager
     }
 
     [RuntimeInitializeOnLoadMethod]
-    static void InitializeTutorialManager ()
+    static void InitializeTutorialManager()
     {
         Debug.Log(Application.installMode);
         Debug.Log(Application.installerName);
@@ -116,11 +118,12 @@ public class TutorialManager
         }
         var deviceInfo = new DeviceInfo();
         var advertisingSupported = Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string errorMsg) => {
-            deviceInfo.advertising_id = advertisingId;
-            deviceInfo.advertising_tracking_enabled = trackingEnabled;
+            deviceInfo.adsid = advertisingId;
+            deviceInfo.ads_tracking = trackingEnabled;
             CallTutorialManagerService(deviceInfo);
         });
-        if(!advertisingSupported)
+        //If advertising is not supported on this platform, callback won't get fired. Call the tutorial manager service immediately.
+        if (!advertisingSupported)
         {
             CallTutorialManagerService(deviceInfo);
         }
@@ -129,7 +132,24 @@ public class TutorialManager
 
     static void CallTutorialManagerService(DeviceInfo data)
     {
-        
+        WWWForm webForm = new WWWForm();
+        webForm.AddField("appid", data.appid);
+        webForm.AddField("app_ver", data.app_ver);
+        webForm.AddField("model", data.model);
+        webForm.AddField("deviceid", data.deviceid);
+        webForm.AddField("ram", data.ram);
+        webForm.AddField("cpu", data.cpu);
+        webForm.AddField("cpu_count", data.cpu_count);
+        webForm.AddField("gfx_name", data.gfx_name);
+        webForm.AddField("gfx_vendor", data.gfx_vendor);
+        webForm.AddField("screen", data.screen);
+        webForm.AddField("dpi", data.dpi.ToString());
+        webForm.AddField("in_editor", data.in_editor.ToString());
+        webForm.AddField("platform", data.platform.ToString());
+        webForm.AddField("os_ver", data.os_ver);
+        webForm.AddField("gfx_shader", data.gfx_shader);
+
+        //var webReq = new WWW()
     }
 
     /// <summary>
