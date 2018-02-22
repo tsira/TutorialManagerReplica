@@ -24,6 +24,7 @@ public class TutorialManager
     const string controlGroupValue = "control";
     const string adaptiveOnboardingSentPrefsKey = "adaptive_onboarding_event_sent";
     static int adaptiveOnboardingEventSent = 0;
+    const string adaptiveOnboardingShowTutorialPrefsKey = "adaptive_onboarding_show_tutorial";
 
     private class DeviceInfo
     {
@@ -55,10 +56,12 @@ public class TutorialManager
         public string build_guid;
         public string install_mode;
         public string app_install_store;
+        public string user_id;
+        public long sessiond_id;
 
-        public DeviceInfo(string projectId)
+        public DeviceInfo()
         {
-            this.project_id = projectId;
+            this.project_id = Application.cloudProjectId;
             this.app_build_version = Application.version;
             this.model = GetDeviceModel();
             this.device_id = SystemInfo.deviceUniqueIdentifier;
@@ -84,6 +87,8 @@ public class TutorialManager
             this.build_guid = Application.buildGUID;
             this.install_mode = Application.installMode.ToString();
             this.app_install_store = Application.installerName;
+            this.user_id = AnalyticsSessionInfo.userId;
+            this.sessiond_id = AnalyticsSessionInfo.sessionId;
         }
 
         private string GetDeviceModel()
@@ -102,41 +107,31 @@ public class TutorialManager
     }
 
     [RuntimeInitializeOnLoadMethod]
-    static void InitializeRemoteSettingsHandler ()
+    static void InitializeTutorialManager ()
     {
         Debug.Log(Application.installMode);
         Debug.Log(Application.installerName);
-        RemoteSettings.Updated += RemoteSettings_Updated;
-    }
-
-    static void RemoteSettings_Updated()
-    {
-        Debug.Log("Remote settings updated");
-        //player has already been allocated. Do nothing.
-        if(PlayerPrefs.HasKey("adaptive_onboarding_show_tutorial"))
+        Debug.Log(AnalyticsSessionInfo.userId);
+        if (PlayerPrefs.HasKey(adaptiveOnboardingShowTutorialPrefsKey))
         {
             return;
         }
-        bool playerInTestGroup = RemoteSettings.GetBool("adapative_onboarding_test_group", false);
-        if(playerInTestGroup)
+        var deviceInfo = new DeviceInfo();
+        if (Application.RequestAdvertisingIdentifierAsync(HandleAdvertisingIdentifierCallback))
         {
-            var deviceInfo = new DeviceInfo(Application.cloudProjectId);
-            if(Application.RequestAdvertisingIdentifierAsync(HandleAdvertisingIdentifierCallback))
-            {
-                Debug.Log("Have ad id");
-            }
-            else 
-            {
-                //advertising ID unsupported
-                Debug.Log("Don't have ad id");
-            }
-            //send device info
+            Debug.Log("Have ad id");
         }
+        else
+        {
+            //advertising ID unsupported
+            Debug.Log("Don't have ad id");
+        }
+        //send device info
     }
 
     static void HandleAdvertisingIdentifierCallback(string advertisingId, bool trackingEnabled, string errorMsg)
     {
-
+        Debug.Log("ad id callback being invoked");
     }
 
     /// <summary>
@@ -155,16 +150,8 @@ public class TutorialManager
     public static bool ShowTutorial()
     {
         bool toShow = true;
-        string bucket = controlGroupValue;
-        bool playerInTestGroup = RemoteSettings.GetBool("adapative_onboarding_test_group", false);
-        if(playerInTestGroup)
-        {
-            toShow = PlayerPrefs.GetInt("adaptive_onboarding_show_tutorial") == 1;
-            bucket = testGroupValue;
-        }
+        toShow = PlayerPrefs.GetInt(adaptiveOnboardingShowTutorialPrefsKey, 1) == 1;
 
-        HandleAdaptiveOnboardingEvent(toShow, bucket);
-        
         if (toShow)
         {
             Analytics.CustomEvent("tutorial_start", new Dictionary<string, object> { { tutorialIdKey, tutorialKey } });
@@ -172,23 +159,6 @@ public class TutorialManager
         tutorialStep = 0;
         SetTutorialStep(tutorialStep);
         return toShow;
-    }
-
-    static void HandleAdaptiveOnboardingEvent (bool toShow, string bucket)
-    {
-        adaptiveOnboardingEventSent = PlayerPrefs.GetInt(adaptiveOnboardingSentPrefsKey, adaptiveOnboardingEventSent);
-        if(adaptiveOnboardingEventSent == 0) 
-        {
-            Analytics.CustomEvent(adaptiveOnboardingEventName,
-                new Dictionary<string, object>{
-                    { tutorialOnKey, toShow },
-                    { tutorialTestGroupKey, bucket}
-                }
-            );
-            adaptiveOnboardingEventSent = 1;
-            PlayerPrefs.SetInt(adaptiveOnboardingSentPrefsKey, adaptiveOnboardingEventSent);
-            PlayerPrefs.Save();
-        }
     }
 
     /// <summary>
