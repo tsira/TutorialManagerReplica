@@ -20,7 +20,10 @@ public class TutorialManager
     const string testGroupValue = "test";
     const string controlGroupValue = "control";
     const string adaptiveOnboardingSentPrefsKey = "adaptive_onboarding_event_sent";
+    static int adaptiveOnboardingEventSent = 0;
     const string adaptiveOnboardingShowTutorialPrefsKey = "adaptive_onboarding_show_tutorial";
+
+    static GameObject webHandlerGO;
 
     private class DeviceInfo
     {
@@ -106,12 +109,14 @@ public class TutorialManager
         }
     }
 
+    private class TutorialWebResponse
+    {
+        public bool show_tutorial;
+    }
+
     [RuntimeInitializeOnLoadMethod]
     static void InitializeTutorialManager()
     {
-        Debug.Log(Application.installMode);
-        Debug.Log(Application.installerName);
-        Debug.Log(AnalyticsSessionInfo.userId);
         if (PlayerPrefs.HasKey(adaptiveOnboardingShowTutorialPrefsKey))
         {
             return;
@@ -127,7 +132,6 @@ public class TutorialManager
         {
             CallTutorialManagerService(deviceInfo);
         }
-        //send device info
     }
 
     static void CallTutorialManagerService(DeviceInfo data)
@@ -148,9 +152,58 @@ public class TutorialManager
         webForm.AddField("platform", data.platform.ToString());
         webForm.AddField("os_ver", data.os_ver);
         webForm.AddField("gfx_shader", data.gfx_shader);
+        webForm.AddField("gfx_ver", data.gfx_ver);
+        webForm.AddField("max_texture_size", data.max_texture_size);
+        webForm.AddField("network", data.network);
+        webForm.AddField("screen_orientation", data.screen_orientation);
+        webForm.AddField("realtime_since_startup", data.realtime_since_startup.ToString());
+        webForm.AddField("battery_level", data.battery_level.ToString());
+        webForm.AddField("battery_status", data.battery_status);
+        webForm.AddField("lang", data.lang);
+        webForm.AddField("build_guid", data.build_guid);
+        webForm.AddField("install_mode", data.install_mode);
+        webForm.AddField("app_install_store", data.app_install_store);
+        webForm.AddField("userid", data.userid);
+        webForm.AddField("sessionid", data.sessionid.ToString());
+        webForm.AddField("adsid", data.adsid);
+        webForm.AddField("ads_tracking", data.ads_tracking.ToString());
+        webForm.AddField("device_name", data.device_name);
 
-        //var webReq = new WWW()
+        webHandlerGO = new GameObject();
+        var webHandler = webHandlerGO.AddComponent<TutorialManagerWebHandler>();
+        TutorialManagerWebHandler.WebRequestReturned += (webRequest) => {
+            var toShow = true;
+            if(string.IsNullOrEmpty(webRequest.error))
+            {
+                //no error - proceed
+                toShow = JsonUtility.FromJson<TutorialWebResponse>(webRequest.text).show_tutorial;
+            }
+            else
+            {
+                Debug.LogWarning("Error received from server: " + webRequest.error + ". Defaulting to true.");
+            }
+            PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, toShow ? 1 : 0);
+            PlayerPrefs.Save();
+        };
+        webHandler.StartWebRequest(webForm);
     }
+
+    static void HandleAdaptiveOnboardingEvent(bool toShow)
+    {
+        adaptiveOnboardingEventSent = PlayerPrefs.GetInt(adaptiveOnboardingSentPrefsKey, adaptiveOnboardingEventSent);
+        if (adaptiveOnboardingEventSent == 0)
+        {
+            Analytics.CustomEvent(adaptiveOnboardingEventName,
+                new Dictionary<string, object>{
+                    { tutorialOnKey, toShow }
+                }
+            );
+            adaptiveOnboardingEventSent = 1;
+            PlayerPrefs.SetInt(adaptiveOnboardingSentPrefsKey, adaptiveOnboardingEventSent);
+            PlayerPrefs.Save();
+        }
+    }
+
 
     /// <summary>
     /// Determine whether to show the tutorial.
@@ -176,6 +229,7 @@ public class TutorialManager
         }
         tutorialStep = 0;
         SetTutorialStep(tutorialStep);
+        HandleAdaptiveOnboardingEvent(toShow);
         return toShow;
     }
 
