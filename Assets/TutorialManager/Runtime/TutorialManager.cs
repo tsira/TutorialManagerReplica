@@ -9,10 +9,7 @@ using System.Collections.Generic;
 /// </summary>
 public class TutorialManager
 {
-    static string testName = "tutorial_test";
     static string tutorialKey = "show_tutorial";
-    static float percentage_a = 0f;
-    static float percentage_b = .2f;
     static int tutorialStep = 0;
 
     const string tutorialIdKey = "tutorial_id";
@@ -24,26 +21,189 @@ public class TutorialManager
     const string controlGroupValue = "control";
     const string adaptiveOnboardingSentPrefsKey = "adaptive_onboarding_event_sent";
     static int adaptiveOnboardingEventSent = 0;
+    const string adaptiveOnboardingShowTutorialPrefsKey = "adaptive_onboarding_show_tutorial";
 
-    [RuntimeInitializeOnLoadMethod]
-    static void InitializeRemoteSettingsHandler ()
+    static GameObject webHandlerGO;
+
+    private class DeviceInfo
     {
-        RemoteSettings.Updated += RemoteSettings_Updated;
+        public string model;
+        public int ram;
+        public string cpu;
+        public string gfx_name;
+        public string gfx_vendor;
+        public string deviceid;
+        public int cpu_count;
+        public float dpi;
+        public string screen;
+        public string appid;
+        public int platform;
+        public string os_ver;
+        public int gfx_shader;
+        public string gfx_ver;
+        public int max_texture_size;
+        public string app_ver;
+        public bool in_editor;
+        public string network;
+        public string screen_orientation;
+        public float realtime_since_startup;
+        public float battery_level;
+        public string battery_status;
+        public string adsid;
+        public bool ads_tracking;
+        public string lang;
+        public string build_guid;
+        public string install_mode;
+        public string app_install_store;
+        public string userid;
+        public long sessionid;
+        public string device_name;
+
+        public DeviceInfo()
+        {
+            this.appid = Application.cloudProjectId;
+            this.app_ver = Application.version;
+            this.model = GetDeviceModel();
+            this.deviceid = SystemInfo.deviceUniqueIdentifier;
+            this.ram = SystemInfo.systemMemorySize;
+            this.cpu = SystemInfo.processorType;
+            this.cpu_count = SystemInfo.processorCount;
+            this.gfx_name = SystemInfo.graphicsDeviceName;
+            this.gfx_vendor = SystemInfo.graphicsDeviceVendor;
+            this.screen = Screen.currentResolution.ToString();
+            this.dpi = Screen.dpi;
+            this.in_editor = Application.isEditor;
+            this.platform = (int)Application.platform;
+            this.os_ver = SystemInfo.operatingSystem;
+            this.gfx_shader = SystemInfo.graphicsShaderLevel;
+            this.gfx_ver = SystemInfo.graphicsDeviceVersion;
+            this.max_texture_size = SystemInfo.maxTextureSize;
+            this.network = Application.internetReachability.ToString();
+            this.screen_orientation = Screen.orientation.ToString();
+            this.realtime_since_startup = Time.realtimeSinceStartup;
+            this.battery_level = SystemInfo.batteryLevel;
+            this.battery_status = SystemInfo.batteryStatus.ToString();
+            this.lang = Application.systemLanguage.ToString();
+            this.build_guid = Application.buildGUID;
+            this.install_mode = Application.installMode.ToString();
+            this.app_install_store = Application.installerName;
+            this.userid = AnalyticsSessionInfo.userId;
+            this.sessionid = AnalyticsSessionInfo.sessionId;
+            this.adsid = "";
+            this.ads_tracking = false;
+            this.device_name = SystemInfo.deviceName;
+        }
+
+        private string GetDeviceModel()
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            // get manufacturer/model/device
+            AndroidJavaClass jc = new AndroidJavaClass("android.os.Build");
+            string manufacturer = jc.GetStatic<string>("MANUFACTURER");
+            string model = jc.GetStatic<string>("MODEL");
+            string device = jc.GetStatic<string>("DEVICE");
+            return String.Format("{0}/{1}/{2}", manufacturer, model, device);
+#else
+            return SystemInfo.deviceModel;
+#endif
+        }
     }
 
-    static void RemoteSettings_Updated()
+    private class TutorialWebResponse
     {
-        //player has already been allocated. Do nothing.
-        if(PlayerPrefs.HasKey("adaptive_onboarding_show_tutorial"))
+        public bool show_tutorial;
+    }
+
+    [RuntimeInitializeOnLoadMethod]
+    static void InitializeTutorialManager()
+    {
+        if (PlayerPrefs.HasKey(adaptiveOnboardingShowTutorialPrefsKey))
         {
             return;
         }
-        bool playerInTestGroup = RemoteSettings.GetBool("adapative_onboarding_test_group", false);
-        if(playerInTestGroup)
+        var deviceInfo = new DeviceInfo();
+        var advertisingSupported = Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string errorMsg) => {
+            deviceInfo.adsid = advertisingId;
+            deviceInfo.ads_tracking = trackingEnabled;
+            CallTutorialManagerService(deviceInfo);
+        });
+        //If advertising is not supported on this platform, callback won't get fired. Call the tutorial manager service immediately.
+        if (!advertisingSupported)
         {
-            //send device info
+            CallTutorialManagerService(deviceInfo);
         }
     }
+
+    static void CallTutorialManagerService(DeviceInfo data)
+    {
+        WWWForm webForm = new WWWForm();
+        webForm.AddField("appid", data.appid);
+        webForm.AddField("app_ver", data.app_ver);
+        webForm.AddField("model", data.model);
+        webForm.AddField("deviceid", data.deviceid);
+        webForm.AddField("ram", data.ram);
+        webForm.AddField("cpu", data.cpu);
+        webForm.AddField("cpu_count", data.cpu_count);
+        webForm.AddField("gfx_name", data.gfx_name);
+        webForm.AddField("gfx_vendor", data.gfx_vendor);
+        webForm.AddField("screen", data.screen);
+        webForm.AddField("dpi", data.dpi.ToString());
+        webForm.AddField("in_editor", data.in_editor.ToString());
+        webForm.AddField("platform", data.platform.ToString());
+        webForm.AddField("os_ver", data.os_ver);
+        webForm.AddField("gfx_shader", data.gfx_shader);
+        webForm.AddField("gfx_ver", data.gfx_ver);
+        webForm.AddField("max_texture_size", data.max_texture_size);
+        webForm.AddField("network", data.network);
+        webForm.AddField("screen_orientation", data.screen_orientation);
+        webForm.AddField("realtime_since_startup", data.realtime_since_startup.ToString());
+        webForm.AddField("battery_level", data.battery_level.ToString());
+        webForm.AddField("battery_status", data.battery_status);
+        webForm.AddField("lang", data.lang);
+        webForm.AddField("build_guid", data.build_guid);
+        webForm.AddField("install_mode", data.install_mode);
+        webForm.AddField("app_install_store", data.app_install_store);
+        webForm.AddField("userid", data.userid);
+        webForm.AddField("sessionid", data.sessionid.ToString());
+        webForm.AddField("adsid", data.adsid);
+        webForm.AddField("ads_tracking", data.ads_tracking.ToString());
+        webForm.AddField("device_name", data.device_name);
+
+        webHandlerGO = new GameObject();
+        var webHandler = webHandlerGO.AddComponent<TutorialManagerWebHandler>();
+        TutorialManagerWebHandler.WebRequestReturned += (webRequest) => {
+            var toShow = true;
+            if(string.IsNullOrEmpty(webRequest.error))
+            {
+                //no error - proceed
+                toShow = JsonUtility.FromJson<TutorialWebResponse>(webRequest.text).show_tutorial;
+            }
+            else
+            {
+                Debug.LogWarning("Error received from server: " + webRequest.error + ". Defaulting to true.");
+            }
+            PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, toShow ? 1 : 0);
+            PlayerPrefs.Save();
+        };
+        webHandler.StartWebRequest(webForm);
+    }
+
+    static void HandleAdaptiveOnboardingEvent(bool toShow)
+    {
+        adaptiveOnboardingEventSent = PlayerPrefs.GetInt(adaptiveOnboardingSentPrefsKey, adaptiveOnboardingEventSent);
+        if (adaptiveOnboardingEventSent == 0)
+        {
+            Analytics.CustomEvent(adaptiveOnboardingEventName,
+                new Dictionary<string, object>{
+                    { tutorialOnKey, toShow }
+                }
+            );
+            adaptiveOnboardingEventSent = 1;
+            PlayerPrefs.SetInt(adaptiveOnboardingSentPrefsKey, adaptiveOnboardingEventSent);
+            PlayerPrefs.Save();
+        }
+    }
+
 
     /// <summary>
     /// Determine whether to show the tutorial.
@@ -61,40 +221,16 @@ public class TutorialManager
     public static bool ShowTutorial()
     {
         bool toShow = true;
-        string bucket = controlGroupValue;
-        bool playerInTestGroup = RemoteSettings.GetBool("adapative_onboarding_test_group", false);
-        if(playerInTestGroup)
-        {
-            toShow = PlayerPrefs.GetInt("adaptive_onboarding_show_tutorial") == 1;
-            bucket = testGroupValue;
-        }
+        toShow = PlayerPrefs.GetInt(adaptiveOnboardingShowTutorialPrefsKey, 1) == 1;
 
-        HandleAdaptiveOnboardingEvent(toShow, bucket);
-        
         if (toShow)
         {
             Analytics.CustomEvent("tutorial_start", new Dictionary<string, object> { { tutorialIdKey, tutorialKey } });
         }
         tutorialStep = 0;
         SetTutorialStep(tutorialStep);
+        HandleAdaptiveOnboardingEvent(toShow);
         return toShow;
-    }
-
-    static void HandleAdaptiveOnboardingEvent (bool toShow, string bucket)
-    {
-        adaptiveOnboardingEventSent = PlayerPrefs.GetInt(adaptiveOnboardingSentPrefsKey, adaptiveOnboardingEventSent);
-        if(adaptiveOnboardingEventSent == 0) 
-        {
-            Analytics.CustomEvent(adaptiveOnboardingEventName,
-                new Dictionary<string, object>{
-                    { tutorialOnKey, toShow },
-                    { tutorialTestGroupKey, bucket}
-                }
-            );
-            adaptiveOnboardingEventSent = 1;
-            PlayerPrefs.SetInt(adaptiveOnboardingSentPrefsKey, adaptiveOnboardingEventSent);
-            PlayerPrefs.Save();
-        }
     }
 
     /// <summary>
