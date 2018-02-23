@@ -192,6 +192,7 @@ public class TutorialManager
         webHandlerGO = new GameObject();
         var webHandler = webHandlerGO.AddComponent<TutorialManagerWebHandler>();
         TutorialManagerWebHandler.WebRequestReturned += (webRequest) => {
+            Debug.Log("web request returned");
             var toShow = true;
             if(string.IsNullOrEmpty(webRequest.error))
             {
@@ -202,6 +203,7 @@ public class TutorialManager
             {
                 Debug.LogWarning("Error received from server: " + webRequest.error + ". Defaulting to true.");
             }
+            GameObject.Destroy(webHandler);
             PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, toShow ? 1 : 0);
             PlayerPrefs.Save();
         };
