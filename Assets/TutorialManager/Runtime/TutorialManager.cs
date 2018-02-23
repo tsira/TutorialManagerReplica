@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.Analytics;
 using System.Collections.Generic;
+using System.IO;
 
 /// <summary>
 /// Tutorial manager configures the ABTester for the Tutorial test,
@@ -87,8 +88,13 @@ public class TutorialManager
             this.build_guid = Application.buildGUID;
             this.install_mode = Application.installMode.ToString();
             this.app_install_store = Application.installerName;
+#if UNITY_2017_2_OR_NEWER
             this.userid = AnalyticsSessionInfo.userId;
             this.sessionid = AnalyticsSessionInfo.sessionId;
+#else
+            this.userid = PlayerPrefs.GetString("unity.cloud_userid");
+            this.sessionid = PlayerPrefs.GetString("unity.player_sessionid");
+#endif
             this.adsid = "";
             this.ads_tracking = false;
             this.device_name = SystemInfo.deviceName;
@@ -114,9 +120,23 @@ public class TutorialManager
         public bool show_tutorial;
     }
 
+    private class ValuesJSONParser
+    {
+        public bool app_installed;
+    }
+
     [RuntimeInitializeOnLoadMethod]
     static void InitializeTutorialManager()
     {
+        if(File.Exists(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values"))
+        {
+            Debug.Log(File.ReadAllText(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values"));
+            Debug.Log(JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values")).app_installed);
+            if(JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values")).app_installed == true)
+            {
+                return;
+            }
+        }
         if (PlayerPrefs.HasKey(adaptiveOnboardingShowTutorialPrefsKey))
         {
             return;
