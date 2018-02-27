@@ -115,7 +115,7 @@ public class TutorialManager
         }
     }
 
-    private class TutorialWebResponse
+    public class TutorialWebResponse
     {
         public bool show_tutorial;
     }
@@ -128,13 +128,15 @@ public class TutorialManager
     [RuntimeInitializeOnLoadMethod]
     static void InitializeTutorialManager()
     {
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
         if(File.Exists(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values"))
         {
             Debug.Log(File.ReadAllText(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values"));
             Debug.Log(JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values")).app_installed);
             if(JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values")).app_installed == true)
             {
-                return;
+                //return;
             }
         }
         if (PlayerPrefs.HasKey(adaptiveOnboardingShowTutorialPrefsKey))
@@ -142,11 +144,14 @@ public class TutorialManager
             return;
         }
         var deviceInfo = new DeviceInfo();
-        var advertisingSupported = Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string errorMsg) => {
+        var advertisingSupported = false;
+#if UNITY_ADS
+        advertisingSupported = Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string errorMsg) => {
             deviceInfo.adsid = advertisingId;
             deviceInfo.ads_tracking = trackingEnabled;
             CallTutorialManagerService(deviceInfo);
         });
+#endif
         //If advertising is not supported on this platform, callback won't get fired. Call the tutorial manager service immediately.
         if (!advertisingSupported)
         {
@@ -156,58 +161,52 @@ public class TutorialManager
 
     static void CallTutorialManagerService(DeviceInfo data)
     {
-        WWWForm webForm = new WWWForm();
-        webForm.AddField("appid", data.appid);
-        webForm.AddField("app_ver", data.app_ver);
-        webForm.AddField("model", data.model);
-        webForm.AddField("deviceid", data.deviceid);
-        webForm.AddField("ram", data.ram);
-        webForm.AddField("cpu", data.cpu);
-        webForm.AddField("cpu_count", data.cpu_count);
-        webForm.AddField("gfx_name", data.gfx_name);
-        webForm.AddField("gfx_vendor", data.gfx_vendor);
-        webForm.AddField("screen", data.screen);
-        webForm.AddField("dpi", data.dpi.ToString());
-        webForm.AddField("in_editor", data.in_editor.ToString());
-        webForm.AddField("platform", data.platform.ToString());
-        webForm.AddField("os_ver", data.os_ver);
-        webForm.AddField("gfx_shader", data.gfx_shader);
-        webForm.AddField("gfx_ver", data.gfx_ver);
-        webForm.AddField("max_texture_size", data.max_texture_size);
-        webForm.AddField("network", data.network);
-        webForm.AddField("screen_orientation", data.screen_orientation);
-        webForm.AddField("realtime_since_startup", data.realtime_since_startup.ToString());
-        webForm.AddField("battery_level", data.battery_level.ToString());
-        webForm.AddField("battery_status", data.battery_status);
-        webForm.AddField("lang", data.lang);
-        webForm.AddField("build_guid", data.build_guid);
-        webForm.AddField("install_mode", data.install_mode);
-        webForm.AddField("app_install_store", data.app_install_store);
-        webForm.AddField("userid", data.userid);
-        webForm.AddField("sessionid", data.sessionid.ToString());
-        webForm.AddField("adsid", data.adsid);
-        webForm.AddField("ads_tracking", data.ads_tracking.ToString());
-        webForm.AddField("device_name", data.device_name);
+        Debug.Log("RUNNING");
+        string json = JsonUtility.ToJson(data);
 
         webHandlerGO = new GameObject();
         var webHandler = webHandlerGO.AddComponent<TutorialManagerWebHandler>();
-        TutorialManagerWebHandler.WebRequestReturned += (webRequest) => {
-            Debug.Log("web request returned");
-            var toShow = true;
-            if(string.IsNullOrEmpty(webRequest.error))
-            {
-                //no error - proceed
-                toShow = JsonUtility.FromJson<TutorialWebResponse>(webRequest.text).show_tutorial;
-            }
-            else
-            {
-                Debug.LogWarning("Error received from server: " + webRequest.error + ". Defaulting to true.");
-            }
-            GameObject.Destroy(webHandler);
-            PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, toShow ? 1 : 0);
+        TutorialManagerWebHandler.WebRequestReturned += (result) => {
+            GameObject.Destroy(webHandlerGO);
+            PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, result ? 1 : 0);
             PlayerPrefs.Save();
         };
-        webHandler.StartWebRequest(webForm);
+        webHandler.StartWebRequest(json);
+        //TutorialManagerWebHandler.WebRequestReturned += (webRequest) => {
+        //    Debug.Log("web request returned");
+        //    var toShow = true;
+        //    if(string.IsNullOrEmpty(webRequest.error))
+        //    {
+        //        //no error - proceed
+        //        toShow = JsonUtility.FromJson<TutorialWebResponse>(webRequest.text).show_tutorial;
+        //    }
+        //    else
+        //    {
+        //        Debug.LogWarning("Error received from server: " + webRequest.error + ". Defaulting to true.");
+        //    }
+        //    GameObject.Destroy(webHandler);
+        //    PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, toShow ? 1 : 0);
+        //    PlayerPrefs.Save();
+        //};
+        //webHandler.StartWebRequest(json).UploadDataCompleted += (sender, e) => {
+        //    var toShow = true;
+        //    if(e.Error != null)
+        //    {
+        //        Debug.LogWarning("Error received from server: " + e.Error + ". Defaulting to true.");
+        //    }
+        //    else if(e.Cancelled)
+        //    {
+        //        Debug.LogWarning("The request was canceled. Defaulting to true.");
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("got a good response");
+        //        toShow = JsonUtility.FromJson<TutorialWebResponse>(System.Text.Encoding.UTF8.GetString(e.Result)).show_tutorial;
+        //    }
+        //    GameObject.Destroy(webHandler);
+        //    PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, toShow ? 1 : 0);
+        //    PlayerPrefs.Save();
+        //};
     }
 
     static void HandleAdaptiveOnboardingEvent(bool toShow)
