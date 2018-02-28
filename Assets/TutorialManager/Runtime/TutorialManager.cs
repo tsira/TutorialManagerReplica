@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.Analytics;
 using System.Collections.Generic;
 using System.IO;
+using System;
 
 /// <summary>
 /// Tutorial manager configures the ABTester for the Tutorial test,
@@ -93,7 +94,7 @@ public class TutorialManager
             this.sessionid = AnalyticsSessionInfo.sessionId;
 #else
             this.userid = PlayerPrefs.GetString("unity.cloud_userid");
-            this.sessionid = PlayerPrefs.GetString("unity.player_sessionid");
+            this.sessionid = Convert.ToInt64(PlayerPrefs.GetString("unity.player_sessionid"));
 #endif
             this.adsid = "";
             this.ads_tracking = false;
@@ -128,13 +129,13 @@ public class TutorialManager
     [RuntimeInitializeOnLoadMethod]
     static void InitializeTutorialManager()
     {
-        //PlayerPrefs.DeleteAll();
-        //PlayerPrefs.Save();
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
         if(File.Exists(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values"))
         {
             if(JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values")).app_installed == true)
             {
-                return;
+                //return;
             }
         }
         if (PlayerPrefs.HasKey(adaptiveOnboardingShowTutorialPrefsKey))
