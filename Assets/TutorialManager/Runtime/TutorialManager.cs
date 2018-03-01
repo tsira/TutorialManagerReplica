@@ -93,7 +93,7 @@ public class TutorialManager
             this.sessionid = AnalyticsSessionInfo.sessionId;
 #else
             this.userid = PlayerPrefs.GetString("unity.cloud_userid");
-            //this.sessionid = PlayerPrefs.GetString("unity.player_sessionid");
+            this.sessionid = System.Convert.ToInt64(PlayerPrefs.GetString("unity.player_sessionid"));
 #endif
             this.adsid = "";
             this.ads_tracking = false;
