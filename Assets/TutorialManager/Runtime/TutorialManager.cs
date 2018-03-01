@@ -128,13 +128,11 @@ public class TutorialManager
     [RuntimeInitializeOnLoadMethod]
     static void InitializeTutorialManager()
     {
-        PlayerPrefs.DeleteAll();
-        PlayerPrefs.Save();
         if (File.Exists(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values"))
         {
             if (JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values")).app_installed == true)
             {
-                //return;
+                return;
             }
         }
         if (PlayerPrefs.HasKey(adaptiveOnboardingShowTutorialPrefsKey))
