@@ -128,11 +128,13 @@ public class TutorialManager
     [RuntimeInitializeOnLoadMethod]
     static void InitializeTutorialManager()
     {
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
         if (File.Exists(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values"))
         {
             if (JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values")).app_installed == true)
             {
-                return;
+                //return;
             }
         }
         if (PlayerPrefs.HasKey(adaptiveOnboardingShowTutorialPrefsKey))
@@ -169,7 +171,7 @@ public class TutorialManager
             {
                 Debug.LogWarning("Error received from server: " + webRequest.error + ". Defaulting to true.");
             }
-            GameObject.Destroy(webHandler);
+            GameObject.Destroy(webHandlerGO);
             PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, toShow ? 1 : 0);
             PlayerPrefs.Save();
         };
