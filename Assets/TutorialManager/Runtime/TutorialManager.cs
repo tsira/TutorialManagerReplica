@@ -35,10 +35,11 @@ public class TutorialManager
         public string gfx_vendor;
         public string deviceid;
         public int cpu_count;
-        public float dpi;
+        public int dpi;
         public string screen;
         public string appid;
-        public int platform;
+        public string platform;
+        public int platformid;
         public string os_ver;
         public int gfx_shader;
         public string gfx_ver;
@@ -72,9 +73,10 @@ public class TutorialManager
             this.gfx_name = SystemInfo.graphicsDeviceName;
             this.gfx_vendor = SystemInfo.graphicsDeviceVendor;
             this.screen = Screen.currentResolution.ToString();
-            this.dpi = Screen.dpi;
+            this.dpi = (int)Screen.dpi;
             this.in_editor = Application.isEditor;
-            this.platform = (int)Application.platform;
+            this.platform = Application.platform.ToString();
+            this.platformid = (int)Application.platform;
             this.os_ver = SystemInfo.operatingSystem;
             this.gfx_shader = SystemInfo.graphicsShaderLevel;
             this.gfx_ver = SystemInfo.graphicsDeviceVersion;
@@ -128,6 +130,15 @@ public class TutorialManager
     [RuntimeInitializeOnLoadMethod]
     static void InitializeTutorialManager()
     {
+#if UNITY_TVOS
+        if (File.Exists(Application.temporaryCachePath + "/Unity/" + Application.cloudProjectId + "/Analytics/values"))
+        {
+            if (JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(Application.temporaryCachePath + "/Unity/" + Application.cloudProjectId + "/Analytics/values")).app_installed == true)
+            {
+                return;
+            }
+        }
+#else
         if (File.Exists(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values"))
         {
             if (JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values")).app_installed == true)
@@ -135,6 +146,7 @@ public class TutorialManager
                 return;
             }
         }
+#endif
         if (PlayerPrefs.HasKey(adaptiveOnboardingShowTutorialPrefsKey))
         {
             return;
