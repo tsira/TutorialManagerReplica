@@ -1,64 +1,38 @@
 ﻿using System.Collections;
-using System.Net;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class TutorialManagerWebHandler : MonoBehaviour {
-    public delegate void HandleWebResponse(bool result);
+public class TutorialManagerWebHandler : MonoBehaviour
+{
+    public delegate void HandleWebResponse(UnityWebRequest request);
     public static event HandleWebResponse WebRequestReturned;
     //const string url = "https://stg-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
     const string url = "https://prd-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
-    bool toShow = true;
-    bool requestReturned = false;
 
     void Awake()
     {
         DontDestroyOnLoad(transform.gameObject);
     }
 
-    public void StartWebRequest(string payload)
+    public void StartWebRequest(string json)
     {
-        using(var client = new WebClient())
-        {
-            client.UploadDataCompleted += Client_UploadDataCompleted;
-            client.Headers.Add("Content-Type", "application/json");
-            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(payload);
-            var uri = new System.Uri(url);
-            try
-            {
-                client.UploadDataAsync(uri, "POST", bytes);
-            }
-            catch (WebException err)
-            {
-                Debug.LogError(err);
-            }
-            StartCoroutine("SendWebRequest");
-        }
+        var request = new UnityWebRequest(url, "POST");
+        var uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(json));
+        uploadHandler.contentType = "application/json";
+        request.uploadHandler = uploadHandler;
+        request.downloadHandler = new DownloadHandlerBuffer();
+        StartCoroutine(SendWebRequest(request));
     }
 
-    IEnumerator SendWebRequest()
+    IEnumerator SendWebRequest(UnityWebRequest request)
     {
-        yield return new WaitUntil(() => requestReturned == true);
-        if(WebRequestReturned != null)
+        using (request)
         {
-            WebRequestReturned(toShow);
+            yield return request.Send();
+            if (WebRequestReturned != null)
+            {
+                WebRequestReturned(request);
+            }
         }
-
-    }
-
-    void Client_UploadDataCompleted(object sender, UploadDataCompletedEventArgs e)
-    {
-        if (e.Error != null)
-        {
-            Debug.LogWarning("Error received from server: " + e.Error + ". Defaulting to true.");
-        }
-        else if (e.Cancelled)
-        {
-            Debug.LogWarning("The request was canceled. Defaulting to true.");
-        }
-        else
-        {
-            toShow = JsonUtility.FromJson<TutorialManager.TutorialWebResponse>(System.Text.Encoding.UTF8.GetString(e.Result)).show_tutorial;
-        }
-        requestReturned = true;
     }
 }

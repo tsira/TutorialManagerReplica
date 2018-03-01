@@ -3,7 +3,6 @@ using System.Collections;
 using UnityEngine.Analytics;
 using System.Collections.Generic;
 using System.IO;
-using System;
 
 /// <summary>
 /// Tutorial manager configures the ABTester for the Tutorial test,
@@ -94,7 +93,7 @@ public class TutorialManager
             this.sessionid = AnalyticsSessionInfo.sessionId;
 #else
             this.userid = PlayerPrefs.GetString("unity.cloud_userid");
-            this.sessionid = Convert.ToInt64(PlayerPrefs.GetString("unity.player_sessionid"));
+            //this.sessionid = PlayerPrefs.GetString("unity.player_sessionid");
 #endif
             this.adsid = "";
             this.ads_tracking = false;
@@ -116,7 +115,7 @@ public class TutorialManager
         }
     }
 
-    public class TutorialWebResponse
+    private class TutorialWebResponse
     {
         public bool show_tutorial;
     }
@@ -129,13 +128,11 @@ public class TutorialManager
     [RuntimeInitializeOnLoadMethod]
     static void InitializeTutorialManager()
     {
-        PlayerPrefs.DeleteAll();
-        PlayerPrefs.Save();
-        if(File.Exists(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values"))
+        if (File.Exists(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values"))
         {
-            if(JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values")).app_installed == true)
+            if (JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values")).app_installed == true)
             {
-                //return;
+                return;
             }
         }
         if (PlayerPrefs.HasKey(adaptiveOnboardingShowTutorialPrefsKey))
@@ -143,14 +140,11 @@ public class TutorialManager
             return;
         }
         var deviceInfo = new DeviceInfo();
-        var advertisingSupported = false;
-#if UNITY_ADS
-        advertisingSupported = Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string errorMsg) => {
+        var advertisingSupported = Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string errorMsg) => {
             deviceInfo.adsid = advertisingId;
             deviceInfo.ads_tracking = trackingEnabled;
             CallTutorialManagerService(deviceInfo);
         });
-#endif
         //If advertising is not supported on this platform, callback won't get fired. Call the tutorial manager service immediately.
         if (!advertisingSupported)
         {
@@ -160,14 +154,27 @@ public class TutorialManager
 
     static void CallTutorialManagerService(DeviceInfo data)
     {
-        string json = JsonUtility.ToJson(data);
+        var json = JsonUtility.ToJson(data);
+
         webHandlerGO = new GameObject();
         var webHandler = webHandlerGO.AddComponent<TutorialManagerWebHandler>();
-        TutorialManagerWebHandler.WebRequestReturned += (result) => {
-            GameObject.Destroy(webHandlerGO);
-            PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, result ? 1 : 0);
+        TutorialManagerWebHandler.WebRequestReturned += (webRequest) => {
+            var toShow = true;
+            if (string.IsNullOrEmpty(webRequest.error))
+            {
+                //no error - proceed
+                toShow = JsonUtility.FromJson<TutorialWebResponse>(webRequest.downloadHandler.text).show_tutorial;
+            }
+            else
+            {
+                Debug.LogWarning("Error received from server: " + webRequest.error + ". Defaulting to true.");
+            }
+            GameObject.Destroy(webHandler);
+            PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, toShow ? 1 : 0);
             PlayerPrefs.Save();
         };
+
+
         webHandler.StartWebRequest(json);
     }
 
