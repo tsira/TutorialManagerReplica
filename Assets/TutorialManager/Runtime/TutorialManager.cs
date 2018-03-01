@@ -74,6 +74,11 @@ public class TutorialManager
     /// <returns><c>true</c>, if tutorial should be shown, <c>false</c> otherwise.</returns>
     public static bool ShowTutorial(bool overrideDecision)
     {
+        HandleAdaptiveOnboardingEvent(overrideDecision, controlGroupValue);
+        if (overrideDecision)
+        {
+            Analytics.CustomEvent("tutorial_start", new Dictionary<string, object> { { tutorialIdKey, tutorialKey } });
+        }
         return overrideDecision;
     }
 
