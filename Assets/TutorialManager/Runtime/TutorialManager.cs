@@ -137,29 +137,20 @@ public class TutorialManager
     [RuntimeInitializeOnLoadMethod]
     static void InitializeTutorialManager()
     {
-#if UNITY_TVOS
-        if (File.Exists(Application.temporaryCachePath + "/Unity/" + Application.cloudProjectId + "/Analytics/values"))
+        if (File.Exists(GetAnalyticsValuesLocation()))
         {
-            if (JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(Application.temporaryCachePath + "/Unity/" + Application.cloudProjectId + "/Analytics/values")).app_installed == true)
+            if (JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(GetAnalyticsValuesLocation())).app_installed == true)
             {
                 return;
             }
         }
-#else
-        if (File.Exists(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values"))
-        {
-            if (JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values")).app_installed == true)
-            {
-                return;
-            }
-        }
-#endif
         if (PlayerPrefs.HasKey(adaptiveOnboardingShowTutorialPrefsKey))
         {
             return;
         }
         var deviceInfo = new DeviceInfo();
-        var advertisingSupported = Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string errorMsg) => {
+        var advertisingSupported = Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string errorMsg) =>
+        {
             deviceInfo.adsid = advertisingId;
             deviceInfo.ads_tracking = trackingEnabled;
             CallTutorialManagerService(deviceInfo);
@@ -169,6 +160,15 @@ public class TutorialManager
         {
             CallTutorialManagerService(deviceInfo);
         }
+    }
+
+    static string GetAnalyticsValuesLocation()
+    {
+#if UNITY_TVOS
+        return Application.temporaryCachePath + "/Unity/" + Application.cloudProjectId + "/Analytics/values";
+#else
+        return Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values";
+#endif
     }
 
     static void CallTutorialManagerService(DeviceInfo data)
