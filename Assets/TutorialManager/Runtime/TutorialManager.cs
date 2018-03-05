@@ -23,6 +23,8 @@ public class TutorialManager
     const string adaptiveOnboardingSentPrefsKey = "adaptive_onboarding_event_sent";
     static int adaptiveOnboardingEventSent = 0;
     const string adaptiveOnboardingShowTutorialPrefsKey = "adaptive_onboarding_show_tutorial";
+    //const string url = "https://stg-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
+    const string url = "https://prd-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
 
     static GameObject webHandlerGO;
 
@@ -177,16 +179,23 @@ public class TutorialManager
 
         webHandlerGO = new GameObject();
         var webHandler = webHandlerGO.AddComponent<TutorialManagerWebHandler>();
-        TutorialManagerWebHandler.WebRequestReturned += (webRequest) => {
+        TutorialManagerWebHandler.PostRequestReturned += (webRequest) => {
             var toShow = true;
-            if (string.IsNullOrEmpty(webRequest.error))
+            if (webRequest.isHttpError || webRequest.isHttpError)
             {
-                //no error - proceed
-                toShow = JsonUtility.FromJson<TutorialWebResponse>(webRequest.downloadHandler.text).show_tutorial;
+                Debug.LogWarning("Error received from server: " + webRequest.error + ". Defaulting to true.");
             }
             else
             {
-                Debug.LogWarning("Error received from server: " + webRequest.error + ". Defaulting to true.");
+                try 
+                {
+                    //no error - proceed
+                    toShow = JsonUtility.FromJson<TutorialWebResponse>(webRequest.downloadHandler.text).show_tutorial;
+                }
+                catch(System.Exception ex)
+                {
+                    Debug.LogWarning("Tutorial Manager response parsing error: " + ex);
+                }
             }
             GameObject.Destroy(webHandlerGO);
             PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, toShow ? 1 : 0);
@@ -194,7 +203,7 @@ public class TutorialManager
         };
 
 
-        webHandler.StartWebRequest(json);
+        webHandler.PostJson(url, json);
     }
 
     static void HandleAdaptiveOnboardingEvent(bool toShow)

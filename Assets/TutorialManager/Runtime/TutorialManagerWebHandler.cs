@@ -4,17 +4,15 @@ using UnityEngine.Networking;
 
 public class TutorialManagerWebHandler : MonoBehaviour
 {
-    public delegate void HandleWebResponse(UnityWebRequest request);
-    public static event HandleWebResponse WebRequestReturned;
-    //const string url = "https://stg-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
-    const string url = "https://prd-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
+    public delegate void HandlePostResponse(UnityWebRequest request);
+    public static event HandlePostResponse PostRequestReturned;
 
     void Awake()
     {
         DontDestroyOnLoad(transform.gameObject);
     }
 
-    public void StartWebRequest(string json)
+    public void PostJson(string url, string json)
     {
         var request = new UnityWebRequest(url, "POST");
         var uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(json));
@@ -29,9 +27,9 @@ public class TutorialManagerWebHandler : MonoBehaviour
         using (request)
         {
             yield return request.Send();
-            if (WebRequestReturned != null)
+            if (PostRequestReturned != null)
             {
-                WebRequestReturned(request);
+                PostRequestReturned(request);
             }
         }
     }
