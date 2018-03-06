@@ -23,6 +23,8 @@ public class TutorialManager
     const string adaptiveOnboardingSentPrefsKey = "adaptive_onboarding_event_sent";
     static int adaptiveOnboardingEventSent = 0;
     const string adaptiveOnboardingShowTutorialPrefsKey = "adaptive_onboarding_show_tutorial";
+    //const string url = "https://stg-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
+    const string url = "https://prd-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
 
     static GameObject webHandlerGO;
 
@@ -35,10 +37,11 @@ public class TutorialManager
         public string gfx_vendor;
         public string deviceid;
         public int cpu_count;
-        public float dpi;
+        public int dpi;
         public string screen;
         public string appid;
-        public int platform;
+        public string platform;
+        public int platformid;
         public string os_ver;
         public int gfx_shader;
         public string gfx_ver;
@@ -72,9 +75,10 @@ public class TutorialManager
             this.gfx_name = SystemInfo.graphicsDeviceName;
             this.gfx_vendor = SystemInfo.graphicsDeviceVendor;
             this.screen = Screen.currentResolution.ToString();
-            this.dpi = Screen.dpi;
+            this.dpi = (int)Screen.dpi;
             this.in_editor = Application.isEditor;
-            this.platform = (int)Application.platform;
+            this.platform = Application.platform.ToString();
+            this.platformid = (int)Application.platform;
             this.os_ver = SystemInfo.operatingSystem;
             this.gfx_shader = SystemInfo.graphicsShaderLevel;
             this.gfx_ver = SystemInfo.graphicsDeviceVersion;
@@ -93,7 +97,14 @@ public class TutorialManager
             this.sessionid = AnalyticsSessionInfo.sessionId;
 #else
             this.userid = PlayerPrefs.GetString("unity.cloud_userid");
-            this.sessionid = PlayerPrefs.GetString("unity.player_sessionid");
+            if(PlayerPrefs.HasKey("unity.player_sessionid"))
+            {
+                this.sessionid = System.Convert.ToInt64(PlayerPrefs.GetString("unity.player_sessionid"));
+            }
+            else
+            {
+                this.sessionid = 0;
+            }
 #endif
             this.adsid = "";
             this.ads_tracking = false;
@@ -128,11 +139,9 @@ public class TutorialManager
     [RuntimeInitializeOnLoadMethod]
     static void InitializeTutorialManager()
     {
-        if(File.Exists(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values"))
+        if (File.Exists(GetAnalyticsValuesLocation()))
         {
-            Debug.Log(File.ReadAllText(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values"));
-            Debug.Log(JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values")).app_installed);
-            if(JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values")).app_installed == true)
+            if (JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(GetAnalyticsValuesLocation())).app_installed == true)
             {
                 return;
             }
@@ -142,7 +151,8 @@ public class TutorialManager
             return;
         }
         var deviceInfo = new DeviceInfo();
-        var advertisingSupported = Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string errorMsg) => {
+        var advertisingSupported = Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string errorMsg) =>
+        {
             deviceInfo.adsid = advertisingId;
             deviceInfo.ads_tracking = trackingEnabled;
             CallTutorialManagerService(deviceInfo);
@@ -154,60 +164,46 @@ public class TutorialManager
         }
     }
 
+    static string GetAnalyticsValuesLocation()
+    {
+#if UNITY_TVOS
+        return Application.temporaryCachePath + "/Unity/" + Application.cloudProjectId + "/Analytics/values";
+#else
+        return Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values";
+#endif
+    }
+
     static void CallTutorialManagerService(DeviceInfo data)
     {
-        WWWForm webForm = new WWWForm();
-        webForm.AddField("appid", data.appid);
-        webForm.AddField("app_ver", data.app_ver);
-        webForm.AddField("model", data.model);
-        webForm.AddField("deviceid", data.deviceid);
-        webForm.AddField("ram", data.ram);
-        webForm.AddField("cpu", data.cpu);
-        webForm.AddField("cpu_count", data.cpu_count);
-        webForm.AddField("gfx_name", data.gfx_name);
-        webForm.AddField("gfx_vendor", data.gfx_vendor);
-        webForm.AddField("screen", data.screen);
-        webForm.AddField("dpi", data.dpi.ToString());
-        webForm.AddField("in_editor", data.in_editor.ToString());
-        webForm.AddField("platform", data.platform.ToString());
-        webForm.AddField("os_ver", data.os_ver);
-        webForm.AddField("gfx_shader", data.gfx_shader);
-        webForm.AddField("gfx_ver", data.gfx_ver);
-        webForm.AddField("max_texture_size", data.max_texture_size);
-        webForm.AddField("network", data.network);
-        webForm.AddField("screen_orientation", data.screen_orientation);
-        webForm.AddField("realtime_since_startup", data.realtime_since_startup.ToString());
-        webForm.AddField("battery_level", data.battery_level.ToString());
-        webForm.AddField("battery_status", data.battery_status);
-        webForm.AddField("lang", data.lang);
-        webForm.AddField("build_guid", data.build_guid);
-        webForm.AddField("install_mode", data.install_mode);
-        webForm.AddField("app_install_store", data.app_install_store);
-        webForm.AddField("userid", data.userid);
-        webForm.AddField("sessionid", data.sessionid.ToString());
-        webForm.AddField("adsid", data.adsid);
-        webForm.AddField("ads_tracking", data.ads_tracking.ToString());
-        webForm.AddField("device_name", data.device_name);
+        var json = JsonUtility.ToJson(data);
 
         webHandlerGO = new GameObject();
         var webHandler = webHandlerGO.AddComponent<TutorialManagerWebHandler>();
-        TutorialManagerWebHandler.WebRequestReturned += (webRequest) => {
-            Debug.Log("web request returned");
+        TutorialManagerWebHandler.PostRequestReturned += (webRequest) => {
             var toShow = true;
-            if(string.IsNullOrEmpty(webRequest.error))
-            {
-                //no error - proceed
-                toShow = JsonUtility.FromJson<TutorialWebResponse>(webRequest.text).show_tutorial;
-            }
-            else
+            if (webRequest.isHttpError || webRequest.isHttpError)
             {
                 Debug.LogWarning("Error received from server: " + webRequest.error + ". Defaulting to true.");
             }
-            GameObject.Destroy(webHandler);
+            else
+            {
+                try 
+                {
+                    //no error - proceed
+                    toShow = JsonUtility.FromJson<TutorialWebResponse>(webRequest.downloadHandler.text).show_tutorial;
+                }
+                catch(System.Exception ex)
+                {
+                    Debug.LogWarning("Tutorial Manager response parsing error: " + ex);
+                }
+            }
+            GameObject.Destroy(webHandlerGO);
             PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, toShow ? 1 : 0);
             PlayerPrefs.Save();
         };
-        webHandler.StartWebRequest(webForm);
+
+
+        webHandler.PostJson(url, json);
     }
 
     static void HandleAdaptiveOnboardingEvent(bool toShow)
