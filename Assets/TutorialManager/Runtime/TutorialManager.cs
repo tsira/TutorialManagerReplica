@@ -103,7 +103,7 @@ public class TutorialManager
             }
             else
             {
-                this.sessionid = -1;
+                this.sessionid = 0;
             }
 #endif
             this.adsid = "";
