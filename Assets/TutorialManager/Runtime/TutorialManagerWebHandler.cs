@@ -1,30 +1,35 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class TutorialManagerWebHandler : MonoBehaviour {
-    public delegate void HandleWebResponse(WWW webRequest);
-    public static event HandleWebResponse WebRequestReturned;
-    const string url = "https://stg-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
+public class TutorialManagerWebHandler : MonoBehaviour
+{
+    public delegate void HandlePostResponse(UnityWebRequest request);
+    public static event HandlePostResponse PostRequestReturned;
 
     void Awake()
     {
         DontDestroyOnLoad(transform.gameObject);
     }
 
-    public void StartWebRequest(WWWForm webForm)
+    public void PostJson(string url, string json)
     {
-        StartCoroutine(SendWebRequest(webForm));
+        var request = new UnityWebRequest(url, "POST");
+        var uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(json));
+        uploadHandler.contentType = "application/json";
+        request.uploadHandler = uploadHandler;
+        request.downloadHandler = new DownloadHandlerBuffer();
+        StartCoroutine(SendWebRequest(request));
     }
 
-    IEnumerator SendWebRequest(WWWForm webForm)
+    IEnumerator SendWebRequest(UnityWebRequest request)
     {
-        using (WWW webRequest = new WWW(url, webForm))
+        using (request)
         {
-            yield return webRequest;
-
-            if(WebRequestReturned != null)
+            yield return request.Send();
+            if (PostRequestReturned != null)
             {
-                WebRequestReturned(webRequest);
+                PostRequestReturned(request);
             }
         }
     }
