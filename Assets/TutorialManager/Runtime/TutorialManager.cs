@@ -57,7 +57,7 @@ public class TutorialManager
         public bool ads_tracking;
         public string lang;
         public string build_guid;
-        public string install_mode;
+        public string app_install_mode;
         public string app_install_store;
         public string userid;
         public long sessionid;
@@ -90,7 +90,7 @@ public class TutorialManager
             this.battery_status = SystemInfo.batteryStatus.ToString();
             this.lang = Application.systemLanguage.ToString();
             this.build_guid = Application.buildGUID;
-            this.install_mode = Application.installMode.ToString();
+            this.app_install_mode = Application.installMode.ToString();
             this.app_install_store = Application.installerName;
 #if UNITY_2017_2_OR_NEWER
             this.userid = AnalyticsSessionInfo.userId;
