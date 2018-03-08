@@ -3,7 +3,6 @@ using UnityEngine.Networking;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
-using System.Reflection;
 using System.IO;
 
 public class TutorialManagerUnitTests : IPrebuildSetup {
