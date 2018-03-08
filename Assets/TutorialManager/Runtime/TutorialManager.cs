@@ -28,7 +28,7 @@ public class TutorialManager
 
     static GameObject webHandlerGO;
 
-    private class DeviceInfo
+    public class DeviceInfo
     {
         public string model;
         public int ram;
@@ -126,12 +126,12 @@ public class TutorialManager
         }
     }
 
-    private class TutorialWebResponse
+    public class TutorialWebResponse
     {
         public bool show_tutorial;
     }
 
-    private class ValuesJSONParser
+    public class ValuesJSONParser
     {
         public bool app_installed;
     }
