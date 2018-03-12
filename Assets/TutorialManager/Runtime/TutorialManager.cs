@@ -252,6 +252,33 @@ public class TutorialManager
     }
 
     /// <summary>
+    /// Overload of ShowTutorial with a bool passed in that will be returned as the decision. Used to mock
+    /// the result of ShowTutorial for QA purposes. Please do not push this to 'live' builds.
+    /// </summary>
+    /// <remarks>
+    ///     <code>
+    ///     if (TutorialManager.ShowTutorial(true)) {
+    ///         // show the tutorial
+    ///     } else {
+    ///         // skip the tutorial
+    ///     }
+    ///     </code>
+    /// </remarks>
+    /// <param name="overrideDecision">Value that will be returned by this method for QA.</param>
+    /// <returns><c>true</c>, if tutorial should be shown, <c>false</c> otherwise.</returns>
+    public static bool ShowTutorial(bool overrideDecision)
+    {
+        HandleAdaptiveOnboardingEvent(overrideDecision);
+        if (overrideDecision)
+        {
+            Analytics.CustomEvent("tutorial_start", new Dictionary<string, object> { { tutorialIdKey, tutorialKey } });
+        }
+        tutorialStep = 0;
+        SetTutorialStep(tutorialStep);
+        return overrideDecision;
+    }
+
+    /// <summary>
     /// Call this when the player completes the tutorial.
     /// </summary>
     public static AnalyticsResult CompleteTutorial()
