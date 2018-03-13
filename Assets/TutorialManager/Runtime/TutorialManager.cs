@@ -211,6 +211,10 @@ public class TutorialManager
         adaptiveOnboardingEventSent = PlayerPrefs.GetInt(adaptiveOnboardingSentPrefsKey, adaptiveOnboardingEventSent);
         if (adaptiveOnboardingEventSent == 0)
         {
+            if (toShow)
+            {
+                Analytics.CustomEvent("tutorial_start", new Dictionary<string, object> { { tutorialIdKey, tutorialKey } });
+            }
             Analytics.CustomEvent(adaptiveOnboardingEventName,
                 new Dictionary<string, object>{
                     { tutorialOnKey, toShow }
@@ -240,11 +244,6 @@ public class TutorialManager
     {
         bool toShow = true;
         toShow = PlayerPrefs.GetInt(adaptiveOnboardingShowTutorialPrefsKey, 1) == 1;
-
-        if (toShow)
-        {
-            Analytics.CustomEvent("tutorial_start", new Dictionary<string, object> { { tutorialIdKey, tutorialKey } });
-        }
         tutorialStep = 0;
         SetTutorialStep(tutorialStep);
         HandleAdaptiveOnboardingEvent(toShow);
@@ -269,10 +268,6 @@ public class TutorialManager
     public static bool ShowTutorial(bool overrideDecision)
     {
         HandleAdaptiveOnboardingEvent(overrideDecision);
-        if (overrideDecision)
-        {
-            Analytics.CustomEvent("tutorial_start", new Dictionary<string, object> { { tutorialIdKey, tutorialKey } });
-        }
         tutorialStep = 0;
         SetTutorialStep(tutorialStep);
         return overrideDecision;
