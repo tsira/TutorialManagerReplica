@@ -211,6 +211,10 @@ public class TutorialManager
         adaptiveOnboardingEventSent = PlayerPrefs.GetInt(adaptiveOnboardingSentPrefsKey, adaptiveOnboardingEventSent);
         if (adaptiveOnboardingEventSent == 0)
         {
+            if (toShow)
+            {
+                Analytics.CustomEvent("tutorial_start", new Dictionary<string, object> { { tutorialIdKey, tutorialKey } });
+            }
             Analytics.CustomEvent(adaptiveOnboardingEventName,
                 new Dictionary<string, object>{
                     { tutorialOnKey, toShow }
@@ -240,15 +244,33 @@ public class TutorialManager
     {
         bool toShow = true;
         toShow = PlayerPrefs.GetInt(adaptiveOnboardingShowTutorialPrefsKey, 1) == 1;
-
-        if (toShow)
-        {
-            Analytics.CustomEvent("tutorial_start", new Dictionary<string, object> { { tutorialIdKey, tutorialKey } });
-        }
         tutorialStep = 0;
         SetTutorialStep(tutorialStep);
         HandleAdaptiveOnboardingEvent(toShow);
         return toShow;
+    }
+
+    /// <summary>
+    /// Overload of ShowTutorial with a bool passed in that will be returned as the decision. Used to mock
+    /// the result of ShowTutorial for QA purposes. Please do not push this to 'live' builds.
+    /// </summary>
+    /// <remarks>
+    ///     <code>
+    ///     if (TutorialManager.ShowTutorial(true)) {
+    ///         // show the tutorial
+    ///     } else {
+    ///         // skip the tutorial
+    ///     }
+    ///     </code>
+    /// </remarks>
+    /// <param name="overrideDecision">Value that will be returned by this method for QA.</param>
+    /// <returns><c>true</c>, if tutorial should be shown, <c>false</c> otherwise.</returns>
+    public static bool ShowTutorial(bool overrideDecision)
+    {
+        HandleAdaptiveOnboardingEvent(overrideDecision);
+        tutorialStep = 0;
+        SetTutorialStep(tutorialStep);
+        return overrideDecision;
     }
 
     /// <summary>
