@@ -7,61 +7,74 @@ using System.IO;
 /// <summary>
 /// Tutorial manager configures the ABTester for the Tutorial test,
 /// and encapsulates some key functionality.
+/// TODO: Add repo url or doc link
+/// <seealso href="">Publically Accesible Repo and Readme</seealso>
 /// </summary>
+
 public class TutorialManager
 {
-    static string tutorialKey = "show_tutorial";
+
+#pragma warning disable 414
+
+    static int adaptiveOnboardingEventSent = 0;
     static int tutorialStep = 0;
 
-    const string tutorialIdKey = "tutorial_id";
-    const string tutorialStepPlayerPrefsKey = "unity_analytics_tutorial_test_current_step";
-    const string adaptiveOnboardingEventName = "adaptive_onboarding";
-    const string tutorialOnKey = "tutorial_on";
-    const string tutorialTestGroupKey = "test_group";
-    const string testGroupValue = "test";
-    const string controlGroupValue = "control";
-    const string adaptiveOnboardingSentPrefsKey = "adaptive_onboarding_event_sent";
-    static int adaptiveOnboardingEventSent = 0;
-    const string adaptiveOnboardingShowTutorialPrefsKey = "adaptive_onboarding_show_tutorial";
-    //const string url = "https://stg-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
-    const string url = "https://prd-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
+    static readonly string adaptiveOnboardingEventName = "adaptive_onboarding";
+    static readonly string testGroupValue = "test";
+    static readonly string tutorialOnKey = "tutorial_on";
+    static readonly string tutorialStepPlayerPrefsKey = "unity_analytics_tutorial_test_current_step";
+    static readonly string tutorialTestGroupKey = "test_group";
+
+    static string tutorialIdKey = "tutorial_id";
+    static string tutorialKey = "show_tutorial";
+
+    static readonly string adaptiveOnboardingSentPrefsKey = "adaptive_onboarding_event_sent";
+    static readonly string adaptiveOnboardingShowTutorialPrefsKey = "adaptive_onboarding_show_tutorial";
+    static readonly string controlGroupValue = "control";
+    static readonly string adaptiveOnboardingUrl = "https://prd-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
 
     static GameObject webHandlerGO;
 
+#pragma warning restore 414
+
     public class DeviceInfo
     {
-        public string model;
-        public int ram;
-        public string cpu;
-        public string gfx_name;
-        public string gfx_vendor;
-        public string deviceid;
+        public bool ads_tracking;
+        public bool in_editor;
+
+        public float battery_level;
+        public float realtime_since_startup;
+
         public int cpu_count;
         public int dpi;
-        public string screen;
-        public string appid;
-        public string platform;
-        public int platformid;
-        public string os_ver;
         public int gfx_shader;
-        public string gfx_ver;
         public int max_texture_size;
-        public string app_ver;
-        public bool in_editor;
-        public string network;
-        public string screen_orientation;
-        public float realtime_since_startup;
-        public float battery_level;
-        public string battery_status;
+        public int ram;
+        public int platformid;
+
+        public long sessionid;
+
         public string adsid;
-        public bool ads_tracking;
-        public string lang;
-        public string build_guid;
+        public string appid;
         public string app_install_mode;
         public string app_install_store;
-        public string userid;
-        public long sessionid;
+        public string app_ver;
+        public string battery_status;
+        public string build_guid;
+        public string cpu;
         public string device_name;
+        public string deviceid;
+        public string gfx_name;
+        public string gfx_vendor;
+        public string gfx_ver;
+        public string lang;
+        public string model;
+        public string network;
+        public string os_ver;
+        public string platform;
+        public string screen;
+        public string screen_orientation;
+        public string userid;
 
         public DeviceInfo()
         {
@@ -92,7 +105,9 @@ public class TutorialManager
             this.build_guid = Application.buildGUID;
             this.app_install_mode = Application.installMode.ToString();
             this.app_install_store = Application.installerName;
+
 #if UNITY_2017_2_OR_NEWER
+// Adjusting for 2017.02+ Analytics Namespace
             this.userid = AnalyticsSessionInfo.userId;
             this.sessionid = AnalyticsSessionInfo.sessionId;
 #else
@@ -114,7 +129,7 @@ public class TutorialManager
         private string GetDeviceModel()
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
-            // get manufacturer/model/device
+// Get manufacturer, model, and device
             AndroidJavaClass jc = new AndroidJavaClass("android.os.Build");
             string manufacturer = jc.GetStatic<string>("MANUFACTURER");
             string model = jc.GetStatic<string>("MODEL");
@@ -137,7 +152,7 @@ public class TutorialManager
     }
 
     [RuntimeInitializeOnLoadMethod]
-    static void InitializeTutorialManager()
+    private static void InitializeTutorialManager()
     {
         if (File.Exists(GetAnalyticsValuesLocation()))
         {
@@ -164,7 +179,7 @@ public class TutorialManager
         }
     }
 
-    static string GetAnalyticsValuesLocation()
+    private static string GetAnalyticsValuesLocation()
     {
 #if UNITY_TVOS
         return Application.temporaryCachePath + "/Unity/" + Application.cloudProjectId + "/Analytics/values";
@@ -173,7 +188,12 @@ public class TutorialManager
 #endif
     }
 
-    static void CallTutorialManagerService(DeviceInfo data)
+    /// <summary>
+    /// Request to fetch a value from Unity Analytics Services to show or skip tutorial for this user.
+    /// Returns an int val from the Unity Tutorial Manager Decision Engine to show or skip tutorial for the user.
+    /// If the request fails the user will be shown the tutorial by default.
+    /// </summary>
+    private static void CallTutorialManagerService(DeviceInfo data)
     {
         var json = JsonUtility.ToJson(data);
 
@@ -187,9 +207,9 @@ public class TutorialManager
             }
             else
             {
-                try 
+                try
                 {
-                    //no error - proceed
+                    //Web request was successful then proceed with tutorial manager decision
                     toShow = JsonUtility.FromJson<TutorialWebResponse>(webRequest.downloadHandler.text).show_tutorial;
                 }
                 catch(System.Exception ex)
@@ -202,11 +222,14 @@ public class TutorialManager
             PlayerPrefs.Save();
         };
 
+        webHandler.PostJson(adaptiveOnboardingUrl, json);
 
-        webHandler.PostJson(url, json);
     }
 
-    static void HandleAdaptiveOnboardingEvent(bool toShow)
+    /// <summary>
+    /// Send standard events tracking the user's tutorial progress.
+    /// </summary>
+    private static void HandleAdaptiveOnboardingEvent(bool toShow)
     {
         adaptiveOnboardingEventSent = PlayerPrefs.GetInt(adaptiveOnboardingSentPrefsKey, adaptiveOnboardingEventSent);
         if (adaptiveOnboardingEventSent == 0)
@@ -299,16 +322,22 @@ public class TutorialManager
         SetTutorialStep(tutorialStep);
         return Analytics.CustomEvent("tutorial_step", new Dictionary<string, object> {
             { tutorialIdKey, tutorialKey },
-            {"step_index", tutorialStep}
+            { "step_index", tutorialStep }
         });
     }
 
+    /// <summary>
+    /// Helper Method for AdvanceTutorial().
+    /// </summary>
     static void SetTutorialStep(int newTutorialStep)
     {
         PlayerPrefs.SetInt(tutorialStepPlayerPrefsKey, newTutorialStep);
         PlayerPrefs.Save();
     }
 
+    /// <summary>
+    /// Helper Method for AdvanceTutorial().
+    /// </summary>
     static int GetTutorialStep()
     {
         if (PlayerPrefs.HasKey(tutorialStepPlayerPrefsKey))

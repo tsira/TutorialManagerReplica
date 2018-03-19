@@ -1,6 +1,10 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
+
+/// <summary>
+/// Tutorial Manager Web Handler provides helper methods to the Tutorial Manager plugin code.
+/// </summary>
 
 public class TutorialManagerWebHandler : MonoBehaviour
 {
