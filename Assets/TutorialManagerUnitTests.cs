@@ -12,13 +12,13 @@ public class NewUserTests {
 
     bool requestReturned = false;
 
-	[UnityTest]
+    [UnityTest]
     [PrebuildSetup(typeof(TutorialManager_NewUserPrebuild))]
 	public IEnumerator CachedResponseMatchesServerResponse() {
         testUtilGO = GameObject.Find("TEST-GO");
         testMono = testUtilGO.GetComponent<TutorialManagerWebHandlerTest>();
         yield return new WaitUntil(() => testMono.IsTestFinished);
-        yield return new WaitUntil(() => PlayerPrefs.HasKey("adaptive_onboarding_show_tutorial"));
+        yield return new WaitUntil(() => PlayerPrefs.HasKey("adaptive_onboarding_show_tutorial")); 
         Assert.AreEqual(PlayerPrefs.GetInt("adaptive_onboarding_show_tutorial"), testMono.toShow);
         GameObject.Destroy(testUtilGO);
 	}
@@ -51,7 +51,7 @@ public class TutorialManagerWebHandlerTest : MonoBehaviour
     {
         //var deviceInfo = JsonUtility.FromJson<TutorialManager.DeviceInfo>(System.Text.Encoding.UTF8.GetString(request.uploadHandler.data));
         var response = JsonUtility.FromJson<TutorialManager.TutorialWebResponse>(request.downloadHandler.text);
-        toShow = System.Convert.ToInt32(response.show_tutorial);
+        toShow = System.Convert.ToInt32(response.showTutorial);
         testFinished = true;
     }
 

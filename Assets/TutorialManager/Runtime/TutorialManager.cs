@@ -128,7 +128,7 @@ public class TutorialManager
 
     public class TutorialWebResponse
     {
-        public bool show_tutorial;
+        public bool showTutorial;
     }
 
     public class ValuesJSONParser
@@ -190,7 +190,7 @@ public class TutorialManager
                 try 
                 {
                     //no error - proceed
-                    toShow = JsonUtility.FromJson<TutorialWebResponse>(webRequest.downloadHandler.text).show_tutorial;
+                    toShow = JsonUtility.FromJson<TutorialWebResponse>(webRequest.downloadHandler.text).showTutorial;
                 }
                 catch(System.Exception ex)
                 {
