@@ -30,7 +30,9 @@ public class TutorialManagerWebHandler : MonoBehaviour
     {
         using (request)
         {
+#pragma warning disable 618
             yield return request.Send();
+#pragma warning restore 618
             if (PostRequestReturned != null)
             {
                 PostRequestReturned(request);

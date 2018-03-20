@@ -18,20 +18,19 @@ public class TutorialManager
 
     static int adaptiveOnboardingEventSent = 0;
     static int tutorialStep = 0;
-
-    static readonly string adaptiveOnboardingEventName = "adaptive_onboarding";
-    static readonly string testGroupValue = "test";
-    static readonly string tutorialOnKey = "tutorial_on";
-    static readonly string tutorialStepPlayerPrefsKey = "unity_analytics_tutorial_test_current_step";
-    static readonly string tutorialTestGroupKey = "test_group";
-
-    static string tutorialIdKey = "tutorial_id";
     static string tutorialKey = "show_tutorial";
 
-    static readonly string adaptiveOnboardingSentPrefsKey = "adaptive_onboarding_event_sent";
-    static readonly string adaptiveOnboardingShowTutorialPrefsKey = "adaptive_onboarding_show_tutorial";
-    static readonly string controlGroupValue = "control";
-    static readonly string adaptiveOnboardingUrl = "https://prd-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
+    const string adaptiveOnboardingUrl = "https://prd-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
+    const string adaptiveOnboardingEventName = "adaptive_onboarding";
+    const string controlGroupValue = "control";
+    const string testGroupValue = "test";
+    const string tutorialOnKey = "tutorial_on";
+    const string tutorialTestGroupKey = "test_group";
+    const string tutorialIdKey = "tutorial_id";
+
+    const string adaptiveOnboardingSentPrefsKey = "adaptive_onboarding_event_sent";
+    const string adaptiveOnboardingShowTutorialPrefsKey = "adaptive_onboarding_show_tutorial";
+    const string tutorialStepPlayerPrefsKey = "unity_analytics_tutorial_test_current_step";
 
     static GameObject webHandlerGO;
 
