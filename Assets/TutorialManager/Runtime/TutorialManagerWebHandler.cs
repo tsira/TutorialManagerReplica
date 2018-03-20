@@ -1,6 +1,10 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
+
+/// <summary>
+/// Tutorial Manager Web Handler provides helper methods to the Tutorial Manager plugin code.
+/// </summary>
 
 public class TutorialManagerWebHandler : MonoBehaviour
 {
@@ -26,7 +30,9 @@ public class TutorialManagerWebHandler : MonoBehaviour
     {
         using (request)
         {
+#pragma warning disable 618
             yield return request.Send();
+#pragma warning restore 618
             if (PostRequestReturned != null)
             {
                 PostRequestReturned(request);
