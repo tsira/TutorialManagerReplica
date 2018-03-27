@@ -151,6 +151,8 @@ public class TutorialManager
             return;
         }
         var deviceInfo = new DeviceInfo();
+#if UNITY_ADS
+        //if game has ads, we can pull the ads id, otherwise, we can't access this info
         var advertisingSupported = Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string errorMsg) =>
         {
             deviceInfo.adsid = advertisingId;
@@ -162,6 +164,9 @@ public class TutorialManager
         {
             CallTutorialManagerService(deviceInfo);
         }
+#else
+        CallTutorialManagerService(deviceInfo);
+#endif
     }
 
     static string GetAnalyticsValuesLocation()
