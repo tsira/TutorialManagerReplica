@@ -205,9 +205,9 @@ public class TutorialManager
             var toShow = true;
             var isError = false;
 #if UNITY_2017_1_OR_NEWER
-            isError = webRequest.isHttpError;
+            isError = webRequest.isHttpError || webRequest.isNetworkError;
 #else
-            isError = webRequest.responseCode > 400;
+            isError = webRequest.responseCode >= 400 || webRequest.isError;
 #endif
             if (isError)
             {
