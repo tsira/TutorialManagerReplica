@@ -203,7 +203,13 @@ public class TutorialManager
         var webHandler = webHandlerGO.AddComponent<TutorialManagerWebHandler>();
         TutorialManagerWebHandler.PostRequestReturned += (webRequest) => {
             var toShow = true;
-            if (webRequest.isHttpError || webRequest.isHttpError)
+            var isError = false;
+#if UNITY_2017_1_OR_NEWER
+            isError = webRequest.isHttpError;
+#else
+            isError = webRequest.responseCode > 400;
+#endif
+            if (isError)
             {
                 Debug.LogWarning("Error received from server: " + webRequest.error + ". Defaulting to true.");
             }
