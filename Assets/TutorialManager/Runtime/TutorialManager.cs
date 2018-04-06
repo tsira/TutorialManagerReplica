@@ -96,10 +96,14 @@ public class TutorialManager
             this.network = Application.internetReachability.ToString();
             this.screen_orientation = Screen.orientation.ToString();
             this.realtime_since_startup = Time.realtimeSinceStartup;
+#if UNITY_5_6_OR_NEWER
             this.battery_level = SystemInfo.batteryLevel;
             this.battery_status = SystemInfo.batteryStatus.ToString();
+#endif
             this.lang = Application.systemLanguage.ToString();
+#if UNITY_5_6_OR_NEWER
             this.build_guid = Application.buildGUID;
+#endif
             this.app_install_mode = Application.installMode.ToString();
             this.app_install_store = Application.installerName;
 
