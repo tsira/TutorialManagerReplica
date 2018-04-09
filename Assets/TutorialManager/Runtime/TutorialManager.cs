@@ -135,7 +135,7 @@ public class TutorialManager
             string manufacturer = jc.GetStatic<string>("MANUFACTURER");
             string model = jc.GetStatic<string>("MODEL");
             string device = jc.GetStatic<string>("DEVICE");
-            return String.Format("{0}/{1}/{2}", manufacturer, model, device);
+            return string.Format("{0}/{1}/{2}", manufacturer, model, device);
 #else
             return SystemInfo.deviceModel;
 #endif
