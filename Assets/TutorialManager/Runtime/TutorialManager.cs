@@ -198,7 +198,6 @@ public class TutorialManager
         retv = Path.Combine(retv, Application.cloudProjectId);
         retv = Path.Combine(retv, "Analytics");
         retv = Path.Combine(retv, "values");
-        Debug.Log(retv);
         return retv;
     }
 
