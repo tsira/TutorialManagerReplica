@@ -155,9 +155,10 @@ public class TutorialManager
     [RuntimeInitializeOnLoadMethod]
     private static void InitializeTutorialManager()
     {
-        if (File.Exists(GetAnalyticsValuesLocation()))
+        string analyticsLocation = GetAnalyticsValuesLocation();
+        if (File.Exists(analyticsLocation))
         {
-            if (JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(GetAnalyticsValuesLocation())).app_installed == true)
+            if (JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(analyticsLocation)).app_installed == true)
             {
                 return;
             }
@@ -187,11 +188,18 @@ public class TutorialManager
 
     private static string GetAnalyticsValuesLocation()
     {
+        string retv;
 #if UNITY_TVOS
-        return Application.temporaryCachePath + "/Unity/" + Application.cloudProjectId + "/Analytics/values";
+        retv = Application.temporaryCachePath;
 #else
-        return Application.persistentDataPath + "/Unity/" + Application.cloudProjectId + "/Analytics/values";
+        retv = Application.persistentDataPath;
 #endif
+        retv = Path.Combine(retv, "Unity");
+        retv = Path.Combine(retv, Application.cloudProjectId);
+        retv = Path.Combine(retv, "Analytics");
+        retv = Path.Combine(retv, "values");
+        Debug.Log(retv);
+        return retv;
     }
 
     /// <summary>
