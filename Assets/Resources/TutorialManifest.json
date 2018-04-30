@@ -1,0 +1,56 @@
+{
+    "enabled": true,
+    "tutorials": [{
+        "id": "this-is-a-tutorial",
+        "name": "Tutorial One",
+        "isActive": true,
+        "steps": ["this-is-step-a", "this-is-step-b"]
+    }, {
+        "id": "this-is-another-tutorial",
+        "name": "Tutorial Two",
+        "isActive": true,
+        "steps": ["this-is-step-c", "this-is-step-d"]
+    }],
+    "steps": [{
+        "id": "this-is-step-a",
+        "name": "Step one",
+        "isActive": true,
+        "messaging": {
+            "isActive": true,
+            "content": ["content-a"]
+        }
+    }, {
+        "id": "this-is-step-b",
+        "name": "Step two",
+        "isActive": true,
+        "messaging": {
+            "isActive": true,
+            "content": ["content-b"]
+        }
+    }, {
+        "id": "this-is-step-c",
+        "name": "Step one",
+        "isActive": true,
+        "messaging": {
+            "isActive": true,
+            "content": ["content-a"]
+        }
+    }, {
+        "id": "this-is-step-d",
+        "name": "Step two",
+        "isActive": true,
+        "messaging": {
+            "isActive": true,
+            "content": ["content-b"]
+        }
+    }],
+    "content": [{
+        "type": "text",
+        "id": "content-a",
+        "text": "Click 'w' to attack."
+    }, {
+        "type": "text",
+        "id": "content-b",
+        "text": "Click 's' to defend."
+    }]
+}
