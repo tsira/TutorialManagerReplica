@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace TutorialManager {
+namespace UnityEngine.Analytics.TutorialManager {
 
     [ExecuteInEditMode]
     public class AdaptiveContent : MonoBehaviour, IBindable {

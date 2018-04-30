@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using TutorialManager;
 using System.IO;
 
-namespace TutorialManager {
+namespace UnityEngine.Analytics.TutorialManager {
     [InitializeOnLoad]
     public static class TMParser {
 

@@ -1,8 +1,8 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using TMPro;
 
-namespace TutorialManager
+namespace UnityEngine.Analytics.TutorialManager
 {
     [RequireComponent(typeof(TextMeshProUGUI))]
     public class AdaptiveText : AdaptiveContent

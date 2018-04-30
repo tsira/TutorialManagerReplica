@@ -1,9 +1,9 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using UnityEditor;
 using System.Collections.Generic;
 
-namespace TutorialManager
+namespace UnityEngine.Analytics.TutorialManager
 {
     
     [CustomEditor(typeof(AdaptiveText))]

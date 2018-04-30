@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -7,7 +7,7 @@ using UnityEditor.IMGUI;
 using System.Net.Security;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
-using TutorialManager;
+using UnityEngine.Analytics.TutorialManager;
 
 namespace UnityEngine.Analytics
 {
@@ -426,84 +426,84 @@ namespace UnityEngine.Analytics
 
         private void SubmitRequest()
         {
-            using (WebClient client = new WebClient())
-            {
-                client.Encoding = System.Text.Encoding.UTF8;
-                Authorization(client);
-                string url = string.Format(ConfigurationPath, m_AppId);
-                string result = "";
-                try
-                {
-                    result = client.DownloadString(new Uri(url));
-                }
-                catch (WebException ex)
-                {
-                    EditorUtility.DisplayDialog(m_ServerErrorDialogTitle, ex.Message, m_ServerErrorDialogBtnLabel);
-                    EditorPrefs.SetBool(k_Installed + m_AppId, false);
-                    return;
-                }
+            //using (WebClient client = new WebClient())
+            //{
+            //    client.Encoding = System.Text.Encoding.UTF8;
+            //    Authorization(client);
+            //    string url = string.Format(ConfigurationPath, m_AppId);
+            //    string result = "";
+            //    try
+            //    {
+            //        result = client.DownloadString(new Uri(url));
+            //    }
+            //    catch (WebException ex)
+            //    {
+            //        EditorUtility.DisplayDialog(m_ServerErrorDialogTitle, ex.Message, m_ServerErrorDialogBtnLabel);
+            //        EditorPrefs.SetBool(k_Installed + m_AppId, false);
+            //        return;
+            //    }
 
-                EditorPrefs.SetBool(k_Installed + m_AppId, true);
-                m_EnvironmentNames.Clear();
-                result = "{ \"array\": " + result + "}";
-                var dict = MiniJSON.Json.Deserialize(result) as Dictionary<string, object>;
-                var list = (dict["array"]) as List<object>;
-                for (int i = 0; i < list.Count; i++)
-                {
-                    var valueDict = list[i] as Dictionary<string, object>;
-                    if (!m_EnvironmentNames.Contains(valueDict["name"].ToString()))
-                    {
-                        m_EnvironmentNames.Add(valueDict["name"].ToString());
-                    }
-                    if (valueDict["name"].ToString() == m_CurrentEnvironment)
-                    {
-                        m_RSId = valueDict["id"].ToString();
-                    }
-                }
+            //    EditorPrefs.SetBool(k_Installed + m_AppId, true);
+            //    m_EnvironmentNames.Clear();
+            //    result = "{ \"array\": " + result + "}";
+            //    var dict = MiniJSON.Json.Deserialize(result) as Dictionary<string, object>;
+            //    var list = (dict["array"]) as List<object>;
+            //    for (int i = 0; i < list.Count; i++)
+            //    {
+            //        var valueDict = list[i] as Dictionary<string, object>;
+            //        if (!m_EnvironmentNames.Contains(valueDict["name"].ToString()))
+            //        {
+            //            m_EnvironmentNames.Add(valueDict["name"].ToString());
+            //        }
+            //        if (valueDict["name"].ToString() == m_CurrentEnvironment)
+            //        {
+            //            m_RSId = valueDict["id"].ToString();
+            //        }
+            //    }
 
-                if (string.IsNullOrEmpty(m_RSId))
-                {
-                    if (m_EnvironmentNames.Count > 0)
-                    {
-                        var valueDict = list[0] as Dictionary<string, object>;
-                        EnvironmentSelectionCallback(valueDict["name"]);
-                        m_RSId = valueDict["id"].ToString();
-                    }
-                    else
-                    {
-                        EditorPrefs.SetBool(k_RSKeysExist + m_AppId, false);
-                        EditorUtility.DisplayDialog(m_ServerErrorDialogTitle, m_NoRSKeysError, m_ServerErrorDialogBtnLabel);
-                        return;
-                    }
-                }
-                url = string.Format(RemoteSettingsPath, m_AppId, m_RSId);
-                try
-                {
-                    result = client.DownloadString(new Uri(url));
-                    result = "{ \"array\": " + result + "}";
-                    dict = MiniJSON.Json.Deserialize(result) as Dictionary<string, object>;
-                    list = (dict["array"]) as List<object>;
-                   // RSDataStore.rsKeyList.Clear();
-                    if (list.Count == 0)
-                    {
-                        EditorPrefs.SetBool(k_RSKeysExist + m_AppId, false);
-                    }
-                    else
-                    {
-                        for (int i = 0; i < list.Count; i++)
-                        {
-                            var valueDict = list[i] as Dictionary<string, object>;
-                            //RSDataStore.rsKeyList.Add(new RemoteSettingsKeyValueType(valueDict["key"].ToString(), valueDict["value"].ToString(), valueDict["type"].ToString()));
-                        }
-                        EditorPrefs.SetBool(k_RSKeysExist + m_AppId, true);
-                    }
-                    CreateDataStoreDict();
-                }
-                catch (WebException ex)
-                {
-                    EditorUtility.DisplayDialog(m_ServerErrorDialogTitle, ex.Message, m_ServerErrorDialogBtnLabel);
-                }
-            }
+            //    if (string.IsNullOrEmpty(m_RSId))
+            //    {
+            //        if (m_EnvironmentNames.Count > 0)
+            //        {
+            //            var valueDict = list[0] as Dictionary<string, object>;
+            //            EnvironmentSelectionCallback(valueDict["name"]);
+            //            m_RSId = valueDict["id"].ToString();
+            //        }
+            //        else
+            //        {
+            //            EditorPrefs.SetBool(k_RSKeysExist + m_AppId, false);
+            //            EditorUtility.DisplayDialog(m_ServerErrorDialogTitle, m_NoRSKeysError, m_ServerErrorDialogBtnLabel);
+            //            return;
+            //        }
+            //    }
+            //    url = string.Format(RemoteSettingsPath, m_AppId, m_RSId);
+            //    try
+            //    {
+            //        result = client.DownloadString(new Uri(url));
+            //        result = "{ \"array\": " + result + "}";
+            //        dict = MiniJSON.Json.Deserialize(result) as Dictionary<string, object>;
+            //        list = (dict["array"]) as List<object>;
+            //       // RSDataStore.rsKeyList.Clear();
+            //        if (list.Count == 0)
+            //        {
+            //            EditorPrefs.SetBool(k_RSKeysExist + m_AppId, false);
+            //        }
+            //        else
+            //        {
+            //            for (int i = 0; i < list.Count; i++)
+            //            {
+            //                var valueDict = list[i] as Dictionary<string, object>;
+            //                //RSDataStore.rsKeyList.Add(new RemoteSettingsKeyValueType(valueDict["key"].ToString(), valueDict["value"].ToString(), valueDict["type"].ToString()));
+            //            }
+            //            EditorPrefs.SetBool(k_RSKeysExist + m_AppId, true);
+            //        }
+            //        CreateDataStoreDict();
+            //    }
+            //    catch (WebException ex)
+            //    {
+            //        EditorUtility.DisplayDialog(m_ServerErrorDialogTitle, ex.Message, m_ServerErrorDialogBtnLabel);
+            //    }
+            //}
         }
 
         protected void Authorization(WebClient client)

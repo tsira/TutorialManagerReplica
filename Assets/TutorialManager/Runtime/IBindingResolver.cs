@@ -1,8 +1,8 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace TutorialManager {
+namespace UnityEngine.Analytics.TutorialManager {
     public interface IBindingResolver
     {
         bool IsResolved(string id);

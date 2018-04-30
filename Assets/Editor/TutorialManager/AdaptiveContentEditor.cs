@@ -1,8 +1,8 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
-namespace TutorialManager
+namespace UnityEngine.Analytics.TutorialManager
 {
     [CustomEditor(typeof(AdaptiveContent))]
     public class AdaptiveContentEditor : Editor
