@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_5_6_OR_NEWER
+using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.TestTools;
 using NUnit.Framework;
@@ -90,3 +91,4 @@ public class TutorialManager_OldUserPrebuild : IPrebuildSetup
         PlayerPrefs.Save();
     }
 }
+#endif
