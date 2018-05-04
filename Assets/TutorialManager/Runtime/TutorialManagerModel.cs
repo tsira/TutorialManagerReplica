@@ -5,10 +5,20 @@ using System.Collections.Generic;
 namespace UnityEngine.Analytics {
 	public class TutorialManagerModel : ScriptableObject
 	{
+        private static TutorialManagerModel m_Instance;
+        public static TutorialManagerModel GetInstance()
+        {
+            if (m_Instance == null) {
+                m_Instance = new TutorialManagerModel();
+            }
+            return m_Instance;
+        }
+
+
         public bool enabled;
-        public TutorialEntity[] tutorials;
-        public StepEntity[] steps;
-        public ContentEntity[] content;
+        public List<TutorialEntity> tutorials;
+        public List<StepEntity> steps;
+        public List<ContentEntity> content;
 
         // Lookup tables
         public Dictionary<string, TutorialEntity> tutorialTable = new Dictionary<string, TutorialEntity>();
@@ -20,7 +30,7 @@ namespace UnityEngine.Analytics {
 
         }
 
-        public void UpdateEntity<T>(string id) where T : Entity
+        public void UpdateEntity<T>(string oldId, string newId) where T : Entity
         {
 
         }
@@ -46,7 +56,7 @@ namespace UnityEngine.Analytics {
     [System.Serializable]
     public class StepEntity : Entity
     {
-        public string name;
+        public string id;
         public bool isActive;
         public Messaging messaging;
     }
