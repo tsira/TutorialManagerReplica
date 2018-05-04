@@ -5,6 +5,7 @@ using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
 using System.IO;
+using UnityEngine.Analytics;
 
 public class NewUserTests {
 
