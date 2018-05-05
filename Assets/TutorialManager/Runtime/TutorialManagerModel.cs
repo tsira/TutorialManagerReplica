@@ -25,17 +25,52 @@ namespace UnityEngine.Analytics {
         public Dictionary<string, StepEntity> stepTable = new Dictionary<string, StepEntity>();
         public Dictionary<string, ContentEntity> contentTable = new Dictionary<string, ContentEntity>();
 
-        public void CreateEntity<T>(string id) where T : Entity
+        public void CreateTutorialEntity(string id)
         {
 
         }
 
-        public void UpdateEntity<T>(string oldId, string newId) where T : Entity
+        public void UpdateTutorialEntity(string oldId, string newId)
         {
 
         }
 
-        public void DestroyEntity<T>(string id) where T : Entity
+        public void DestroyTutorialEntity(string id)
+        {
+
+        }
+
+        public void CreateStepEntity(string id, string tutorialId)
+        {
+
+        }
+
+        public void UpdateStepEntity(string oldId, string newId)
+        {
+
+        }
+
+        public void DestroyStepEntity(string id)
+        {
+
+        }
+
+        public void CreateContentEntity(string id, string contentType, string stepId)
+        {
+
+        }
+
+        public void UpdateContentEntity(string id, string content)
+        {
+
+        }
+
+        public void DestroyContentEntity(string id)
+        {
+
+        }
+
+        void RelateEntity<T>(string id, string relatesTo) where T : Entity
         {
 
         }
