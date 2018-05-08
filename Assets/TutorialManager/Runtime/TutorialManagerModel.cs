@@ -98,7 +98,6 @@ namespace UnityEngine.Analytics
                     if (stepTable.ContainsKey(id) == false)
                     {
                         var step = new StepEntity(id);
-                        step.id = id;
                         steps.Add(step);
                         stepTable.Add(id, step);
                         tutorial.steps.Add(id);
