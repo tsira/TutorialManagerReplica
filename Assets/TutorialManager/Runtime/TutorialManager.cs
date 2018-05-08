@@ -15,6 +15,7 @@ namespace UnityEngine.Analytics
     {
 
 #pragma warning disable 414
+        public readonly static string k_PluginVersion = "0.1.0";
 
         static int adaptiveOnboardingEventSent = 0;
         static int tutorialStep = 0;
