@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -117,17 +118,11 @@ namespace UnityEngine.Analytics
                 var step = stepTable[oldId];
                 step.id = newId;
 
-                // Update reference in tutorials
-                for (int a = 0; a < tutorials.Count; a++)
+                var tutorialEntitiesToUpdate = tutorials.Select(t => t).Where(t => t.steps.Any(s => s == oldId));
+
+                foreach (var tutorialEntity in tutorialEntitiesToUpdate)
                 {
-                    for (int b = 0; b < tutorials[a].steps.Count; b++)
-                    {
-                        if (tutorials[a].steps[b] == oldId)
-                        {
-                            tutorials[a].steps[b] = newId;
-                            break;
-                        }
-                    }
+                    tutorialEntity.steps[tutorialEntity.steps.IndexOf(oldId)] = newId;
                 }
 
                 // Update content reference, if any
