@@ -2,13 +2,15 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace UnityEngine.Analytics {
-	public class TutorialManagerModel : ScriptableObject
-	{
+namespace UnityEngine.Analytics
+{
+    public class TutorialManagerModel : ScriptableObject
+    {
         private static TutorialManagerModel m_Instance;
         public static TutorialManagerModel GetInstance()
         {
-            if (m_Instance == null) {
+            if (m_Instance == null)
+            {
                 m_Instance = ScriptableObject.CreateInstance<TutorialManagerModel>();
             }
             return m_Instance;
@@ -43,7 +45,8 @@ namespace UnityEngine.Analytics {
         public string UpdateTutorialEntity(string oldId, string newId)
         {
             var result = oldId;
-            if (tutorialTable.ContainsKey(oldId) && tutorialTable.ContainsKey(newId) == false) {
+            if (tutorialTable.ContainsKey(oldId) && tutorialTable.ContainsKey(newId) == false)
+            {
                 var tutorial = tutorialTable[oldId];
                 tutorialTable.Remove(oldId);
                 tutorial.id = newId;
@@ -54,7 +57,7 @@ namespace UnityEngine.Analytics {
                 for (int a = 0; a < tutorial.steps.Count; a++)
                 {
                     string oldStepId = tutorial.steps[a];
-                    string stepBase = oldStepId.Substring(oldId.Length+1);
+                    string stepBase = oldStepId.Substring(oldId.Length + 1);
                     string newStepId = string.Format("{0}-{1}", newId, stepBase);
 
                     UpdateStepEntity(tutorial.steps[a], newStepId);
@@ -65,7 +68,8 @@ namespace UnityEngine.Analytics {
 
         public void DestroyTutorialEntity(string id)
         {
-            if (tutorialTable.ContainsKey(id)) {
+            if (tutorialTable.ContainsKey(id))
+            {
                 var tutorial = tutorialTable[id];
                 while (tutorial.steps.Count > 0)
                 {
@@ -182,7 +186,7 @@ namespace UnityEngine.Analytics {
             // Remove from stepTable
             // Remove from steps
             var step = stepTable[id];
-			steps.Remove(step);
+            steps.Remove(step);
             stepTable.Remove(id);
         }
 
@@ -268,10 +272,11 @@ namespace UnityEngine.Analytics {
         {
             return string.Format("{0}-{1}", stepId, ContentType.text.ToString());
         }
-	}
+    }
 
     [System.Serializable]
-    public class Entity {
+    public class Entity
+    {
         public string id;
 
         public Entity(string entityId)
