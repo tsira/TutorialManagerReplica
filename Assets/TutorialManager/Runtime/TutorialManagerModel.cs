@@ -118,9 +118,7 @@ namespace UnityEngine.Analytics
                 var step = stepTable[oldId];
                 step.id = newId;
 
-                var tutorialEntitiesToUpdate = tutorials.Select(t => t).Where(t => t.steps.Any(s => s == oldId));
-
-                foreach (var tutorialEntity in tutorialEntitiesToUpdate)
+                foreach (var tutorialEntity in GetTutorialsThatContainStepWithId(oldId))
                 {
                     tutorialEntity.steps[tutorialEntity.steps.IndexOf(oldId)] = newId;
                 }
@@ -150,16 +148,9 @@ namespace UnityEngine.Analytics
             if (stepTable.ContainsKey(id))
             {
                 // Remove from Tutorial
-                for (int a = 0; a < tutorials.Count; a++)
+                foreach (var tutorialEntity in GetTutorialsThatContainStepWithId(id)) 
                 {
-                    for (int b = 0; b < tutorials[a].steps.Count; b++)
-                    {
-                        if (tutorials[a].steps[b] == id)
-                        {
-                            tutorials[a].steps.RemoveAt(b);
-                            break;
-                        }
-                    }
+                    tutorialEntity.steps.RemoveAt(tutorialEntity.steps.IndexOf(id));
                 }
             }
 
@@ -182,6 +173,11 @@ namespace UnityEngine.Analytics
             var step = stepTable[id];
             steps.Remove(step);
             stepTable.Remove(id);
+        }
+
+        private IEnumerable<TutorialEntity> GetTutorialsThatContainStepWithId (string id)
+        {
+            return tutorials.Select(t => t).Where(t => t.steps.Any(s => s == id));
         }
 
         public string CreateContentEntity(string stepId, ContentType contentType, string contentValue = null)
