@@ -31,9 +31,7 @@ namespace UnityEngine.Analytics {
             // Tutorial id must be unique.
             if (tutorialTable.ContainsKey(id) == false)
             {
-                var tutorial = new TutorialEntity();
-                tutorial.id = id;
-                tutorial.steps = new List<string>();
+                var tutorial = new TutorialEntity(id);
 
                 tutorials.Add(tutorial);
                 tutorialTable.Add(id, tutorial);
@@ -95,7 +93,7 @@ namespace UnityEngine.Analytics {
                     // stepId must be unique in the stepTable.
                     if (stepTable.ContainsKey(id) == false)
                     {
-                        var step = new StepEntity();
+                        var step = new StepEntity(id);
                         step.id = id;
                         steps.Add(step);
                         stepTable.Add(id, step);
@@ -206,10 +204,7 @@ namespace UnityEngine.Analytics {
                     // contentId must be unique in the contentTable.
                     if (contentTable.ContainsKey(contentId) == false)
                     {
-                        var contentEntity = new ContentEntity();
-                        contentEntity.type = contentType.ToString();
-                        contentEntity.id = contentId;
-                        contentEntity.text = contentValue;
+                        var contentEntity = new ContentEntity(contentId, contentType.ToString(), contentValue);
 
                         content.Add(contentEntity);
                         contentTable.Add(contentId, contentEntity);
@@ -276,23 +271,38 @@ namespace UnityEngine.Analytics {
 	}
 
     [System.Serializable]
-    public class Entity {}
+    public class Entity {
+        public string id;
+
+        public Entity(string entityId)
+        {
+            id = entityId;
+        }
+    }
 
 
     [System.Serializable]
     public class TutorialEntity : Entity
     {
-        public string id;
         public bool isActive;
         public List<string> steps = new List<string>();
+
+        public TutorialEntity(string entityId, bool startActive = true) : base(entityId)
+        {
+            isActive = startActive;
+        }
     }
 
     [System.Serializable]
     public class StepEntity : Entity
     {
-        public string id;
         public bool isActive;
         public Messaging messaging = new Messaging();
+
+        public StepEntity(string entityId, bool startActive = true) : base(entityId)
+        {
+            isActive = startActive;
+        }
     }
 
     [System.Serializable]
@@ -306,8 +316,13 @@ namespace UnityEngine.Analytics {
     public class ContentEntity : Entity
     {
         public string type;
-        public string id;
         public string text;
+
+        public ContentEntity(string entityId, string contentType, string contentText) : base(entityId)
+        {
+            type = contentType;
+            text = contentText;
+        }
     }
 
     public enum ContentType
