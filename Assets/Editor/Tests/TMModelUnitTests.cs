@@ -45,113 +45,113 @@ namespace UnityEngine.Analytics
         [Test]
         public void CreateTutorial()
         {
-            var model = TutorialManagerModel.GetInstance();
+            var model = TutorialManagerModelMiddleware.GetInstance();
             model.Clear();
 
             model.CreateTutorialEntity(tutorialName1);
 
-            Assert.AreEqual(1, model.tutorials.Count, "tutorial length should be 1");
-            TutorialEntity entityFromList = model.tutorials[0];
+            Assert.AreEqual(1, model.TMData.tutorials.Count, "tutorial length should be 1");
+            TutorialEntity entityFromList = model.TMData.tutorials[0];
             Assert.IsNotNull(entityFromList, "entity should exist");
             Assert.That(tutorialName1, Is.EqualTo(entityFromList.id), string.Format("entity id shoyuld be {0}", tutorialName1));
-            TutorialEntity entityFromLookup = model.tutorialTable[tutorialName1];
+            TutorialEntity entityFromLookup = model.TMData.tutorialTable[tutorialName1];
 
             Assert.AreSame(entityFromList, entityFromLookup, "tutorial entities should be the same object");
-            Assert.AreEqual(1, model.tutorialTable.Count, "tutorialTable has 1 item");
+            Assert.AreEqual(1, model.TMData.tutorialTable.Count, "tutorialTable has 1 item");
 
             model.CreateTutorialEntity(tutorialName2);
-            Assert.AreEqual(2, model.tutorials.Count, "tutorial length should be 2");
-            TutorialEntity entityFromList2 = model.tutorials[1];
+            Assert.AreEqual(2, model.TMData.tutorials.Count, "tutorial length should be 2");
+            TutorialEntity entityFromList2 = model.TMData.tutorials[1];
             Assert.IsNotNull(entityFromList2, "second entity should exist");
             Assert.That(tutorialName2, Is.EqualTo(entityFromList2.id), string.Format("second entity id should be {0}", tutorialName2));
-            TutorialEntity entityFromLookup2 = model.tutorialTable[tutorialName2];
+            TutorialEntity entityFromLookup2 = model.TMData.tutorialTable[tutorialName2];
             Assert.AreSame(entityFromList2, entityFromLookup2, "tutorial entities should be the same object");
-            Assert.AreEqual(2, model.tutorialTable.Count, "tutorialTable has 2 items");
+            Assert.AreEqual(2, model.TMData.tutorialTable.Count, "tutorialTable has 2 items");
         }
 
         [Test]
         public void UpdateTutorialWhenNoStepsOrContent()
         {
-            var model = TutorialManagerModel.GetInstance();
+            var model = TutorialManagerModelMiddleware.GetInstance();
             model.Clear();
 
             model.CreateTutorialEntity(tutorialName1);
             model.CreateTutorialEntity(tutorialName2);
-            Assert.AreEqual(2, model.tutorials.Count, "tutorial length should be 2");
+            Assert.AreEqual(2, model.TMData.tutorials.Count, "tutorial length should be 2");
 
             model.UpdateTutorialEntity(tutorialName1, tutorialName1v2);
 
-            Assert.AreEqual(2, model.tutorials.Count, "tutorial length should still be 2");
+            Assert.AreEqual(2, model.TMData.tutorials.Count, "tutorial length should still be 2");
 
-            Assert.IsFalse(model.tutorialTable.ContainsKey(tutorialName1), "the old key has been destroyed");
+            Assert.IsFalse(model.TMData.tutorialTable.ContainsKey(tutorialName1), "the old key has been destroyed");
 
-            TutorialEntity entityFromLookup = model.tutorialTable[tutorialName1v2];
+            TutorialEntity entityFromLookup = model.TMData.tutorialTable[tutorialName1v2];
             Assert.IsNotNull(entityFromLookup, "the new key exists");
             Assert.That(tutorialName1v2, Is.EqualTo(entityFromLookup.id), "tutorial name should be changed");
-            TutorialEntity entityFromList = model.tutorials[0];
+            TutorialEntity entityFromList = model.TMData.tutorials[0];
             Assert.IsNotNull(entityFromList, "entity should exist");
             Assert.AreSame(entityFromList, entityFromLookup, "tutorial entities should be the same object");
 
-            TutorialEntity entityFromList2 = model.tutorials[1];
+            TutorialEntity entityFromList2 = model.TMData.tutorials[1];
             Assert.IsNotNull(entityFromList2, "second entity should not be destroyed");
             Assert.That(tutorialName2, Is.EqualTo(entityFromList2.id), "second entity id should be unchanged");
-            TutorialEntity entityFromLookup2 = model.tutorialTable[tutorialName2];
+            TutorialEntity entityFromLookup2 = model.TMData.tutorialTable[tutorialName2];
             Assert.AreSame(entityFromList2, entityFromLookup2, "tutorial entities should be the same object");
 
-            Assert.AreEqual(2, model.tutorialTable.Count, "tutorialTable has 2 items");
+            Assert.AreEqual(2, model.TMData.tutorialTable.Count, "tutorialTable has 2 items");
         }
 
         [Test]
         public void UpdateTutorialWhenSteps()
         {
-            var model = TutorialManagerModel.GetInstance();
+            var model = TutorialManagerModelMiddleware.GetInstance();
             model.Clear();
 
             SetupTutorial();
             SetupSteps();
 
-            var tutorial1 = model.tutorials[0];
+            var tutorial1 = model.TMData.tutorials[0];
 
             string updatedName = model.UpdateTutorialEntity(tutorialName1, tutorialName1v2);
 
             Assert.AreEqual(2, tutorial1.steps.Count, "tutorial 1 should still have 2 steps");
-            Assert.IsFalse(model.stepTable.ContainsKey(t1step1), "the old t1S1 key should be gone");
-            Assert.IsFalse(model.stepTable.ContainsKey(t1step2), "the old t1S2 key should be gone");
+            Assert.IsFalse(model.TMData.stepTable.ContainsKey(t1step1), "the old t1S1 key should be gone");
+            Assert.IsFalse(model.TMData.stepTable.ContainsKey(t1step2), "the old t1S2 key should be gone");
 
             var newStep1Id = ConstructID(tutorialName1v2, stepBaseID);
             var newStep2Id = ConstructID(tutorialName1v2, stepBaseID2);
 
-            Assert.IsTrue(model.stepTable.ContainsKey(newStep1Id), string.Format("new key should be {0}", newStep1Id));
-            Assert.IsTrue(model.stepTable.ContainsKey(newStep2Id), string.Format("new key should be {0}", newStep2Id));
-            Assert.That(newStep1Id, Is.EqualTo(model.stepTable[newStep1Id].id), "renamed tutorial should cascade and rename step 1");
-            Assert.That(newStep2Id, Is.EqualTo(model.stepTable[newStep2Id].id), "renamed tutorial should cascade and rename step 2");
+            Assert.IsTrue(model.TMData.stepTable.ContainsKey(newStep1Id), string.Format("new key should be {0}", newStep1Id));
+            Assert.IsTrue(model.TMData.stepTable.ContainsKey(newStep2Id), string.Format("new key should be {0}", newStep2Id));
+            Assert.That(newStep1Id, Is.EqualTo(model.TMData.stepTable[newStep1Id].id), "renamed tutorial should cascade and rename step 1");
+            Assert.That(newStep2Id, Is.EqualTo(model.TMData.stepTable[newStep2Id].id), "renamed tutorial should cascade and rename step 2");
         }
 
         [Test]
         public void UpdateTutorialWhenStepsAndContent()
         {
-            var model = TutorialManagerModel.GetInstance();
+            var model = TutorialManagerModelMiddleware.GetInstance();
             model.Clear();
 
             SetupTutorial();
             SetupSteps();
             SetupContent();
 
-            var tutorial1 = model.tutorials[0];
+            var tutorial1 = model.TMData.tutorials[0];
 
 
             var content1Id = ConstructID(t1step1, ContentType.text.ToString());
             var content2Id = ConstructID(t1step2, ContentType.text.ToString());
 
-            Assert.IsTrue(model.contentTable.ContainsKey(content1Id), "should have content key 1");
-            Assert.IsTrue(model.contentTable.ContainsKey(content2Id), "should have content key 2");
+            Assert.IsTrue(model.TMData.contentTable.ContainsKey(content1Id), "should have content key 1");
+            Assert.IsTrue(model.TMData.contentTable.ContainsKey(content2Id), "should have content key 2");
 
 
             string updatedName = model.UpdateTutorialEntity(tutorialName1, tutorialName1v2);
 
-            Assert.AreEqual(2, model.contentTable.Count, "should still have 2 content elements");
-            Assert.IsFalse(model.contentTable.ContainsKey(content1Id), "the old key 1 should be gone");
-            Assert.IsFalse(model.contentTable.ContainsKey(content1Id), "the old key 2 should be gone");
+            Assert.AreEqual(2, model.TMData.contentTable.Count, "should still have 2 content elements");
+            Assert.IsFalse(model.TMData.contentTable.ContainsKey(content1Id), "the old key 1 should be gone");
+            Assert.IsFalse(model.TMData.contentTable.ContainsKey(content1Id), "the old key 2 should be gone");
 
             var newStep1Id = ConstructID(tutorialName1v2, stepBaseID);
             var newStep2Id = ConstructID(tutorialName1v2, stepBaseID2);
@@ -159,47 +159,47 @@ namespace UnityEngine.Analytics
             var newContent2Id = ConstructID(newStep1Id, ContentType.text.ToString());
 
 
-            Assert.IsTrue(model.contentTable.ContainsKey(newContent1Id), "should have updated content key 1");
-            Assert.IsTrue(model.contentTable.ContainsKey(newContent2Id), "should have updated content key 2");
+            Assert.IsTrue(model.TMData.contentTable.ContainsKey(newContent1Id), "should have updated content key 1");
+            Assert.IsTrue(model.TMData.contentTable.ContainsKey(newContent2Id), "should have updated content key 2");
 
-            Assert.That(newContent1Id, Is.EqualTo(model.contentTable[newContent1Id].id), "renamed tutorial should cascade and rename content 1");
-            Assert.That(newContent2Id, Is.EqualTo(model.contentTable[newContent2Id].id), "renamed tutorial should cascade and rename content 2");
+            Assert.That(newContent1Id, Is.EqualTo(model.TMData.contentTable[newContent1Id].id), "renamed tutorial should cascade and rename content 1");
+            Assert.That(newContent2Id, Is.EqualTo(model.TMData.contentTable[newContent2Id].id), "renamed tutorial should cascade and rename content 2");
         }
 
         [Test]
         public void DestroyTutorial()
         {
 
-            var model = TutorialManagerModel.GetInstance();
+            var model = TutorialManagerModelMiddleware.GetInstance();
             model.Clear();
 
             model.CreateTutorialEntity(tutorialName1);
             model.CreateTutorialEntity(tutorialName2);
-            Assert.AreEqual(2, model.tutorials.Count, "tutorial length should be 2");
+            Assert.AreEqual(2, model.TMData.tutorials.Count, "tutorial length should be 2");
 
             model.DestroyTutorialEntity(tutorialName1);
-            Assert.AreEqual(1, model.tutorials.Count, "tutorial length should be 1");
+            Assert.AreEqual(1, model.TMData.tutorials.Count, "tutorial length should be 1");
 
-            TutorialEntity entityFromLookup = model.tutorialTable[tutorialName2];
+            TutorialEntity entityFromLookup = model.TMData.tutorialTable[tutorialName2];
             Assert.IsNotNull(entityFromLookup, "the second tutorial still exists");
             Assert.That(tutorialName2, Is.EqualTo(entityFromLookup.id), "tutorial id 2 is unaffected");
-            TutorialEntity entityFromList = model.tutorials[0];
+            TutorialEntity entityFromList = model.TMData.tutorials[0];
             Assert.IsNotNull(entityFromList, "entity should exist");
             Assert.AreSame(entityFromList, entityFromLookup, "tutorial entities should be the same object");
 
             model.DestroyTutorialEntity(tutorialName2);
-            Assert.AreEqual(0, model.tutorials.Count, "tutorials should be empty");
-            Assert.AreEqual(0, model.tutorialTable.Count, "tutorialTable should be empty");
+            Assert.AreEqual(0, model.TMData.tutorials.Count, "tutorials should be empty");
+            Assert.AreEqual(0, model.TMData.tutorialTable.Count, "tutorialTable should be empty");
         }
 
         [Test]
         public void CreateStep()
         {
             SetupTutorial();
-            var model = TutorialManagerModel.GetInstance();
-            var tutorial1 = model.tutorials[0];
-            var tutorial2 = model.tutorials[1];
-            var tutorial3 = model.tutorials[2];
+            var model = TutorialManagerModelMiddleware.GetInstance();
+            var tutorial1 = model.TMData.tutorials[0];
+            var tutorial2 = model.TMData.tutorials[1];
+            var tutorial3 = model.TMData.tutorials[2];
 
             Assert.IsEmpty(tutorial1.steps, "tutorial 1 should exist but have no steps");
             Assert.IsEmpty(tutorial2.steps, "tutorial 2 should exist but have no steps");
@@ -212,10 +212,10 @@ namespace UnityEngine.Analytics
             Assert.AreEqual(1, tutorial1.steps.Count, "tutorial 1 should have one step");
             Assert.IsEmpty(tutorial2.steps, "tutorial 2 should still have no steps");
             Assert.IsEmpty(tutorial3.steps, "tutorial 3 should still have no steps");
-            Assert.AreEqual(1, model.stepTable.Count, "model should have 1 step");
+            Assert.AreEqual(1, model.TMData.stepTable.Count, "model should have 1 step");
 
-            StepEntity t1S1FromList = model.steps[0];
-            StepEntity t1S1FromTable = model.stepTable[t1step1];
+            StepEntity t1S1FromList = model.TMData.steps[0];
+            StepEntity t1S1FromTable = model.TMData.stepTable[t1step1];
             Assert.IsNotNull(t1S1FromList, "new step should be in list");
             Assert.IsNotNull(t1S1FromTable, "new step should be in table");
             Assert.AreSame(t1S1FromList, t1S1FromTable, "the two entities should represent the same step");
@@ -231,10 +231,10 @@ namespace UnityEngine.Analytics
             Assert.AreEqual(2, tutorial1.steps.Count, "tutorial 1 should have 2 steps");
             Assert.IsEmpty(tutorial2.steps, "tutorial 2 should still have no steps");
             Assert.IsEmpty(tutorial3.steps, "tutorial 3 should still have no steps");
-            Assert.AreEqual(2, model.stepTable.Count, "model should have 2 steps");
+            Assert.AreEqual(2, model.TMData.stepTable.Count, "model should have 2 steps");
 
-            StepEntity t1S2FromList = model.steps[1];
-            StepEntity t1S2FromTable = model.stepTable[t1step2];
+            StepEntity t1S2FromList = model.TMData.steps[1];
+            StepEntity t1S2FromTable = model.TMData.stepTable[t1step2];
             Assert.IsNotNull(t1S2FromList, "new step t1S2 should be in list");
             Assert.IsNotNull(t1S2FromTable, "new step t1S2 should be in table");
             Assert.AreSame(t1S2FromList, t1S2FromTable, "the two entities should represent the same step");
@@ -249,10 +249,10 @@ namespace UnityEngine.Analytics
             Assert.AreEqual(2, tutorial1.steps.Count, "tutorial 1 should have 2 steps");
             Assert.AreEqual(1, tutorial2.steps.Count, "tutorial 2 should have 1 step");
             Assert.IsEmpty(tutorial3.steps, "tutorial 3 should still have no steps");
-            Assert.AreEqual(3, model.stepTable.Count, "model should have 3 steps");
+            Assert.AreEqual(3, model.TMData.stepTable.Count, "model should have 3 steps");
 
-            StepEntity t2S1FromList = model.steps[2];
-            StepEntity t2S1FromTable = model.stepTable[t2step1];
+            StepEntity t2S1FromList = model.TMData.steps[2];
+            StepEntity t2S1FromTable = model.TMData.stepTable[t2step1];
             Assert.IsNotNull(t2S1FromList, "new step t2S1 hould be in list");
             Assert.IsNotNull(t2S1FromTable, "new step t2S1 should be in table");
             Assert.AreSame(t2S1FromList, t2S1FromTable, "the two entities should represent the same step");
@@ -266,10 +266,10 @@ namespace UnityEngine.Analytics
             Assert.AreEqual(2, tutorial1.steps.Count, "tutorial 1 should have 2 steps");
             Assert.AreEqual(2, tutorial2.steps.Count, "tutorial 2 should have 2 steps");
             Assert.IsEmpty(tutorial3.steps, "tutorial 3 should still have no steps");
-            Assert.AreEqual(4, model.stepTable.Count, "model should have 4 steps");
+            Assert.AreEqual(4, model.TMData.stepTable.Count, "model should have 4 steps");
 
-            StepEntity t2S2FromList = model.steps[3];
-            StepEntity t2S2FromTable = model.stepTable[t2step2];
+            StepEntity t2S2FromList = model.TMData.steps[3];
+            StepEntity t2S2FromTable = model.TMData.stepTable[t2step2];
             Assert.IsNotNull(t2S2FromList, "new step t2S2 should be in list");
             Assert.IsNotNull(t2S2FromTable, "new step t2S2 should be in table");
             Assert.AreSame(t2S2FromList, t2S2FromTable, "the two entities should represent the same step");
@@ -284,20 +284,20 @@ namespace UnityEngine.Analytics
         {
             SetupTutorial();
             SetupSteps();
-            var model = TutorialManagerModel.GetInstance();
-            var tutorial1 = model.tutorials[0];
+            var model = TutorialManagerModelMiddleware.GetInstance();
+            var tutorial1 = model.TMData.tutorials[0];
 
             model.UpdateStepEntity(t1step1, t1step1v2);
 
             Assert.AreEqual(2, tutorial1.steps.Count, "tutorial 1 should still have 2 steps");
             Assert.IsFalse(tutorial1.steps.Contains(t1step1), "the old t1S1 key should be gone from the Tutorial steps");
-            Assert.IsFalse(model.stepTable.ContainsKey(t1step1), "the old t1S1 key should be gone from the stepTable");
+            Assert.IsFalse(model.TMData.stepTable.ContainsKey(t1step1), "the old t1S1 key should be gone from the stepTable");
             Assert.IsTrue(tutorial1.steps.Contains(t1step1v2), "the new t1step1v2 key should be in from the Tutorial steps");
-            Assert.IsTrue(model.stepTable.ContainsKey(t1step1v2), "there should be a new t1step1v2 key in the stepTable");
+            Assert.IsTrue(model.TMData.stepTable.ContainsKey(t1step1v2), "there should be a new t1step1v2 key in the stepTable");
 
-            StepEntity stepEntity = model.stepTable[t1step1v2];
+            StepEntity stepEntity = model.TMData.stepTable[t1step1v2];
             Assert.That(t1step1v2, Is.EqualTo(stepEntity.id), string.Format("step id should be {0}", t1step1v2));
-            Assert.That(t1step2, Is.EqualTo(model.stepTable[t1step2].id), "other step t1step2 should be unchanged");
+            Assert.That(t1step2, Is.EqualTo(model.TMData.stepTable[t1step2].id), "other step t1step2 should be unchanged");
 
             EnsureUnaffectedSteps();
         }
@@ -309,21 +309,21 @@ namespace UnityEngine.Analytics
             SetupSteps();
             SetupContent();
 
-            var model = TutorialManagerModel.GetInstance();
-            var tutorial1 = model.tutorials[0];
+            var model = TutorialManagerModelMiddleware.GetInstance();
+            var tutorial1 = model.TMData.tutorials[0];
 
 
             string step1TextId = ConstructID(t1step1, ContentType.text.ToString());
-            Assert.IsTrue(model.contentTable.ContainsKey(step1TextId), "should have a step1TextId key");
-            Assert.That(step1TextId, Is.EqualTo(model.contentTable[step1TextId].id), "content object should have correct id");
+            Assert.IsTrue(model.TMData.contentTable.ContainsKey(step1TextId), "should have a step1TextId key");
+            Assert.That(step1TextId, Is.EqualTo(model.TMData.contentTable[step1TextId].id), "content object should have correct id");
 
             model.UpdateStepEntity(t1step1, t1step1v2);
             string step1TextIdv2 = ConstructID(t1step1v2, ContentType.text.ToString());
 
-            Assert.AreEqual(2, model.content.Count, "there should still be 2 content items");
-            Assert.IsFalse(model.contentTable.ContainsKey(step1TextId), "step1TextId key should be gone");
-            Assert.IsTrue(model.contentTable.ContainsKey(step1TextIdv2), "should have a new step1TextIdv2 key");
-            Assert.That(step1TextIdv2, Is.EqualTo(model.contentTable[step1TextIdv2].id), "content object should have correct id");
+            Assert.AreEqual(2, model.TMData.content.Count, "there should still be 2 content items");
+            Assert.IsFalse(model.TMData.contentTable.ContainsKey(step1TextId), "step1TextId key should be gone");
+            Assert.IsTrue(model.TMData.contentTable.ContainsKey(step1TextIdv2), "should have a new step1TextIdv2 key");
+            Assert.That(step1TextIdv2, Is.EqualTo(model.TMData.contentTable[step1TextIdv2].id), "content object should have correct id");
 
             EnsureUnaffectedSteps();
         }
@@ -334,30 +334,30 @@ namespace UnityEngine.Analytics
             SetupTutorial();
             SetupSteps();
 
-            var model = TutorialManagerModel.GetInstance();
-            var tutorial1 = model.tutorials[0];
-            var tutorial2 = model.tutorials[1];
-            var tutorial3 = model.tutorials[2];
+            var model = TutorialManagerModelMiddleware.GetInstance();
+            var tutorial1 = model.TMData.tutorials[0];
+            var tutorial2 = model.TMData.tutorials[1];
+            var tutorial3 = model.TMData.tutorials[2];
 
-            int stepTableCount = model.stepTable.Count;
-            int stepListCount = model.steps.Count;
+            int stepTableCount = model.TMData.stepTable.Count;
+            int stepListCount = model.TMData.steps.Count;
 
             model.DestroyStepEntity(t1step1);
 
             Assert.AreEqual(1, tutorial1.steps.Count, "tutorial 1 should have just 1 step");
             Assert.That(t1step2, Is.EqualTo(tutorial1.steps[0]), "the first step item in tutorial 1 should be t1step2");
-            Assert.AreEqual(1, stepTableCount - model.stepTable.Count, "stepTable count should have decremented by one");
-            Assert.AreEqual(1, stepListCount - model.steps.Count, "steps count should have decremented by one");
-            Assert.IsFalse(model.stepTable.ContainsKey(t1step1), "the step should have been removed from the table");
+            Assert.AreEqual(1, stepTableCount - model.TMData.stepTable.Count, "stepTable count should have decremented by one");
+            Assert.AreEqual(1, stepListCount - model.TMData.steps.Count, "steps count should have decremented by one");
+            Assert.IsFalse(model.TMData.stepTable.ContainsKey(t1step1), "the step should have been removed from the table");
 
             Assert.IsFalse(FoundKeyInList(t1step1, tutorial1.steps), "content should have been removed from step list");
 
             model.DestroyStepEntity(t1step2);
 
             Assert.IsEmpty(tutorial1.steps, "tutorial 1 should be empty");
-            Assert.AreEqual(2, stepTableCount - model.stepTable.Count, "stepTable count should have decremented by two");
-            Assert.AreEqual(2, stepListCount - model.steps.Count, "steps count should have decremented by two");
-            Assert.IsFalse(model.stepTable.ContainsKey(t1step2), "the step should have been removed from the table");
+            Assert.AreEqual(2, stepTableCount - model.TMData.stepTable.Count, "stepTable count should have decremented by two");
+            Assert.AreEqual(2, stepListCount - model.TMData.steps.Count, "steps count should have decremented by two");
+            Assert.IsFalse(model.TMData.stepTable.ContainsKey(t1step2), "the step should have been removed from the table");
 
             EnsureUnaffectedSteps();
         }
@@ -368,12 +368,12 @@ namespace UnityEngine.Analytics
             SetupTutorial();
             SetupSteps();
 
-            var model = TutorialManagerModel.GetInstance();
+            var model = TutorialManagerModelMiddleware.GetInstance();
             string expectedStep1TextId = ConstructID(t1step1, ContentType.text.ToString());
             string expectedStep2TextId = ConstructID(t1step2, ContentType.text.ToString());
 
-            var t1s1 = model.stepTable[t1step1];
-            var t1s2 = model.stepTable[t1step2];
+            var t1s1 = model.TMData.stepTable[t1step1];
+            var t1s2 = model.TMData.stepTable[t1step2];
 
 
             // Add content to s1
@@ -383,10 +383,10 @@ namespace UnityEngine.Analytics
 
             Assert.AreEqual(1, t1s1.messaging.content.Count, "step 1 should have one content item");
             Assert.IsEmpty(t1s2.messaging.content, "step 2 should still have no steps");
-            Assert.AreEqual(1, model.contentTable.Count, "model should have 1 content item");
+            Assert.AreEqual(1, model.TMData.contentTable.Count, "model should have 1 content item");
 
-            ContentEntity t1S1textFromList = model.content[0];
-            ContentEntity t1S1textFromTable = model.contentTable[contentId];
+            ContentEntity t1S1textFromList = model.TMData.content[0];
+            ContentEntity t1S1textFromTable = model.TMData.contentTable[contentId];
             Assert.IsNotNull(t1S1textFromList, "new content item should be in list");
             Assert.IsNotNull(t1S1textFromTable, "new content item should be in table");
             Assert.AreSame(t1S1textFromList, t1S1textFromTable, "the two entities should represent the same content item");
@@ -405,10 +405,10 @@ namespace UnityEngine.Analytics
 
             Assert.AreEqual(1, t1s2.messaging.content.Count, "step 2 should have one content item");
             Assert.AreEqual(1, t1s1.messaging.content.Count, "step 1 should still have 1 step");
-            Assert.AreEqual(2, model.contentTable.Count, "model should have 2 content items");
+            Assert.AreEqual(2, model.TMData.contentTable.Count, "model should have 2 content items");
 
-            ContentEntity t1S2textFromList = model.content[1];
-            ContentEntity t1S2textFromTable = model.contentTable[contentId2];
+            ContentEntity t1S2textFromList = model.TMData.content[1];
+            ContentEntity t1S2textFromTable = model.TMData.contentTable[contentId2];
             Assert.IsNotNull(t1S2textFromList, "new content item should be in list");
             Assert.IsNotNull(t1S2textFromTable, "new content item should be in table");
             Assert.AreSame(t1S2textFromList, t1S2textFromTable, "the two entities should represent the same content item");
@@ -428,11 +428,11 @@ namespace UnityEngine.Analytics
 
             string expectedStep1TextId = ConstructID(t1step1, ContentType.text.ToString());
 
-            var model = TutorialManagerModel.GetInstance();
-            var step1 = model.steps[0];
-            var tutorial1 = model.tutorials[0];
+            var model = TutorialManagerModelMiddleware.GetInstance();
+            var step1 = model.TMData.steps[0];
+            var tutorial1 = model.TMData.tutorials[0];
 
-            var content = model.contentTable[expectedStep1TextId];
+            var content = model.TMData.contentTable[expectedStep1TextId];
 
             Assert.That(t1step1Text, Is.EqualTo(content.text), "content should have original text");
             model.UpdateContentEntity(expectedStep1TextId, t1step1Textv2);
@@ -451,24 +451,24 @@ namespace UnityEngine.Analytics
             string textId1 = ConstructID(t1step1, ContentType.text.ToString());
             string textId2 = ConstructID(t1step2, ContentType.text.ToString());
 
-            var model = TutorialManagerModel.GetInstance();
-            int contentListCount = model.content.Count;
-            int contentTableCount = model.contentTable.Count;
-            Assert.That(textId1, Is.EqualTo(model.content[0].id), "the original content 0 was in first position");
+            var model = TutorialManagerModelMiddleware.GetInstance();
+            int contentListCount = model.TMData.content.Count;
+            int contentTableCount = model.TMData.contentTable.Count;
+            Assert.That(textId1, Is.EqualTo(model.TMData.content[0].id), "the original content 0 was in first position");
 
             model.DestroyContentEntity(textId1);
 
-            Assert.AreEqual(1, contentListCount - model.content.Count, "content list should have lost an item");
-            Assert.AreEqual(1, contentTableCount - model.contentTable.Count, "content table should have lost an item");
-            Assert.That(textId2, Is.EqualTo(model.content[0].id), "content 2 is now in the first position");
-            Assert.IsFalse(model.contentTable.ContainsKey(t1step1), "original content removed from the content table");
+            Assert.AreEqual(1, contentListCount - model.TMData.content.Count, "content list should have lost an item");
+            Assert.AreEqual(1, contentTableCount - model.TMData.contentTable.Count, "content table should have lost an item");
+            Assert.That(textId2, Is.EqualTo(model.TMData.content[0].id), "content 2 is now in the first position");
+            Assert.IsFalse(model.TMData.contentTable.ContainsKey(t1step1), "original content removed from the content table");
 
             model.DestroyContentEntity(textId2);
 
-            Assert.AreEqual(2, contentListCount - model.content.Count, "content list should have lost an item");
-            Assert.AreEqual(2, contentTableCount - model.contentTable.Count, "content table should have lost an item");
-            Assert.IsEmpty(model.contentTable, "all content removed from the content table");
-            Assert.IsEmpty(model.content, "all content removed from the content list");
+            Assert.AreEqual(2, contentListCount - model.TMData.content.Count, "content list should have lost an item");
+            Assert.AreEqual(2, contentTableCount - model.TMData.contentTable.Count, "content table should have lost an item");
+            Assert.IsEmpty(model.TMData.contentTable, "all content removed from the content table");
+            Assert.IsEmpty(model.TMData.content, "all content removed from the content list");
 
             EnsureUnaffectedSteps();
         }
@@ -476,32 +476,46 @@ namespace UnityEngine.Analytics
         [Test]
         public void Clear()
         {
-            var model = TutorialManagerModel.GetInstance();
+            var model = TutorialManagerModelMiddleware.GetInstance();
             model.Clear();
 
             SetupTutorial();
             SetupSteps();
             SetupContent();
 
-            Assert.IsNotEmpty(model.tutorials, "tutorials should be populated");
-            Assert.IsNotEmpty(model.steps, "steps should be populated");
-            Assert.IsNotEmpty(model.content, "content should be populated");
-            Assert.IsNotEmpty(model.tutorialTable, "tutorial table should be populated");
-            Assert.IsNotEmpty(model.stepTable, "step table should be populated");
-            Assert.IsNotEmpty(model.contentTable, "content table should be populated");
+            Assert.IsNotEmpty(model.TMData.tutorials, "tutorials should be populated");
+            Assert.IsNotEmpty(model.TMData.steps, "steps should be populated");
+            Assert.IsNotEmpty(model.TMData.content, "content should be populated");
+            Assert.IsNotEmpty(model.TMData.tutorialTable, "tutorial table should be populated");
+            Assert.IsNotEmpty(model.TMData.stepTable, "step table should be populated");
+            Assert.IsNotEmpty(model.TMData.contentTable, "content table should be populated");
 
             model.Clear();
 
-            Assert.IsEmpty(model.tutorials, "tutorials should be empty");
-            Assert.IsEmpty(model.steps, "steps should be empty");
-            Assert.IsEmpty(model.content, "content should be empty");
-            Assert.IsEmpty(model.tutorialTable, "tutorial table should be empty");
-            Assert.IsEmpty(model.stepTable, "step table should be empty");
-            Assert.IsEmpty(model.contentTable, "content table should be empty");
+            Assert.IsEmpty(model.TMData.tutorials, "tutorials should be empty");
+            Assert.IsEmpty(model.TMData.steps, "steps should be empty");
+            Assert.IsEmpty(model.TMData.content, "content should be empty");
+            Assert.IsEmpty(model.TMData.tutorialTable, "tutorial table should be empty");
+            Assert.IsEmpty(model.TMData.stepTable, "step table should be empty");
+            Assert.IsEmpty(model.TMData.contentTable, "content table should be empty");
+        }
+
+        [Test]
+        public void ReadFromFile ()
+        {
+            //var actualModel = new TutorialManagerModel();
+            //var tutorial = new TutorialEntity("tutorial1");
+            //tutorial.steps.Add("step1");
+            //var step = new StepEntity("step1");
+            //step.messaging
+            //var text = new AdaptiveText
+            //actualModel.tutorials.Add(new TutorialEntity("tutorial1", true));
+            //actualModel.steps.Add(new StepEntity("step1"));
+            //actualModel.stepTable.Add("step1", );
         }
 
         void SetupTutorial() {
-            var model = TutorialManagerModel.GetInstance();
+            var model = TutorialManagerModelMiddleware.GetInstance();
             model.Clear();
             model.CreateTutorialEntity(tutorialName1);
             model.CreateTutorialEntity(tutorialName2);
@@ -510,10 +524,10 @@ namespace UnityEngine.Analytics
         }
 
         void SetupSteps() {
-            var model = TutorialManagerModel.GetInstance();
-            var tutorial1 = model.tutorials[0];
-            var tutorial2 = model.tutorials[1];
-            var tutorial3 = model.tutorials[2];
+            var model = TutorialManagerModelMiddleware.GetInstance();
+            var tutorial1 = model.TMData.tutorials[0];
+            var tutorial2 = model.TMData.tutorials[1];
+            var tutorial3 = model.TMData.tutorials[2];
 
             model.CreateStepEntity(t1step1, tutorial1.id);
             model.CreateStepEntity(t1step2, tutorial1.id);
@@ -526,24 +540,24 @@ namespace UnityEngine.Analytics
         }
 
         void SetupContent() {
-            var model = TutorialManagerModel.GetInstance();
+            var model = TutorialManagerModelMiddleware.GetInstance();
 
-            var t1s1 = model.stepTable[t1step1];
-            var t1s2 = model.stepTable[t1step2];
+            var t1s1 = model.TMData.stepTable[t1step1];
+            var t1s2 = model.TMData.stepTable[t1step2];
 
             model.CreateContentEntity(t1step1, ContentType.text, t1step1Text);
             model.CreateContentEntity(t1step2, ContentType.text, t1step2Text);
 
-            Assert.AreEqual(2, model.content.Count, "content should have 2 items");
-            Assert.AreEqual(2, model.contentTable.Count, "contentTable should have 2 items");
+            Assert.AreEqual(2, model.TMData.content.Count, "content should have 2 items");
+            Assert.AreEqual(2, model.TMData.contentTable.Count, "contentTable should have 2 items");
             Assert.AreEqual(1, t1s1.messaging.content.Count, "t1s1 content should have 1 items");
             Assert.AreEqual(1, t1s2.messaging.content.Count, "t1s2 should have 1 items");
         }
 
         void EnsureUnaffectedSteps() {
-            var model = TutorialManagerModel.GetInstance();
-            var tutorial2 = model.tutorials[1];
-            var tutorial3 = model.tutorials[2];
+            var model = TutorialManagerModelMiddleware.GetInstance();
+            var tutorial2 = model.TMData.tutorials[1];
+            var tutorial3 = model.TMData.tutorials[2];
 
             Assert.AreEqual(2, tutorial2.steps.Count, "tutorial 2 should still have 2 steps");
             Assert.AreEqual(0, tutorial3.steps.Count, "tutorial 3 should still have no steps");

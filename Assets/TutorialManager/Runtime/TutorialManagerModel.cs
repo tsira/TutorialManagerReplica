@@ -7,19 +7,9 @@ using System.IO;
 
 namespace UnityEngine.Analytics.TutorialManagerRuntime
 {
-    public class TutorialManagerModel : ScriptableObject
+    [System.Serializable]
+    public class TutorialManagerModel
     {
-        private static TutorialManagerModel m_Instance;
-        public static TutorialManagerModel GetInstance()
-        {
-            if (m_Instance == null)
-            {
-                m_Instance = ScriptableObject.CreateInstance<TutorialManagerModel>();
-            }
-            return m_Instance;
-        }
-
-        public bool enabled;
         public List<TutorialEntity> tutorials = new List<TutorialEntity>();
         public List<StepEntity> steps = new List<StepEntity>();
         public List<ContentEntity> content = new List<ContentEntity>();
@@ -28,6 +18,23 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         public Dictionary<string, TutorialEntity> tutorialTable = new Dictionary<string, TutorialEntity>();
         public Dictionary<string, StepEntity> stepTable = new Dictionary<string, StepEntity>();
         public Dictionary<string, ContentEntity> contentTable = new Dictionary<string, ContentEntity>();
+    }
+
+    public class TutorialManagerModelMiddleware
+    {
+        private static TutorialManagerModelMiddleware m_Instance;
+        public static TutorialManagerModelMiddleware GetInstance()
+        {
+            if (m_Instance == null)
+            {
+                m_Instance = new TutorialManagerModelMiddleware();
+                m_Instance.TMData = new TutorialManagerModel();
+                TMSerializer.ReadFromDisk(m_Instance.TMData);
+            }
+            return m_Instance;
+        }
+
+        public TutorialManagerModel TMData;
 
 #if UNITY_EDITOR
         public string CreateTutorialEntity(string id)
@@ -35,12 +42,12 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             string result = null;
             // Enforce tutorial rule #1.
             // Tutorial id must be unique.
-            if (tutorialTable.ContainsKey(id) == false)
+            if (TMData.tutorialTable.ContainsKey(id) == false)
             {
                 var tutorial = new TutorialEntity(id);
 
-                tutorials.Add(tutorial);
-                tutorialTable.Add(id, tutorial);
+                TMData.tutorials.Add(tutorial);
+                TMData.tutorialTable.Add(id, tutorial);
                 result = tutorial.id;
                 Save();
             }
@@ -50,12 +57,12 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         public string UpdateTutorialEntity(string oldId, string newId)
         {
             var result = oldId;
-            if (tutorialTable.ContainsKey(oldId) && tutorialTable.ContainsKey(newId) == false)
+            if (TMData.tutorialTable.ContainsKey(oldId) && TMData.tutorialTable.ContainsKey(newId) == false)
             {
-                var tutorial = tutorialTable[oldId];
-                tutorialTable.Remove(oldId);
+                var tutorial = TMData.tutorialTable[oldId];
+                TMData.tutorialTable.Remove(oldId);
                 tutorial.id = newId;
-                tutorialTable.Add(newId, tutorial);
+                TMData.tutorialTable.Add(newId, tutorial);
                 result = newId;
 
                 // migrate associated steps
@@ -74,15 +81,15 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 #if UNITY_EDITOR
         public void DestroyTutorialEntity(string id)
         {
-            if (tutorialTable.ContainsKey(id))
+            if (TMData.tutorialTable.ContainsKey(id))
             {
-                var tutorial = tutorialTable[id];
+                var tutorial = TMData.tutorialTable[id];
                 while (tutorial.steps.Count > 0)
                 {
                     DestroyStepEntity(tutorial.steps[tutorial.steps.Count - 1]);
                 }
-                tutorialTable.Remove(id);
-                tutorials.Remove(tutorial);
+                TMData.tutorialTable.Remove(id);
+                TMData.tutorials.Remove(tutorial);
                 Save();
             }
         }
@@ -93,20 +100,20 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
             // Enforce step rule #1.
             // Must be attached to existing tutorial.
-            if (tutorialTable.ContainsKey(tutorialId))
+            if (TMData.tutorialTable.ContainsKey(tutorialId))
             {
                 // Enforce step rule #2.
                 // Tutorial must not contain a reference to a step with this id.
-                var tutorial = tutorialTable[tutorialId];
+                var tutorial = TMData.tutorialTable[tutorialId];
                 if (tutorial.steps.Contains(id) == false)
                 {
                     // Enforce step rule #3.
                     // stepId must be unique in the stepTable.
-                    if (stepTable.ContainsKey(id) == false)
+                    if (TMData.stepTable.ContainsKey(id) == false)
                     {
                         var step = new StepEntity(id);
-                        steps.Add(step);
-                        stepTable.Add(id, step);
+                        TMData.steps.Add(step);
+                        TMData.stepTable.Add(id, step);
                         tutorial.steps.Add(id);
                         result = id;
                         Save();
@@ -120,9 +127,9 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         public string UpdateStepEntity(string oldId, string newId)
         {
             var result = oldId;
-            if (stepTable.ContainsKey(oldId) && stepTable.ContainsKey(newId) == false)
+            if (TMData.stepTable.ContainsKey(oldId) && TMData.stepTable.ContainsKey(newId) == false)
             {
-                var step = stepTable[oldId];
+                var step = TMData.stepTable[oldId];
                 step.id = newId;
 
                 foreach (var tutorialEntity in GetTutorialsThatContainStepWithId(oldId))
@@ -133,18 +140,18 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                 // Update content reference, if any
                 string oldContentId = GetTextId(oldId);
                 string newContentId = GetTextId(newId);
-                if (contentTable.ContainsKey(oldContentId))
+                if (TMData.contentTable.ContainsKey(oldContentId))
                 {
-                    var contentEntity = contentTable[oldContentId];
+                    var contentEntity = TMData.contentTable[oldContentId];
                     contentEntity.id = newContentId;
-                    contentTable.Remove(oldContentId);
-                    contentTable.Add(newContentId, contentEntity);
+                    TMData.contentTable.Remove(oldContentId);
+                    TMData.contentTable.Add(newContentId, contentEntity);
                 }
 
                 // Remove from stepTable
-                stepTable.Remove(oldId);
+                TMData.stepTable.Remove(oldId);
                 // Add to stepTable under new id
-                stepTable.Add(newId, step);
+                TMData.stepTable.Add(newId, step);
                 result = newId;
                 Save();
             }
@@ -153,7 +160,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 #if UNITY_EDITOR
         public void DestroyStepEntity(string id)
         {
-            if (stepTable.ContainsKey(id))
+            if (TMData.stepTable.ContainsKey(id))
             {
                 // Remove from Tutorial
                 foreach (var tutorialEntity in GetTutorialsThatContainStepWithId(id)) 
@@ -163,7 +170,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
                 // Remove related content entries
                 List<string> contentToRemove = new List<string>();
-                foreach (ContentEntity c in content)
+                foreach (ContentEntity c in TMData.content)
                 {
                     if (c.id.IndexOf(c.id, 0, System.StringComparison.Ordinal) > -1)
                     {
@@ -177,16 +184,16 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
                 // Remove from stepTable
                 // Remove from steps
-                var step = stepTable[id];
-                steps.Remove(step);
-                stepTable.Remove(id);
+                var step = TMData.stepTable[id];
+                TMData.steps.Remove(step);
+                TMData.stepTable.Remove(id);
                 Save();
 		    }
         }
 #endif
         private IEnumerable<TutorialEntity> GetTutorialsThatContainStepWithId (string id)
         {
-            return tutorials.Select(t => t).Where(t => t.steps.Any(s => s == id));
+            return TMData.tutorials.Select(t => t).Where(t => t.steps.Any(s => s == id));
         }
 #if UNITY_EDITOR
         public string CreateContentEntity(string stepId, ContentType contentType, string contentValue = null)
@@ -194,23 +201,22 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             string result = null;
             // Enforce content rule #1.
             // Must be attached to existing step.
-            if (stepTable.ContainsKey(stepId))
+            if (TMData.stepTable.ContainsKey(stepId))
             {
                 // Enforce content rule #2.
                 // Step must not contain a reference to content with this type.
-                var step = stepTable[stepId];
-                if (step.messaging.content.Contains(contentType.ToString()) == false)
+                var step = TMData.stepTable[stepId];
+                string contentId = GetTextId(stepId);
+                if (step.messaging.content.Contains(contentId) == false)
                 {
-                    string contentId = GetTextId(stepId);
-
                     // Enforce step rule #3.
                     // contentId must be unique in the contentTable.
-                    if (contentTable.ContainsKey(contentId) == false)
+                    if (TMData.contentTable.ContainsKey(contentId) == false)
                     {
                         var contentEntity = new ContentEntity(contentId, contentType.ToString(), contentValue);
 
-                        content.Add(contentEntity);
-                        contentTable.Add(contentId, contentEntity);
+                        TMData.content.Add(contentEntity);
+                        TMData.contentTable.Add(contentId, contentEntity);
                         step.messaging.content.Add(contentId);
                         result = contentId;
                         Save();
@@ -222,9 +228,9 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 #endif
         public void UpdateContentEntity(string id, string contentInfo)
         {
-            if (contentTable.ContainsKey(id))
+            if (TMData.contentTable.ContainsKey(id))
             {
-                ContentEntity contentEntity = contentTable[id];
+                ContentEntity contentEntity = TMData.contentTable[id];
                 contentEntity.text = contentInfo;
                 Save();
             }
@@ -232,14 +238,14 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 #if UNITY_EDITOR
         public void DestroyContentEntity(string id)
         {
-            if (contentTable.ContainsKey(id))
+            if (TMData.contentTable.ContainsKey(id))
             {
-                var contentEntity = contentTable[id];
-                contentTable.Remove(id);
-                content.Remove(contentEntity);
+                var contentEntity = TMData.contentTable[id];
+                TMData.contentTable.Remove(id);
+                TMData.content.Remove(contentEntity);
 
                 // Remove from Step
-                foreach (StepEntity step in steps)
+                foreach (StepEntity step in TMData.steps)
                 {
                     if (step.messaging.content.Contains(id))
                     {
@@ -253,34 +259,34 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
         public void Clear()
         {
-            while (tutorials.Count > 0)
+            while (TMData.tutorials.Count > 0)
             {
-                tutorials.RemoveAt(0);
+                TMData.tutorials.RemoveAt(0);
             }
-            while (steps.Count > 0)
+            while (TMData.steps.Count > 0)
             {
-                steps.RemoveAt(0);
+                TMData.steps.RemoveAt(0);
             }
-            while (content.Count > 0)
+            while (TMData.content.Count > 0)
             {
-                content.RemoveAt(0);
+                TMData.content.RemoveAt(0);
             }
-            tutorialTable.Clear();
-            stepTable.Clear();
-            contentTable.Clear();
+            TMData.tutorialTable.Clear();
+            TMData.stepTable.Clear();
+            TMData.contentTable.Clear();
             Save();
         }
 #endif
 
         void Save()
         {
-#if UNITY_EDITOR
-            UnityEditor.AssetDatabase.SaveAssets();
-#endif
-            TMSerializer.WriteToDisk(this);
+            TMSerializer.WriteToDisk(TMData);
         }
 
-
+        string GetStepId (string stepId, string tutorialId)
+        {
+            return string.Format("{0}-{1}", tutorialId, stepId); 
+        }
 
         string GetTextId(string stepId)
         {
@@ -298,7 +304,6 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             id = entityId;
         }
     }
-
 
     [System.Serializable]
     public class TutorialEntity : Entity
