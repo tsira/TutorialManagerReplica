@@ -6,6 +6,7 @@ using NUnit.Framework;
 using System.Collections;
 using System.IO;
 using System.Collections.Generic;
+using UnityEngine.Analytics.TutorialManagerRuntime;
 
 namespace UnityEngine.Analytics
 {

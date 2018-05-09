@@ -2,8 +2,10 @@ using UnityEngine;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
-namespace UnityEngine.Analytics
+namespace UnityEngine.Analytics.TutorialManagerRuntime
 {
     public class TutorialManagerModel : ScriptableObject
     {
@@ -27,6 +29,7 @@ namespace UnityEngine.Analytics
         public Dictionary<string, StepEntity> stepTable = new Dictionary<string, StepEntity>();
         public Dictionary<string, ContentEntity> contentTable = new Dictionary<string, ContentEntity>();
 
+#if UNITY_EDITOR
         public string CreateTutorialEntity(string id)
         {
             string result = null;
@@ -39,10 +42,11 @@ namespace UnityEngine.Analytics
                 tutorials.Add(tutorial);
                 tutorialTable.Add(id, tutorial);
                 result = tutorial.id;
+                Save();
             }
             return result;
         }
-
+#endif
         public string UpdateTutorialEntity(string oldId, string newId)
         {
             var result = oldId;
@@ -62,11 +66,12 @@ namespace UnityEngine.Analytics
                     string newStepId = string.Format("{0}-{1}", newId, stepBase);
 
                     UpdateStepEntity(tutorial.steps[a], newStepId);
+                    Save();
                 }
             }
             return result;
         }
-
+#if UNITY_EDITOR
         public void DestroyTutorialEntity(string id)
         {
             if (tutorialTable.ContainsKey(id))
@@ -78,6 +83,7 @@ namespace UnityEngine.Analytics
                 }
                 tutorialTable.Remove(id);
                 tutorials.Remove(tutorial);
+                Save();
             }
         }
 
@@ -103,12 +109,13 @@ namespace UnityEngine.Analytics
                         stepTable.Add(id, step);
                         tutorial.steps.Add(id);
                         result = id;
+                        Save();
                     }
                 }
-
             }
             return result;
         }
+#endif
 
         public string UpdateStepEntity(string oldId, string newId)
         {
@@ -139,10 +146,11 @@ namespace UnityEngine.Analytics
                 // Add to stepTable under new id
                 stepTable.Add(newId, step);
                 result = newId;
+                Save();
             }
             return result;
         }
-
+#if UNITY_EDITOR
         public void DestroyStepEntity(string id)
         {
             if (stepTable.ContainsKey(id))
@@ -152,34 +160,35 @@ namespace UnityEngine.Analytics
                 {
                     tutorialEntity.steps.RemoveAt(tutorialEntity.steps.IndexOf(id));
                 }
-            }
 
-            // Remove related content entries
-            List<string> contentToRemove = new List<string>();
-            foreach (ContentEntity c in content)
-            {
-                if (c.id.IndexOf(c.id, 0, System.StringComparison.Ordinal) > -1)
+                // Remove related content entries
+                List<string> contentToRemove = new List<string>();
+                foreach (ContentEntity c in content)
                 {
-                    contentToRemove.Add(c.id);
+                    if (c.id.IndexOf(c.id, 0, System.StringComparison.Ordinal) > -1)
+                    {
+                        contentToRemove.Add(c.id);
+                    }
                 }
-            }
-            foreach (string s in contentToRemove)
-            {
-                DestroyContentEntity(s);
-            }
+                foreach (string s in contentToRemove)
+                {
+                    DestroyContentEntity(s);
+                }
 
-            // Remove from stepTable
-            // Remove from steps
-            var step = stepTable[id];
-            steps.Remove(step);
-            stepTable.Remove(id);
+                // Remove from stepTable
+                // Remove from steps
+                var step = stepTable[id];
+                steps.Remove(step);
+                stepTable.Remove(id);
+                Save();
+		    }
         }
-
+#endif
         private IEnumerable<TutorialEntity> GetTutorialsThatContainStepWithId (string id)
         {
             return tutorials.Select(t => t).Where(t => t.steps.Any(s => s == id));
         }
-
+#if UNITY_EDITOR
         public string CreateContentEntity(string stepId, ContentType contentType, string contentValue = null)
         {
             string result = null;
@@ -204,21 +213,23 @@ namespace UnityEngine.Analytics
                         contentTable.Add(contentId, contentEntity);
                         step.messaging.content.Add(contentId);
                         result = contentId;
+                        Save();
                     }
                 }
             }
             return result;
         }
-
+#endif
         public void UpdateContentEntity(string id, string contentInfo)
         {
             if (contentTable.ContainsKey(id))
             {
                 ContentEntity contentEntity = contentTable[id];
                 contentEntity.text = contentInfo;
+                Save();
             }
         }
-
+#if UNITY_EDITOR
         public void DestroyContentEntity(string id)
         {
             if (contentTable.ContainsKey(id))
@@ -236,6 +247,7 @@ namespace UnityEngine.Analytics
                         break;
                     }
                 }
+                Save();
             }
         }
 
@@ -256,7 +268,19 @@ namespace UnityEngine.Analytics
             tutorialTable.Clear();
             stepTable.Clear();
             contentTable.Clear();
+            Save();
         }
+#endif
+
+        void Save()
+        {
+#if UNITY_EDITOR
+            UnityEditor.AssetDatabase.SaveAssets();
+#endif
+            TMSerializer.WriteToDisk(this);
+        }
+
+
 
         string GetTextId(string stepId)
         {
