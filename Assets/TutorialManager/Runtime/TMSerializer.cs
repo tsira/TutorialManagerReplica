@@ -8,7 +8,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
     internal static class TMSerializer
     {
-        internal static void ReadFromDisk(TutorialManagerModel model)
+        internal static void ReadFromDisk(ref TutorialManagerModel model)
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             if (File.Exists(GetSavePath()))
@@ -19,7 +19,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             }
         }
 
-        internal static void WriteToDisk(TutorialManagerModel model)
+        internal static void WriteToDisk(ref TutorialManagerModel model)
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             FileStream file = File.Create(GetSavePath());

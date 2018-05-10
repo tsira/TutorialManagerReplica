@@ -29,7 +29,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             {
                 m_Instance = new TutorialManagerModelMiddleware();
                 m_Instance.TMData = new TutorialManagerModel();
-                TMSerializer.ReadFromDisk(m_Instance.TMData);
+                TMSerializer.ReadFromDisk(ref m_Instance.TMData);
             }
             return m_Instance;
         }
@@ -281,7 +281,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
         void Save()
         {
-            TMSerializer.WriteToDisk(TMData);
+            TMSerializer.WriteToDisk(ref TMData);
         }
 
         string GetStepId (string stepId, string tutorialId)
