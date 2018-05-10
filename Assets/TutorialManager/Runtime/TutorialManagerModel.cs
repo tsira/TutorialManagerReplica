@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System;
 
 namespace UnityEngine.Analytics.TutorialManagerRuntime
 {
@@ -30,6 +31,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                 m_Instance = new TutorialManagerModelMiddleware();
                 m_Instance.TMData = new TutorialManagerModel();
                 TMSerializer.ReadFromDisk(ref m_Instance.TMData);
+                //TODO: Make dictionaries from read data
             }
             return m_Instance;
         }
