@@ -105,17 +105,18 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                 // Enforce step rule #2.
                 // Tutorial must not contain a reference to a step with this id.
                 var tutorial = TMData.tutorialTable[tutorialId];
-                if (tutorial.steps.Contains(id) == false)
+                var stepId = GetStepId(id, tutorialId);
+                if (tutorial.steps.Contains(stepId) == false)
                 {
                     // Enforce step rule #3.
                     // stepId must be unique in the stepTable.
-                    if (TMData.stepTable.ContainsKey(id) == false)
+                    if (TMData.stepTable.ContainsKey(stepId) == false)
                     {
-                        var step = new StepEntity(id);
+                        var step = new StepEntity(stepId);
                         TMData.steps.Add(step);
-                        TMData.stepTable.Add(id, step);
-                        tutorial.steps.Add(id);
-                        result = id;
+                        TMData.stepTable.Add(stepId, step);
+                        tutorial.steps.Add(stepId);
+                        result = stepId;
                         Save();
                     }
                 }
