@@ -70,7 +70,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                 {
                     string oldStepId = tutorial.steps[a];
                     string stepBase = oldStepId.Substring(oldId.Length + 1);
-                    string newStepId = string.Format("{0}-{1}", newId, stepBase);
+                    string newStepId = GetStepId(stepBase, newId);
 
                     UpdateStepEntity(tutorial.steps[a], newStepId);
                     Save();
