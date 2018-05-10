@@ -10,7 +10,7 @@ namespace UnityEngine.Analytics {
 	public class TutorialManagerWebHandler : MonoBehaviour
 	{
 		public delegate void HandlePostResponse(UnityWebRequest request);
-		public static event HandlePostResponse PostRequestReturned;
+		public event HandlePostResponse PostRequestReturned;
 		
 		void Awake()
 		{

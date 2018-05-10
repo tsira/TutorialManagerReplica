@@ -22,7 +22,6 @@ namespace UnityEngine.Analytics
         static int tutorialStep = 0;
         static string tutorialKey = "show_tutorial";
 
-        const string adaptiveOnboardingUrl = "https://prd-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
         const string adaptiveOnboardingEventName = "adaptive_onboarding";
         const string controlGroupValue = "control";
         const string testGroupValue = "test";
@@ -34,14 +33,7 @@ namespace UnityEngine.Analytics
         const string adaptiveOnboardingShowTutorialPrefsKey = "adaptive_onboarding_show_tutorial";
         const string tutorialStepPlayerPrefsKey = "unity_analytics_tutorial_test_current_step";
 
-        static GameObject webHandlerGO;
-
 #pragma warning restore 414
-
-        public class TutorialWebResponse
-        {
-            public bool showTutorial;
-        }
 
         public class ValuesJSONParser
         {
@@ -54,39 +46,35 @@ namespace UnityEngine.Analytics
             string analyticsLocation = GetAnalyticsValuesLocation();
             if (File.Exists(analyticsLocation))
             {
-                if (JsonUtility.FromJson<ValuesJSONParser>(File.ReadAllText(analyticsLocation)).app_installed == true)
+                var fileText = File.ReadAllText(analyticsLocation);
+                if(string.IsNullOrEmpty(fileText) == false)
                 {
-                    return;
+                    if (JsonUtility.FromJson<ValuesJSONParser>(fileText).app_installed == true)
+                    {
+                        return;
+                    }
                 }
             }
             if (PlayerPrefs.HasKey(adaptiveOnboardingShowTutorialPrefsKey))
             {
                 return;
             }
-            var deviceInfo = new DeviceInfo();
-#if UNITY_ADS
-        //if game has ads, we can pull the ads id, otherwise, we can't access this info
-        var advertisingSupported = Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string errorMsg) =>
-        {
-            deviceInfo.adsid = advertisingId;
-            deviceInfo.ads_tracking = trackingEnabled;
-            CallTutorialManagerService(deviceInfo);
-        });
-        //If advertising is not supported on this platform, callback won't get fired. Call the tutorial manager service immediately.
-        if (!advertisingSupported)
-        {
-            CallTutorialManagerService(deviceInfo);
+            DecisionRequestService.OnDecisionReceived += DecisionRequestService_OnDecisionReceived;
+            DecisionRequestService.RequestDecision();
         }
-#else
-            CallTutorialManagerService(deviceInfo);
-#endif
+
+        static void DecisionRequestService_OnDecisionReceived(bool toShow)
+        {
+            DecisionRequestService.OnDecisionReceived -= DecisionRequestService_OnDecisionReceived;
+            PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, toShow ? 1 : 0);
+            PlayerPrefs.Save();
         }
 
         private static string GetAnalyticsValuesLocation()
         {
             string retv;
 #if UNITY_TVOS
-        retv = Application.temporaryCachePath;
+            retv = Application.temporaryCachePath;
 #else
             retv = Application.persistentDataPath;
 #endif
@@ -95,51 +83,6 @@ namespace UnityEngine.Analytics
             retv = Path.Combine(retv, "Analytics");
             retv = Path.Combine(retv, "values");
             return retv;
-        }
-
-        /// <summary>
-        /// Request to fetch a value from Unity Analytics Services to show or skip tutorial for this user.
-        /// Returns an int val from the Unity Tutorial Manager Decision Engine to show or skip tutorial for the user.
-        /// If the request fails the user will be shown the tutorial by default.
-        /// </summary>
-        private static void CallTutorialManagerService(DeviceInfo data)
-        {
-            var json = JsonUtility.ToJson(data);
-
-            webHandlerGO = new GameObject();
-            var webHandler = webHandlerGO.AddComponent<TutorialManagerWebHandler>();
-            TutorialManagerWebHandler.PostRequestReturned += (webRequest) =>
-            {
-                var toShow = true;
-                var isError = false;
-#if UNITY_2017_1_OR_NEWER
-                isError = webRequest.isHttpError || webRequest.isNetworkError;
-#else
-            isError = webRequest.responseCode >= 400 || webRequest.isError;
-#endif
-                if (isError)
-                {
-                    Debug.LogWarning("Error received from server: " + webRequest.error + ". Defaulting to true.");
-                }
-                else
-                {
-                    try
-                    {
-                        //Web request was successful then proceed with tutorial manager decision
-                        toShow = JsonUtility.FromJson<TutorialWebResponse>(webRequest.downloadHandler.text).showTutorial;
-                    }
-                    catch (System.Exception ex)
-                    {
-                        Debug.LogWarning("Tutorial Manager response parsing error: " + ex);
-                    }
-                }
-                GameObject.Destroy(webHandlerGO);
-                PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, toShow ? 1 : 0);
-                PlayerPrefs.Save();
-            };
-
-            webHandler.PostJson(adaptiveOnboardingUrl, json);
-
         }
 
         /// <summary>
@@ -164,7 +107,6 @@ namespace UnityEngine.Analytics
                 PlayerPrefs.Save();
             }
         }
-
 
         /// <summary>
         /// Determine whether to show the tutorial.
