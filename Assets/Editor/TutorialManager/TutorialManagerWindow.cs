@@ -18,7 +18,7 @@ namespace UnityEngine.Analytics.TutorialManagerEngine
     [Serializable]
     public struct RemoteSettingsData
     {
-        public List<RemoteSettingsKeyValueType> list;
+        public List<RemoteSettingsKeyValueType> remoteSettings;
     }
 
     public class TutorialManagerWindow : EditorWindow
@@ -64,9 +64,14 @@ namespace UnityEngine.Analytics.TutorialManagerEngine
 
         private void OnGUI()
         {
-            if (GUILayout.Button("Test Auth"))
+            if (GUILayout.Button("Read"))
             {
                 PullData();
+            }
+
+            if(GUILayout.Button("Write"))
+            {
+                PushData();
             }
         }
 
@@ -131,18 +136,25 @@ namespace UnityEngine.Analytics.TutorialManagerEngine
 
         private void PushData()
         {
+            //TODO: Figure out write flow
+            TutorialManagerEditorWebHandler.TMRSWriteResponseReceived += WriteResponseReceived;
+            m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Write(m_AppId);
+        }
+
+        void WriteResponseReceived(bool succes)
+        {
 
         }
 
         private void PullData()
         {
-            TutorialManagerEditorWebHandler.DataReceived += RemoteSettingsDataReceived;
+            TutorialManagerEditorWebHandler.TMRSDataReceived += RemoteSettingsDataReceived;
             m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Read(m_AppId);
         }
 
         private void RemoteSettingsDataReceived(List<RemoteSettingsKeyValueType> remoteSettings)
         {
-            TutorialManagerEditorWebHandler.DataReceived -= RemoteSettingsDataReceived;
+            TutorialManagerEditorWebHandler.TMRSDataReceived -= RemoteSettingsDataReceived;
             if(m_WebRequestEnumerator != null)
             {
                 m_WebRequestEnumerator = null;
