@@ -537,6 +537,7 @@ namespace UnityEngine.Analytics
         {
             PostTestCleanup();
 
+            //Test set up - generate a model and save it out so it can be retreived by the middleware
             var tutorialName = "tutorial 1";
             var stepName = "step 1";
             var stepLookupName = ConstructID(tutorialName, stepName);
@@ -558,17 +559,21 @@ namespace UnityEngine.Analytics
             binaryFormatter.Serialize(file, actualModel);
             file.Close();
 
+            //Actual test code
             var model = TutorialManagerModelMiddleware.GetInstance();
-            Assert.IsNotEmpty(model.TMData.tutorials);
-            Assert.IsNotEmpty(model.TMData.steps);
-            Assert.IsNotEmpty(model.TMData.content);
-            Assert.AreEqual(tutorialName, model.TMData.tutorials[0].id);
-            Assert.AreEqual(stepLookupName, model.TMData.steps[0].id);
-            Assert.AreEqual(textLookupName, model.TMData.content[0].id);
+            Assert.IsNotEmpty(model.TMData.tutorials, "tutorials should be populated");
+            Assert.IsNotEmpty(model.TMData.steps, "steps should be populated");
+            Assert.IsNotEmpty(model.TMData.content, "content should be populated");
+            Assert.AreEqual(1, model.TMData.tutorials.Count, "there should only be one tutorial");
+            Assert.AreEqual(1, model.TMData.steps.Count, "there should only be one step");
+            Assert.AreEqual(1, model.TMData.content.Count, "there should only be one conent");
+            Assert.AreEqual(tutorialName, model.TMData.tutorials[0].id, string.Format("the tutorial should be named {0}", tutorialName));
+            Assert.AreEqual(stepLookupName, model.TMData.steps[0].id, string.Format("the step should be named {0}", stepLookupName));
+            Assert.AreEqual(textLookupName, model.TMData.content[0].id, string.Format("the content should be named {0}", textLookupName));
 
-            Assert.IsTrue(model.TMData.tutorialTable.ContainsKey(tutorialName));
-            Assert.IsTrue(model.TMData.stepTable.ContainsKey(stepLookupName));
-            Assert.IsTrue(model.TMData.contentTable.ContainsKey(textLookupName));
+            Assert.IsTrue(model.TMData.tutorialTable.ContainsKey(tutorialName), string.Format("tutorial table should contain {0}", tutorialName));
+            Assert.IsTrue(model.TMData.stepTable.ContainsKey(stepLookupName), string.Format("steps table should contain {0}", stepLookupName));
+            Assert.IsTrue(model.TMData.contentTable.ContainsKey(textLookupName), string.Format("content table should contain {0}", textLookupName));
 
             PostTestCleanup();
         }
@@ -580,9 +585,13 @@ namespace UnityEngine.Analytics
 
             var model = TutorialManagerModelMiddleware.GetInstance();
 
-            Assert.IsEmpty(model.TMData.tutorials);
-            Assert.IsEmpty(model.TMData.steps);
-            Assert.IsEmpty(model.TMData.content);
+            Assert.IsEmpty(model.TMData.tutorials, "tutorials should be empty");
+            Assert.IsEmpty(model.TMData.steps, "steps should be empty");
+            Assert.IsEmpty(model.TMData.content, "content should be empty");
+
+            Assert.IsEmpty(model.TMData.tutorialTable, "tutorial table should be empty");
+            Assert.IsEmpty(model.TMData.stepTable, "steps table should be empty");
+            Assert.IsEmpty(model.TMData.contentTable, "contents table should be empty");
 
             PostTestCleanup();
         }
