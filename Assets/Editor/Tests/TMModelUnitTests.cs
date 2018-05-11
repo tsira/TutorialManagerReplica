@@ -537,21 +537,23 @@ namespace UnityEngine.Analytics
         }
 
         [Test]
-        public void ReadFromFile_WorksWhenFileExists ()
+        public void ReadFromFile_WorksWhenFileExists()
         {
             PostTestCleanup();
 
             var tutorialName = "tutorial 1";
             var stepName = "step 1";
             var textName = "text 1";
+            var stepLookupName = ConstructID(tutorialName, stepName);
+            var textLookupName = ConstructID(stepLookupName, "text");
             var actualModel = new TutorialManagerModel();
             var tutorial = new TutorialEntity(tutorialName);
             tutorial.steps.Add(stepName);
-            var step = new StepEntity(stepName);
+            var step = new StepEntity(stepLookupName);
             step.messaging = new Messaging();
             step.messaging.isActive = true;
             step.messaging.content = new List<string>();
-            var text = new ContentEntity(textName, "text", "yooo what's up! I work!");
+            var text = new ContentEntity(textLookupName, "text", "yooo what's up! I work!");
             step.messaging.content.Add(text.id);
             actualModel.tutorials.Add(tutorial);
             actualModel.steps.Add(step);
@@ -568,8 +570,12 @@ namespace UnityEngine.Analytics
             Assert.IsNotEmpty(model.TMData.steps);
             Assert.IsNotEmpty(model.TMData.content);
             Assert.AreEqual(tutorialName, model.TMData.tutorials[0].id);
-            Assert.AreEqual(stepName, model.TMData.steps[0].id);
-            Assert.AreEqual(textName, model.TMData.content[0].id);
+            Assert.AreEqual(stepLookupName, model.TMData.steps[0].id);
+            Assert.AreEqual(textLookupName, model.TMData.content[0].id);
+
+            Assert.IsTrue(model.TMData.tutorialTable.ContainsKey(tutorialName));
+            Assert.IsTrue(model.TMData.stepTable.ContainsKey(stepLookupName));
+            Assert.IsTrue(model.TMData.contentTable.ContainsKey(textLookupName));
 
             PostTestCleanup();
         }
@@ -588,7 +594,7 @@ namespace UnityEngine.Analytics
             PostTestCleanup();
         }
 
-        void PostTestCleanup ()
+        void PostTestCleanup()
         {
             var model = TutorialManagerModelMiddleware.GetInstance();
             var type = model.GetType();
@@ -602,7 +608,8 @@ namespace UnityEngine.Analytics
             return Path.Combine(Application.persistentDataPath, "unity_tutorial_manager.dat");
         }
 
-        void SetupTutorial() {
+        void SetupTutorial()
+        {
             var model = TutorialManagerModelMiddleware.GetInstance();
             model.Clear();
             model.CreateTutorialEntity(tutorialName1);
@@ -611,7 +618,8 @@ namespace UnityEngine.Analytics
             model.CreateTutorialEntity(tutorialName4);
         }
 
-        void SetupSteps() {
+        void SetupSteps()
+        {
             var model = TutorialManagerModelMiddleware.GetInstance();
             var tutorial1 = model.TMData.tutorials[0];
             var tutorial2 = model.TMData.tutorials[1];
@@ -627,7 +635,8 @@ namespace UnityEngine.Analytics
             Assert.AreEqual(0, tutorial3.steps.Count, "tutorial 3 should have no steps");
         }
 
-        void SetupContent() {
+        void SetupContent()
+        {
             var model = TutorialManagerModelMiddleware.GetInstance();
 
             var t1s1 = model.TMData.stepTable[t1Step1LookupID];
@@ -642,7 +651,8 @@ namespace UnityEngine.Analytics
             Assert.AreEqual(1, t1s2.messaging.content.Count, "t1s2 should have 1 items");
         }
 
-        void EnsureUnaffectedSteps() {
+        void EnsureUnaffectedSteps()
+        {
             var model = TutorialManagerModelMiddleware.GetInstance();
             var tutorial2 = model.TMData.tutorials[1];
             var tutorial3 = model.TMData.tutorials[2];

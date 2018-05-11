@@ -31,7 +31,9 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                 m_Instance = new TutorialManagerModelMiddleware();
                 m_Instance.TMData = new TutorialManagerModel();
                 TMSerializer.ReadFromDisk(ref m_Instance.TMData);
-                //TODO: Make dictionaries from read data
+                m_Instance.TMData.tutorialTable = m_Instance.TMData.tutorials.ToDictionary(t => t.id, t => t);
+                m_Instance.TMData.stepTable = m_Instance.TMData.steps.ToDictionary(s => s.id, s => s);
+                m_Instance.TMData.contentTable = m_Instance.TMData.content.ToDictionary(c => c.id, c => c);
             }
             return m_Instance;
         }
