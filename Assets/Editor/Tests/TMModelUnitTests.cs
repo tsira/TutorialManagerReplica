@@ -539,16 +539,13 @@ namespace UnityEngine.Analytics
 
             var tutorialName = "tutorial 1";
             var stepName = "step 1";
-            var textName = "text 1";
             var stepLookupName = ConstructID(tutorialName, stepName);
             var textLookupName = ConstructID(stepLookupName, "text");
             var actualModel = new TutorialManagerModel();
             var tutorial = new TutorialEntity(tutorialName);
             tutorial.steps.Add(stepName);
             var step = new StepEntity(stepLookupName);
-            step.messaging = new Messaging();
             step.messaging.isActive = true;
-            step.messaging.content = new List<string>();
             var text = new ContentEntity(textLookupName, "text", "yooo what's up! I work!");
             step.messaging.content.Add(text.id);
             actualModel.tutorials.Add(tutorial);
