@@ -29,8 +29,8 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             if (m_Instance == null)
             {
                 m_Instance = new TutorialManagerModelMiddleware();
-                m_Instance.TMData = new TutorialManagerModel();
-                TMSerializer.ReadFromDisk(ref m_Instance.TMData);
+                m_Instance.m_TMData = new TutorialManagerModel();
+                TMSerializer.ReadFromDisk(ref m_Instance.m_TMData);
                 m_Instance.TMData.tutorialTable = m_Instance.TMData.tutorials.ToDictionary(t => t.id, t => t);
                 m_Instance.TMData.stepTable = m_Instance.TMData.steps.ToDictionary(s => s.id, s => s);
                 m_Instance.TMData.contentTable = m_Instance.TMData.content.ToDictionary(c => c.id, c => c);
@@ -38,7 +38,13 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             return m_Instance;
         }
 
-        public TutorialManagerModel TMData;
+        private TutorialManagerModel m_TMData;
+        public TutorialManagerModel TMData {
+            get
+            {
+                return m_TMData;
+            }
+        }
 
 #if UNITY_EDITOR
         public string CreateTutorialEntity(string id)
@@ -285,7 +291,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
         void Save()
         {
-            TMSerializer.WriteToDisk(ref TMData);
+            TMSerializer.WriteToDisk(ref m_TMData);
         }
 
         string GetStepId (string stepId, string tutorialId)
