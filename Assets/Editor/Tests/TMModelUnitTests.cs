@@ -593,7 +593,10 @@ namespace UnityEngine.Analytics
             var type = model.GetType();
             var prop = type.GetField("m_Instance", BindingFlags.NonPublic | BindingFlags.Static);
             prop.SetValue(model, null);
-            File.Delete(GetModelSavePath());
+            if(File.Exists(GetModelSavePath()))
+            {
+                File.Delete(GetModelSavePath());
+            }
         }
 
         string GetModelSavePath()
