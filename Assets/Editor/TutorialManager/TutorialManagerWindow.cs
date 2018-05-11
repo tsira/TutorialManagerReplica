@@ -20,7 +20,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
     [Serializable]
     public struct RemoteSettingsData
     {
-        public List<RemoteSettingsKeyValueType> list;
+        public List<RemoteSettingsKeyValueType> remoteSettings;
     }
 
     public class TutorialManagerWindow : EditorWindow
@@ -112,7 +112,8 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
             RenderFooter();
 
-            if (string.IsNullOrEmpty(tutorialMarkedForDeletion) == false) {
+            if (string.IsNullOrEmpty(tutorialMarkedForDeletion) == false)
+            {
                 DestroyTutorial(tutorialMarkedForDeletion);
                 tutorialMarkedForDeletion = string.Empty;
             }
@@ -325,18 +326,27 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
         private void PushData()
         {
-            TutorialManagerEditorWebHandler.Write(m_AppId, TMModel.TMData);
+            //TODO: Figure out write flow
+            TutorialManagerEditorWebHandler.TMRSWriteResponseReceived += GetWriteResponseReceived();
+            m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Write(m_AppId);
+
+            //TutorialManagerEditorWebHandler.Write(m_AppId, TMModel.TMData);
+        }
+
+        private TutorialManagerEditorWebHandler.TMRSWriteResponseHandler GetWriteResponseReceived()
+        {
+            return null;
         }
 
         private void PullData()
         {
-            TutorialManagerEditorWebHandler.DataReceived += RemoteSettingsReadDataReceived;
+            TutorialManagerEditorWebHandler.TMRSDataReceived += RemoteSettingsReadDataReceived;
             m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Read(m_AppId);
         }
 
         private void RemoteSettingsReadDataReceived(List<RemoteSettingsKeyValueType> remoteSettings)
         {
-            TutorialManagerEditorWebHandler.DataReceived -= RemoteSettingsReadDataReceived;
+            TutorialManagerEditorWebHandler.TMRSDataReceived -= RemoteSettingsReadDataReceived;
             if(m_WebRequestEnumerator != null)
             {
                 m_WebRequestEnumerator = null;
