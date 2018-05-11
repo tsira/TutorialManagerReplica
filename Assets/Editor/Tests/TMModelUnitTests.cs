@@ -128,14 +128,12 @@ namespace UnityEngine.Analytics
 
             var tutorial1 = model.TMData.tutorials[0];
 
-            string updatedName = model.UpdateTutorialEntity(tutorialName1, tutorialName1v2);
-
             Assert.AreEqual(2, tutorial1.steps.Count, "tutorial 1 should still have 2 steps");
             Assert.IsFalse(model.TMData.stepTable.ContainsKey(t1step1), "the old t1S1 key should be gone");
             Assert.IsFalse(model.TMData.stepTable.ContainsKey(t1step2), "the old t1S2 key should be gone");
 
-            var newStep1Id = ConstructID(tutorialName1v2, stepBaseID);
-            var newStep2Id = ConstructID(tutorialName1v2, stepBaseID2);
+            var newStep1Id = ConstructID(tutorialName1, stepBaseID);
+            var newStep2Id = ConstructID(tutorialName1, stepBaseID2);
 
             Assert.IsTrue(model.TMData.stepTable.ContainsKey(newStep1Id), string.Format("new key should be {0}", newStep1Id));
             Assert.IsTrue(model.TMData.stepTable.ContainsKey(newStep2Id), string.Format("new key should be {0}", newStep2Id));
@@ -157,15 +155,13 @@ namespace UnityEngine.Analytics
 
             var tutorial1 = model.TMData.tutorials[0];
 
-
             var content1Id = ConstructID(t1Step1LookupID, ContentType.text.ToString());
             var content2Id = ConstructID(t1Step2LookupID, ContentType.text.ToString());
 
             Assert.IsTrue(model.TMData.contentTable.ContainsKey(content1Id), "should have content key 1");
             Assert.IsTrue(model.TMData.contentTable.ContainsKey(content2Id), "should have content key 2");
 
-
-            string updatedName = model.UpdateTutorialEntity(tutorialName1, tutorialName1v2);
+            model.UpdateTutorialEntity(tutorial1.id, tutorialName1v2);
 
             Assert.AreEqual(2, model.TMData.contentTable.Count, "should still have 2 content elements");
             Assert.IsFalse(model.TMData.contentTable.ContainsKey(content1Id), "the old key 1 should be gone");
@@ -174,7 +170,7 @@ namespace UnityEngine.Analytics
             var newStep1Id = ConstructID(tutorialName1v2, stepBaseID);
             var newStep2Id = ConstructID(tutorialName1v2, stepBaseID2);
             var newContent1Id = ConstructID(newStep1Id, ContentType.text.ToString());
-            var newContent2Id = ConstructID(newStep1Id, ContentType.text.ToString());
+            var newContent2Id = ConstructID(newStep2Id, ContentType.text.ToString());
 
 
             Assert.IsTrue(model.TMData.contentTable.ContainsKey(newContent1Id), "should have updated content key 1");
