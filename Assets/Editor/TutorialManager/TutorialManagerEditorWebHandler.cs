@@ -122,7 +122,6 @@ namespace UnityEngine.Analytics
         static void LoadRemoteSettings(string remoteSettingsResult)
         {
             Debug.Log(remoteSettingsResult);
-
             //string remoteSettingsJson = "{ \"list\": " + remoteSettingsResult + "}";
 
             List<TutorialManagerEditor.RemoteSettingsKeyValueType> remoteSettings;

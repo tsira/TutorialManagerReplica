@@ -327,15 +327,13 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         private void PushData()
         {
             //TODO: Figure out write flow
-            TutorialManagerEditorWebHandler.TMRSWriteResponseReceived += GetWriteResponseReceived();
+            TutorialManagerEditorWebHandler.TMRSWriteResponseReceived += WriteResponseReceived;
             m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Write(m_AppId);
-
-            //TutorialManagerEditorWebHandler.Write(m_AppId, TMModel.TMData);
         }
 
-        private TutorialManagerEditorWebHandler.TMRSWriteResponseHandler GetWriteResponseReceived()
+        void WriteResponseReceived(bool succes)
         {
-            return null;
+            return;
         }
 
         private void PullData()
@@ -347,6 +345,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         private void RemoteSettingsReadDataReceived(List<RemoteSettingsKeyValueType> remoteSettings)
         {
             TutorialManagerEditorWebHandler.TMRSDataReceived -= RemoteSettingsReadDataReceived;
+
             if(m_WebRequestEnumerator != null)
             {
                 m_WebRequestEnumerator = null;
