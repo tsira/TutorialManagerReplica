@@ -18,7 +18,7 @@ namespace UnityEngine.Analytics
         private const string k_RemoteSettingsPath = k_APIPath + "{0}/configurations/{1}/remotesettings";
 
         //Event for receiving RS data
-        public delegate void DataReceivedHandler(List<TutorialManagerEngine.RemoteSettingsKeyValueType> remoteSettings);
+        public delegate void DataReceivedHandler(List<TutorialManagerEditor.RemoteSettingsKeyValueType> remoteSettings);
         public static event DataReceivedHandler DataReceived;
 
         public static IEnumerator<AsyncOperation> Read(string appId)
@@ -92,10 +92,10 @@ namespace UnityEngine.Analytics
         {
             string remoteSettingsJson = "{ \"list\": " + remoteSettingsResult + "}";
 
-            List<TutorialManagerEngine.RemoteSettingsKeyValueType> remoteSettings;
+            List<TutorialManagerEditor.RemoteSettingsKeyValueType> remoteSettings;
             try
             {
-                remoteSettings = JsonUtility.FromJson<TutorialManagerEngine.RemoteSettingsData>(remoteSettingsJson).list;
+                remoteSettings = JsonUtility.FromJson<TutorialManagerEditor.RemoteSettingsData>(remoteSettingsJson).list;
             }
             catch (Exception e)
             {
