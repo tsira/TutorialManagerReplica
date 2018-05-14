@@ -4,6 +4,10 @@ using UnityEngine.Networking;
 using System;
 using System.Collections.Generic;
 using UnityEngine.Analytics.TutorialManagerRuntime;
+<<<<<<< HEAD
+=======
+using System.Linq;
+>>>>>>> Refactored some code into a helper method
 
 namespace UnityEngine.Analytics
 {
@@ -13,7 +17,6 @@ namespace UnityEngine.Analytics
         //REST API paths
         private const string k_BasePath = "https://analytics.cloud.unity3d.com/";
         private const string k_APIPath = k_BasePath + "api/v2/projects/";
-        //private const string k_RemoteSettingsPath = k_APIPath + "{0}/configurations/{1}/remotesettings";
         private const string k_RemoteSettingsPath = k_APIPath + "{0}/tutorial/remote_settings";
 
         //Event for receiving RS data
@@ -26,9 +29,8 @@ namespace UnityEngine.Analytics
         public static IEnumerator<AsyncOperation> Read(string appId)
         {
             var settingsRequest = Authorize(UnityWebRequest.Get(GetUrl(appId)));
-            if (settingsRequest == null)
+            if (IsAuthError(settingsRequest))
             {
-                Debug.LogError("Failed getting authentication token. In editor versions before 2018.1, this is done through internal APIs which may be subject to undocumented changes, thus your plugin may need to be updated. Please contact tutorialmanager@unity3d.com for help.");
                 ReadErrorEvent();
                 yield break;
             }
@@ -54,18 +56,16 @@ namespace UnityEngine.Analytics
             LoadRemoteSettings(remoteSettingsJson);
         }
 
-        //TODO: Implement write once endpoint is ready
         public static IEnumerator<AsyncOperation> Write(string appId)
         {
+            var model = TutorialManagerModelMiddleware.GetInstance().TMData;
+            string jsonData = EditorJsonUtility.ToJson(model);
+            Debug.Log(jsonData);
             var settingsRequest = Authorize(UnityWebRequest.Post(appId, "test payload"));
-            if(settingsRequest == null)
+            if(IsAuthError(settingsRequest))
             {
-                if (settingsRequest == null)
-                {
-                    Debug.LogError("Failed getting authentication token. In editor versions before 2018.1, this is done through internal APIs which may be subject to undocumented changes, thus your plugin may need to be updated. Please contact tutorialmanager@unity3d.com for help.");
-                    WriteEvent(false);
-                    yield break;
-                }
+                WriteEvent(false);
+                yield break;
             }
             #if UNITY_2017_2_OR_NEWER
             yield return settingsRequest.SendWebRequest();
@@ -85,6 +85,16 @@ namespace UnityEngine.Analytics
             }
 
             WriteEvent(true);
+        }
+
+        private static bool IsAuthError(UnityWebRequest request)
+        {
+            if(request == null)
+            {
+                Debug.LogError("Failed getting authentication token. In editor versions before 2018.1, this is done through internal APIs which may be subject to undocumented changes, thus your plugin may need to be updated. Please contact tutorialmanager@unity3d.com for help.");
+                return true;
+            }
+            return false;
         }
 
         private static string GetUrl (string appId)
