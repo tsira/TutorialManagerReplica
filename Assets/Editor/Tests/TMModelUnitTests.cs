@@ -520,11 +520,13 @@ namespace UnityEngine.Analytics
         {
             var modelMiddleware = TutorialManagerModelMiddleware.GetInstance();
             modelMiddleware.Clear();
-
             SetupTutorial();
             SetupSteps();
             SetupContent();
 
+            modelMiddleware.TMData.genre = "something-anything-really";
+
+            Assert.IsFalse(string.IsNullOrEmpty(modelMiddleware.TMData.genre), "genre should be populated");
             Assert.IsNotEmpty(modelMiddleware.TMData.tutorials, "tutorials should be populated");
             Assert.IsNotEmpty(modelMiddleware.TMData.steps, "steps should be populated");
             Assert.IsNotEmpty(modelMiddleware.TMData.content, "content should be populated");
@@ -534,6 +536,7 @@ namespace UnityEngine.Analytics
 
             modelMiddleware.Clear();
 
+            Assert.IsTrue(string.IsNullOrEmpty(modelMiddleware.TMData.genre), "genre should be empty");
             Assert.IsEmpty(modelMiddleware.TMData.tutorials, "tutorials should be empty");
             Assert.IsEmpty(modelMiddleware.TMData.steps, "steps should be empty");
             Assert.IsEmpty(modelMiddleware.TMData.content, "content should be empty");
@@ -561,6 +564,7 @@ namespace UnityEngine.Analytics
             step.messaging.isActive = true;
             var text = new ContentEntity(textLookupName, "text", "yooo what's up! I work!");
             step.messaging.content.Add(text.id);
+            actualModel.genre = "myGenre";
             actualModel.tutorials.Add(tutorial);
             actualModel.steps.Add(step);
             actualModel.content.Add(text);
@@ -573,15 +577,16 @@ namespace UnityEngine.Analytics
 
             //Actual test code
             var modelMiddleware = TutorialManagerModelMiddleware.GetInstance();
+            Assert.That("myGenre", Is.EqualTo(modelMiddleware.TMData.genre), "genre should be myGenre");
             Assert.IsNotEmpty(modelMiddleware.TMData.tutorials, "tutorials should be populated");
             Assert.IsNotEmpty(modelMiddleware.TMData.steps, "steps should be populated");
             Assert.IsNotEmpty(modelMiddleware.TMData.content, "content should be populated");
             Assert.AreEqual(1, modelMiddleware.TMData.tutorials.Count, "there should only be one tutorial");
             Assert.AreEqual(1, modelMiddleware.TMData.steps.Count, "there should only be one step");
             Assert.AreEqual(1, modelMiddleware.TMData.content.Count, "there should only be one conent");
-            Assert.AreEqual(tutorialName, modelMiddleware.TMData.tutorials[0].id, string.Format("the tutorial should be named {0}", tutorialName));
-            Assert.AreEqual(stepLookupName, modelMiddleware.TMData.steps[0].id, string.Format("the step should be named {0}", stepLookupName));
-            Assert.AreEqual(textLookupName, modelMiddleware.TMData.content[0].id, string.Format("the content should be named {0}", textLookupName));
+            Assert.That(tutorialName, Is.EqualTo(modelMiddleware.TMData.tutorials[0].id), string.Format("the tutorial should be named {0}", tutorialName));
+            Assert.That(stepLookupName, Is.EqualTo(modelMiddleware.TMData.steps[0].id), string.Format("the step should be named {0}", stepLookupName));
+            Assert.That(textLookupName, Is.EqualTo(modelMiddleware.TMData.content[0].id), string.Format("the content should be named {0}", textLookupName));
 
             Assert.IsTrue(modelMiddleware.TMData.tutorialTable.ContainsKey(tutorialName), string.Format("tutorial table should contain {0}", tutorialName));
             Assert.IsTrue(modelMiddleware.TMData.stepTable.ContainsKey(stepLookupName), string.Format("steps table should contain {0}", stepLookupName));
@@ -596,6 +601,8 @@ namespace UnityEngine.Analytics
             PostTestCleanup();
 
             var modelMiddleware = TutorialManagerModelMiddleware.GetInstance();
+
+            Assert.IsTrue(string.IsNullOrEmpty(modelMiddleware.TMData.genre), "genre should be empty");
 
             Assert.IsEmpty(modelMiddleware.TMData.tutorials, "tutorials should be empty");
             Assert.IsEmpty(modelMiddleware.TMData.steps, "steps should be empty");

@@ -278,6 +278,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
         public void Clear()
         {
+            TMData.genre = String.Empty;
             while (TMData.tutorials.Count > 0)
             {
                 TMData.tutorials.RemoveAt(0);
