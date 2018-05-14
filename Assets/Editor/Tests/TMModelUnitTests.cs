@@ -53,6 +53,18 @@ namespace UnityEngine.Analytics
 
         const string t1step1Textv2 = "Text modified for tutorial one step one";
 
+        [Test]
+        public void TestSetGenre()
+        {
+            var modelMiddleware = TutorialManagerModelMiddleware.GetInstance();
+            modelMiddleware.Clear();
+
+            modelMiddleware.SaveGenre("foo");
+            Assert.That("foo", Is.EqualTo(modelMiddleware.TMData.genre), "genre should read 'foo'");
+            modelMiddleware.SaveGenre("bar");
+            Assert.That("bar", Is.EqualTo(modelMiddleware.TMData.genre), "genre should read 'bar'");
+        }
+
 
         [Test]
         public void CreateTutorial()

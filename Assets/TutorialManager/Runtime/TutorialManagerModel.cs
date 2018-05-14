@@ -11,6 +11,8 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
     [System.Serializable]
     public class TutorialManagerModel
     {
+        public string genre;
+
         public List<TutorialEntity> tutorials = new List<TutorialEntity>();
         public List<StepEntity> steps = new List<StepEntity>();
         public List<ContentEntity> content = new List<ContentEntity>();
@@ -47,6 +49,12 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         }
 
 #if UNITY_EDITOR
+        public void SaveGenre(string id)
+        {
+            TMData.genre = id;
+        }
+
+
         public string CreateTutorialEntity(string id)
         {
             string result = null;

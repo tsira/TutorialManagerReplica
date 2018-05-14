@@ -146,7 +146,6 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         {
             using (new GUILayout.HorizontalScope()) {
                 RenderGenre();
-                RenderDashboardLink();
             }
         }
 
@@ -162,6 +161,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
                 if (GUILayout.Button(pushButtonGUIContent)) {
                     PushData();
                 }
+                RenderDashboardLink();
             }
 
             if (GUILayout.Button("Test Auth")) {
@@ -258,8 +258,8 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
         private void SetGenre(int id)
         {
-            // TODO: save genre ID somewhere. To the model?
             genreId = id;
+            TMModel.SaveGenre(TMGenre.genres[id]);
         }
 
         private void CreateTutorial()
