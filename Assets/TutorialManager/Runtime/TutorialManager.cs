@@ -63,11 +63,16 @@ namespace UnityEngine.Analytics
             DecisionRequestService.RequestDecision();
         }
 
-        static void DecisionRequestService_OnDecisionReceived(bool toShow)
+        static void DecisionRequestService_OnDecisionReceived(TutorialWebResponse response)
         {
-            DecisionRequestService.OnDecisionReceived -= DecisionRequestService_OnDecisionReceived;
-            PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, toShow ? 1 : 0);
-            PlayerPrefs.Save();
+
+
+
+
+
+            //DecisionRequestService.OnDecisionReceived -= DecisionRequestService_OnDecisionReceived;
+            //PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, toShow ? 1 : 0);
+            //PlayerPrefs.Save();
         }
 
         private static string GetAnalyticsValuesLocation()

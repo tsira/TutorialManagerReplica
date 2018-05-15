@@ -50,10 +50,10 @@ namespace UnityEngine.Analytics
             DecisionRequestService.OnDecisionReceived += TestResponseCaching;
         }
 
-        public virtual void TestResponseCaching(bool decision)
+        public virtual void TestResponseCaching(TutorialWebResponse response)
         {
             DecisionRequestService.OnDecisionReceived -= TestResponseCaching;
-            toShow = decision ? 1 : 0;
+            toShow = response.showTutorial ? 1 : 0;
             testFinished = true;
         }
 

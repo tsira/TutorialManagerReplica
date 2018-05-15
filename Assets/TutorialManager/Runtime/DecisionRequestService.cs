@@ -1,12 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace UnityEngine.Analytics.TutorialManagerRuntime
 {
     public class TutorialWebResponse
     {
         public bool showTutorial;
+        public Dictionary<string, string> contentTable;
     }
 
     public static class DecisionRequestService
@@ -14,7 +17,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         const string adaptiveOnboardingUrl = "https://prd-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
         static GameObject webHandlerGO;
 
-        public delegate void TMDecisionHandler(bool decision);
+        public delegate void TMDecisionHandler(TutorialWebResponse decision);
         public static event TMDecisionHandler OnDecisionReceived;
 
         internal static void RequestDecision()
@@ -51,8 +54,9 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             var webHandler = webHandlerGO.AddComponent<TutorialManagerWebHandler>();
             webHandler.PostRequestReturned += (webRequest) =>
             {
-                var toShow = true;
-                var isError = false;
+
+                var response = new TutorialWebResponse();
+                bool isError = false;
 #if UNITY_2017_1_OR_NEWER
                 isError = webRequest.isHttpError || webRequest.isNetworkError;
 #else
@@ -66,8 +70,10 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                 {
                     try
                     {
-                        //Web request was successful then proceed with tutorial manager decision
-                        toShow = JsonUtility.FromJson<TutorialWebResponse>(webRequest.downloadHandler.text).showTutorial;
+                        // If web request was successful then proceed with tutorial manager decision
+                        string text = webRequest.downloadHandler.text;
+                        response.showTutorial = ParseShowTutorial(text);
+                        response.contentTable = ParseTextStrings(text);
                     }
                     catch (System.Exception ex)
                     {
@@ -78,10 +84,32 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                 //TODO: fire an event here
                 if(OnDecisionReceived != null)
                 {
-                    OnDecisionReceived(toShow);
+                    OnDecisionReceived(response);
                 }
             };
             webHandler.PostJson(adaptiveOnboardingUrl, json);
+        }
+
+        private static bool ParseShowTutorial(string text)
+        {
+            Regex regex = new Regex(@"false(?!showTutorial.{1,3})");
+            // NB: I've deliberately turned this logic "upside down" to ensure
+            // that failover favors showing the tutorial. MAT - 5/15/2018
+            return regex.Match(text).Success ? false : true;
+        }
+
+        private static Dictionary<string, string> ParseTextStrings(string text)
+        {
+            string keyPattern = @"(?:\"")(.*?\-text)(?=\"".{1,3}\"")";
+            MatchCollection keyMatches = Regex.Matches(text, keyPattern);
+            List<string> keys = keyMatches.Cast<Match>().Select(match => match.Groups[1].ToString()).ToList();
+
+            string valuePattern = @"(?:\-text\"".{1,3})\""(.*?)(?=\"",)";
+            MatchCollection valueMatches = Regex.Matches(text, valuePattern);
+            List<string> values = valueMatches.Cast<Match>().Select(match => match.Groups[1].ToString()).ToList();
+
+            var dict = keys.Select((k, i) => new { k, v = values[i] }).ToDictionary(x => x.k, x => x.v);
+            return dict;
         }
     }
 }
