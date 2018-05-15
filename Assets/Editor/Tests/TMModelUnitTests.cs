@@ -1,4 +1,4 @@
-#if UNITY_5_6_OR_NEWER
+//#if UNITY_5_6_OR_NEWER
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.TestTools;
@@ -52,6 +52,7 @@ namespace UnityEngine.Analytics
         const string t1step2Text = "Here is text for tutorial one step two";
 
         const string t1step1Textv2 = "Text modified for tutorial one step one";
+        const string t1step2Textv2 = "Text modified for tutorial one step two";
 
         [Test]
         public void TestSetGenre()
@@ -515,6 +516,102 @@ namespace UnityEngine.Analytics
             PostTestCleanup();
         }
 
+        // Next group is a set of three to test three scenarios
+        // Test one...change first item
+        [Test]
+        public void UpdateContentValues1()
+        {
+            SetupTutorial();
+            SetupSteps();
+            SetupContent();
+
+            var modelMiddleware = TutorialManagerModelMiddleware.GetInstance();
+            string textId1 = ConstructID(t1Step1LookupID, ContentType.text.ToString());
+            string textId2 = ConstructID(t1Step2LookupID, ContentType.text.ToString());
+            string textValue1 = modelMiddleware.TMData.contentTable[textId1].text;
+            string textValue2 = modelMiddleware.TMData.contentTable[textId2].text;
+            Dictionary<string, string> dict = new Dictionary<string, string>();
+            dict[textId1] = t1step1Textv2;
+
+            Assert.That(t1step1Text, Is.EqualTo(textValue1), "textValue1 should be default");
+            Assert.That(t1step2Text, Is.EqualTo(textValue2), "textValue2 should be default");
+
+            modelMiddleware.UpdateContentEntityValues(dict);
+            string textValue1v2 = modelMiddleware.TMData.contentTable[textId1].text;
+
+            Assert.That(t1step1Textv2, Is.EqualTo(textValue1v2), "textValue1 should have changed");
+            Assert.That(t1step2Text, Is.EqualTo(textValue2), "textValue2 should still be default");
+
+
+            EnsureUnaffectedSteps();
+            PostTestCleanup();
+
+        }
+
+        // Test two...change second item
+        [Test]
+        public void UpdateContentValues2()
+        {
+            SetupTutorial();
+            SetupSteps();
+            SetupContent();
+
+            var modelMiddleware = TutorialManagerModelMiddleware.GetInstance();
+            string textId1 = ConstructID(t1Step1LookupID, ContentType.text.ToString());
+            string textId2 = ConstructID(t1Step2LookupID, ContentType.text.ToString());
+            string textValue1 = modelMiddleware.TMData.contentTable[textId1].text;
+            string textValue2 = modelMiddleware.TMData.contentTable[textId2].text;
+            Dictionary<string, string> dict = new Dictionary<string, string>();
+            dict[textId2] = t1step2Textv2;
+
+            Assert.That(t1step1Text, Is.EqualTo(textValue1), "textValue1 should be default");
+            Assert.That(t1step2Text, Is.EqualTo(textValue2), "textValue2 should be default");
+
+            modelMiddleware.UpdateContentEntityValues(dict);
+            string textValue2v2 = modelMiddleware.TMData.contentTable[textId2].text;
+
+            Assert.That(t1step1Text, Is.EqualTo(textValue1), "textValue1 should still be default");
+            Assert.That(t1step2Textv2, Is.EqualTo(textValue2v2), "textValue2 should have changed");
+
+
+            EnsureUnaffectedSteps();
+            PostTestCleanup();
+
+        }
+
+        // Test three...change both items
+        [Test]
+        public void UpdateContentValues3()
+        {
+            SetupTutorial();
+            SetupSteps();
+            SetupContent();
+
+            var modelMiddleware = TutorialManagerModelMiddleware.GetInstance();
+            string textId1 = ConstructID(t1Step1LookupID, ContentType.text.ToString());
+            string textId2 = ConstructID(t1Step2LookupID, ContentType.text.ToString());
+            string textValue1 = modelMiddleware.TMData.contentTable[textId1].text;
+            string textValue2 = modelMiddleware.TMData.contentTable[textId2].text;
+            Dictionary<string, string> dict = new Dictionary<string, string>();
+            dict[textId1] = t1step1Textv2;
+            dict[textId2] = t1step2Textv2;
+
+            Assert.That(t1step1Text, Is.EqualTo(textValue1), "textValue1 should be default");
+            Assert.That(t1step2Text, Is.EqualTo(textValue2), "textValue2 should be default");
+
+            modelMiddleware.UpdateContentEntityValues(dict);
+            string textValue2v1 = modelMiddleware.TMData.contentTable[textId1].text;
+            string textValue2v2 = modelMiddleware.TMData.contentTable[textId2].text;
+
+            Assert.That(t1step1Textv2, Is.EqualTo(textValue2v1), "textValue1 should have changed");
+            Assert.That(t1step2Textv2, Is.EqualTo(textValue2v2), "textValue2 should have changed");
+
+
+            EnsureUnaffectedSteps();
+            PostTestCleanup();
+
+        }
+
         [Test]
         public void Clear()
         {
@@ -703,5 +800,5 @@ namespace UnityEngine.Analytics
             return false;
         }
     }
-#endif
+//#endif
 }

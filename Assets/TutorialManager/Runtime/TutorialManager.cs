@@ -65,14 +65,10 @@ namespace UnityEngine.Analytics
 
         static void DecisionRequestService_OnDecisionReceived(TutorialWebResponse response)
         {
-
-
-
-
-
-            //DecisionRequestService.OnDecisionReceived -= DecisionRequestService_OnDecisionReceived;
-            //PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, toShow ? 1 : 0);
-            //PlayerPrefs.Save();
+            DecisionRequestService.OnDecisionReceived -= DecisionRequestService_OnDecisionReceived;
+            PlayerPrefs.SetInt(adaptiveOnboardingShowTutorialPrefsKey, response.showTutorial ? 1 : 0);
+            PlayerPrefs.Save();
+            TutorialManagerModelMiddleware.GetInstance().UpdateContentEntityValues(response.contentTable);
         }
 
         private static string GetAnalyticsValuesLocation()

@@ -254,6 +254,16 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                 Save();
             }
         }
+
+        public void UpdateContentEntityValues(Dictionary<string, string> contentTable)
+        {
+            foreach (KeyValuePair<string, string> kv in contentTable) {
+                if (TMData.contentTable.ContainsKey(kv.Key)) {
+                    TMData.contentTable[kv.Key].text = kv.Value;
+                }
+            }
+        }
+
 #if UNITY_EDITOR
         public void DestroyContentEntity(string id)
         {
