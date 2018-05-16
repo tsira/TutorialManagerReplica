@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System;
+using UnityEngine.Analytics;
 
 namespace UnityEngine.Analytics.TutorialManagerRuntime
 {
@@ -23,7 +24,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         public Dictionary<string, ContentEntity> contentTable = new Dictionary<string, ContentEntity>();
     }
 
-    public class TutorialManagerModelMiddleware
+    public class TutorialManagerModelMiddleware : IDataStore
     {
         private static TutorialManagerModelMiddleware m_Instance;
         public static TutorialManagerModelMiddleware GetInstance()
@@ -46,6 +47,18 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             {
                 return m_TMData;
             }
+        }
+
+        public string GetString(string id, string defaultValue = null)
+        {
+            if (TMData.stepTable.ContainsKey(id)) {
+                string key = GetTextId(id);
+                if (TMData.contentTable.ContainsKey(key)) {
+                    string value = TMData.contentTable[key].text;
+                    return value;
+                }
+            }
+            return defaultValue;
         }
 
 #if UNITY_EDITOR
