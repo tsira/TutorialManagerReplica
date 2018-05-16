@@ -66,6 +66,47 @@ namespace UnityEngine.Analytics
             Assert.That("bar", Is.EqualTo(modelMiddleware.TMData.genre), "genre should read 'bar'");
         }
 
+        [Test]
+        public void TestGetStringNoKey()
+        {
+            const string someDefaultValue = "Some default value";
+
+            var modelMiddleware = TutorialManagerModelMiddleware.GetInstance();
+            modelMiddleware.Clear();
+
+            SetupTutorial();
+            SetupSteps();
+
+            var result = modelMiddleware.GetString(t1Step1LookupID);
+            Assert.IsNull(result, "result for no key should be null");
+
+            var result2 = modelMiddleware.GetString(t1Step1LookupID, someDefaultValue);
+            Assert.That(someDefaultValue, Is.EqualTo(result2), "result for no key should equal passed-in default value");
+        }
+
+        [Test]
+        public void TestGetStringWithKey()
+        {
+            const string someDefaultValue = "Some default value";
+
+            var modelMiddleware = TutorialManagerModelMiddleware.GetInstance();
+            modelMiddleware.Clear();
+
+            SetupTutorial();
+            SetupSteps();
+            SetupContent();
+
+            var result = modelMiddleware.GetString(t1Step1LookupID);
+            Assert.That(t1step1Text, Is.EqualTo(result), string.Format("result for valid key should be {0}", t1step1Text));
+            var result2 = modelMiddleware.GetString(t1Step2LookupID);
+            Assert.That(t1step2Text, Is.EqualTo(result2), string.Format("result for valid key should be {0}", t1step2Text));
+
+            var result3 = modelMiddleware.GetString(t1Step1LookupID, someDefaultValue);
+            Assert.That(t1step1Text, Is.EqualTo(result3), string.Format("result for valid key should be {0}", t1step1Text));
+            var result4 = modelMiddleware.GetString(t1Step2LookupID);
+            Assert.That(t1step2Text, Is.EqualTo(result4), string.Format("result for valid key should be {0}", t1step2Text));
+        }
+
 
         [Test]
         public void CreateTutorial()
