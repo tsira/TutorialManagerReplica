@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine.Networking;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using UnityEngine.Analytics.TutorialManagerRuntime;
 
 namespace UnityEngine.Analytics
 {
@@ -56,9 +56,15 @@ namespace UnityEngine.Analytics
         }
 
         //TODO: Implement write once endpoint is ready
-        public static void Write()
+        public static IEnumerator<AsyncOperation> Write(string appId, TutorialManagerModel model)
         {
+            string payload = TMModelToJsonInterpreter.ProcessModelToJson(model);
 
+            Debug.Log("TODO: Wire this method to the actual service call when the endpoint is ready.");
+            Debug.Log(payload);
+
+
+            return null;
         }
 
         private static UnityWebRequest Authorize(UnityWebRequest request)
@@ -117,5 +123,7 @@ namespace UnityEngine.Analytics
                 DataReceived(null);
             }
         }
+
+
     }
 }

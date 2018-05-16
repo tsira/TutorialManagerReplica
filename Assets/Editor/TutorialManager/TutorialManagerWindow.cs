@@ -325,18 +325,18 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
         private void PushData()
         {
-            // TODO
+            TutorialManagerEditorWebHandler.Write(m_AppId, TMModel.TMData);
         }
 
         private void PullData()
         {
-            TutorialManagerEditorWebHandler.DataReceived += RemoteSettingsDataReceived;
+            TutorialManagerEditorWebHandler.DataReceived += RemoteSettingsReadDataReceived;
             m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Read(m_AppId);
         }
 
-        private void RemoteSettingsDataReceived(List<RemoteSettingsKeyValueType> remoteSettings)
+        private void RemoteSettingsReadDataReceived(List<RemoteSettingsKeyValueType> remoteSettings)
         {
-            TutorialManagerEditorWebHandler.DataReceived -= RemoteSettingsDataReceived;
+            TutorialManagerEditorWebHandler.DataReceived -= RemoteSettingsReadDataReceived;
             if(m_WebRequestEnumerator != null)
             {
                 m_WebRequestEnumerator = null;
