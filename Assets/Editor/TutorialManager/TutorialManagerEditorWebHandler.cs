@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.Networking;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine.Analytics.TutorialManagerRuntime;
 using System.Linq;
@@ -56,7 +57,49 @@ namespace UnityEngine.Analytics
         public static IEnumerator<AsyncOperation> Write(string appId)
         {
             var model = TutorialManagerModelMiddleware.GetInstance().TMData;
-            string jsonData = EditorJsonUtility.ToJson(model);
+            //TODO: Remove when endpoint is live
+            var tutorialName = "tutorial 1";
+            var stepName = "step 1";
+            var stepLookupName = ConstructID(tutorialName, stepName);
+            var textLookupName = ConstructID(stepLookupName, "text");
+            var tutorial = new TutorialEntity(tutorialName);
+            tutorial.steps.Add(stepName);
+            var step = new StepEntity(stepLookupName);
+            step.messaging.isActive = true;
+            var text = new ContentEntity(textLookupName, "text", "yooo what's up! I work!");
+            step.messaging.content.Add(text.id);
+            model.tutorials.Add(tutorial);
+            model.steps.Add(step);
+            model.content.Add(text);
+            //END REMOVE CODE
+
+            var tutsArr = model.tutorials.Select(t => t.id).ToArray();
+
+            var tutorials = new TutorialJSON(tutsArr);
+
+            var stepsArr = model.tutorials.Select(t => t.steps).ToArray();
+            var stepObj = new StepsJSON(stepsArr[0].ToArray());
+
+            var tutsJson = JsonUtility.ToJson(tutorials);
+            //Debug.Log(tutsJson);
+            tutsJson = RemoveWrappingBracesFromString(tutsJson);
+            var stepObjJson = JsonUtility.ToJson(stepObj);
+            stepObjJson = RemoveWrappingBracesFromString(stepObjJson);
+
+            var contentsArr = model.content.Select(c => c.text).ToArray();
+            var contentObj = new TextJSON(contentsArr[0]);
+            var contentJson = JsonUtility.ToJson(contentObj);
+            contentJson = contentJson.Replace("TMContent", model.content[0].id);
+
+            Debug.Log(contentJson);
+
+            Debug.Log(tutsJson);
+            stepObjJson = stepObjJson.Replace("TMStep", tutsArr[0]);
+            Debug.Log(stepObjJson);
+            var stringList = new List<string>();
+            stringList.Add(tutsJson);
+            stringList.Add(stepObjJson);
+            string jsonData = CreateWritePayload(stringList);
             Debug.Log(jsonData);
             var settingsRequest = Authorize(UnityWebRequest.Post(appId, "test payload"));
             if(IsAuthError(settingsRequest))
@@ -82,6 +125,34 @@ namespace UnityEngine.Analytics
             }
 
             WriteEvent(true);
+        }
+
+        private static string RemoveWrappingBracesFromString (string stringToParse)
+        {
+            return stringToParse.Substring(1, stringToParse.Length - 2);
+        }
+
+        private static string CreateWritePayload (List<string> payload)
+        {
+            string retString = "{\"remoteSettings\":{";
+
+            for (int i = 0; i < payload.Count; i++)
+            {
+                retString += payload[i];
+                //if this isn't the last string, add a comma after
+                if(i < payload.Count - 1)
+                {
+                    retString += ",";
+                }
+            }
+
+            return retString + "}}";
+        }
+
+        //TODO: Remove when endpoint is live
+        private static string ConstructID(string tutorialId, string stepId)
+        {
+            return string.Format("{0}-{1}", tutorialId, stepId);
         }
 
         private static bool IsAuthError(UnityWebRequest request)
@@ -162,6 +233,36 @@ namespace UnityEngine.Analytics
             {
                 TMRSDataReceived(null);
             }
+        }
+    }
+
+    public struct TutorialJSON 
+    {
+        public string[] tutorials;
+
+        public TutorialJSON (string[] tuts)
+        {
+            tutorials = tuts;
+        }
+    }
+
+    public struct StepsJSON 
+    {
+        public string[] TMStep;
+
+        public StepsJSON (string [] s)
+        {
+            TMStep = s;
+        }
+    }
+
+    public struct TextJSON
+    {
+        public string TMContent;
+
+        public TextJSON (string contentid)
+        {
+            TMContent = contentid;
         }
     }
 }
