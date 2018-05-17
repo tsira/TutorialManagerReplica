@@ -15,6 +15,7 @@ namespace UnityEngine.Analytics
         //REST API paths
         private const string k_BasePath = "https://analytics.cloud.unity3d.com/";
         private const string k_APIPath = k_BasePath + "api/v2/projects/";
+        //private const string k_RemoteSettingsPath = k_APIPath + "{0}/configurations/{1}/remotesettings";
         private const string k_RemoteSettingsPath = k_APIPath + "{0}/tutorial/remote_settings";
 
         //Event for receiving RS data
@@ -199,6 +200,7 @@ namespace UnityEngine.Analytics
 
         static void LoadRemoteSettings(string remoteSettingsResult)
         {
+            Debug.Log(remoteSettingsResult);
             //string remoteSettingsJson = "{ \"list\": " + remoteSettingsResult + "}";
 
             List<TutorialManagerEngine.RemoteSettingsKeyValueType> remoteSettings;
