@@ -84,7 +84,7 @@ namespace UnityEngine.Analytics
             var stepObj = new StepsJSON(stepsArr[0].ToArray());
 
             var tutsJson = JsonUtility.ToJson(tutorials);
-            //Debug.Log(tutsJson);
+            /Debug.Log(tutsJson);
             tutsJson = RemoveWrappingBracesFromString(tutsJson);
             var stepObjJson = JsonUtility.ToJson(stepObj);
             stepObjJson = RemoveWrappingBracesFromString(stepObjJson);
