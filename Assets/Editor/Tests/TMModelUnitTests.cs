@@ -1,4 +1,4 @@
-//#if UNITY_5_6_OR_NEWER
+#if UNITY_5_6_OR_NEWER
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.TestTools;
@@ -800,5 +800,5 @@ namespace UnityEngine.Analytics
             return false;
         }
     }
-//#endif
+#endif
 }
