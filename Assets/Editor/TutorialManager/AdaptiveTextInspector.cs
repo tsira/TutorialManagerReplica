@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace UnityEngine.Analytics {
+namespace UnityEngine.Analytics.TutorialManagerRuntime {
 	[CustomEditor(typeof(AdaptiveText))]
 	public class AdaptiveTextInspector : AdaptiveContentInspector
 	{
