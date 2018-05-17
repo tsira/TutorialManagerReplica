@@ -5,10 +5,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine.Analytics.TutorialManagerRuntime;
-<<<<<<< HEAD
-=======
 using System.Linq;
->>>>>>> Refactored some code into a helper method
 
 namespace UnityEngine.Analytics
 {
@@ -84,7 +81,7 @@ namespace UnityEngine.Analytics
             var stepObj = new StepsJSON(stepsArr[0].ToArray());
 
             var tutsJson = JsonUtility.ToJson(tutorials);
-            /Debug.Log(tutsJson);
+            Debug.Log(tutsJson);
             tutsJson = RemoveWrappingBracesFromString(tutsJson);
             var stepObjJson = JsonUtility.ToJson(stepObj);
             stepObjJson = RemoveWrappingBracesFromString(stepObjJson);
