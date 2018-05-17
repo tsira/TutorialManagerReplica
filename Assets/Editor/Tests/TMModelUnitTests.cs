@@ -555,6 +555,7 @@ namespace UnityEngine.Analytics
             //Test set up - generate a model and save it out so it can be retreived by the middleware
             var tutorialName = "tutorial 1";
             var stepName = "step 1";
+            var genreName = "myGenre";
             var stepLookupName = ConstructID(tutorialName, stepName);
             var textLookupName = ConstructID(stepLookupName, "text");
             var actualModel = new TutorialManagerModel();
@@ -564,7 +565,7 @@ namespace UnityEngine.Analytics
             step.messaging.isActive = true;
             var text = new ContentEntity(textLookupName, "text", "yooo what's up! I work!");
             step.messaging.content.Add(text.id);
-            actualModel.genre = "myGenre";
+            actualModel.genre = genreName;
             actualModel.tutorials.Add(tutorial);
             actualModel.steps.Add(step);
             actualModel.content.Add(text);
@@ -577,7 +578,7 @@ namespace UnityEngine.Analytics
 
             //Actual test code
             var modelMiddleware = TutorialManagerModelMiddleware.GetInstance();
-            Assert.That("myGenre", Is.EqualTo(modelMiddleware.TMData.genre), "genre should be myGenre");
+            Assert.That(genreName, Is.EqualTo(modelMiddleware.TMData.genre), string.Format("genre should be {0}", genreName));
             Assert.IsNotEmpty(modelMiddleware.TMData.tutorials, "tutorials should be populated");
             Assert.IsNotEmpty(modelMiddleware.TMData.steps, "steps should be populated");
             Assert.IsNotEmpty(modelMiddleware.TMData.content, "content should be populated");
