@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 using UnityEngine.Analytics.TutorialManagerRuntime;
+using UnityEngine.Analytics.TutorialManagerEditor;
 using System.Linq;
 
 namespace UnityEngine.Analytics
@@ -9,38 +11,56 @@ namespace UnityEngine.Analytics
     {
         public static string ProcessModelToJson(TutorialManagerModel model)
         {
-            string tutorials = Quotify("tutorials") + ":" + Quotify(
-                "[" + model.tutorials.Select(x => x.id).Aggregate((current, next) => current + "," + next) + "]"
-            );
-
-            string steps = model.tutorials.Select(x => {
-                return Quotify(x.id) + ":" + Quotify(
-                    "[" + x.steps.Select(y => y).Aggregate((current, next) => current + "," + next) + "]");
-            }).Aggregate((current, next) => current + "," + next);
-
-            string content = string.Empty;
-            if (model.content.Count > 0) {
-                content = model.content.Select(x => {
-                    return Quotify(x.id) + ":" + Quotify(x.text);
-                }).Aggregate((current, next) => current + "," + next);
+            var rsDataList = new RemoteSettingsData();
+            rsDataList.genre = model.genre;
+            rsDataList.remoteSettings = new List<RemoteSettingsKeyValueType>();
+            string tutorialsValue = null;
+            if(model.tutorials.Count == 1)
+            {
+                tutorialsValue = "[" + Quotify(model.tutorials[0].id) + "]";
+            }
+            else
+            {
+                tutorialsValue = "[" + model.tutorials.Select(x => x.id).Aggregate((current, next) => Quotify(current) + "," + Quotify(next)) + "]";
             }
 
-            string retv = string.Empty;
-            const string contentPattern = "\"remoteSettings\":{{{0},{1},{2}}}";
-            const string noContentPattern = "\"remoteSettings\":{{{0},{1}}}";
+            rsDataList.remoteSettings.Add(MakeRSJSONObject("tutorials", tutorialsValue));
 
-            if (content == string.Empty) {
-                retv = string.Format(noContentPattern, tutorials, steps);
-            } else {
-                retv = string.Format(contentPattern, tutorials, steps, content);
-            }
+            var stepsList = model.tutorials.Select(x => {
+                if(x.steps.Count == 1)
+                {
+                    return MakeRSJSONObject(x.id, "[" + Quotify(x.steps[0]) + "]");
+                }
+                return MakeRSJSONObject(x.id, "[" + x.steps.Select(y => y).Aggregate((current, next) => Quotify(current) + "," + Quotify(next)) + "]");
+            });
+            rsDataList.remoteSettings.AddRange(stepsList);
 
-            return retv;
+            var contentList = model.content.Select(x =>
+            {
+                return MakeRSJSONObject(x.id, x.text);
+            });
+            rsDataList.remoteSettings.AddRange(contentList);
+
+            return JsonUtility.ToJson(rsDataList);
         }
 
         static string Quotify(string text)
         {
-            return "\"" + text + "\"";
+            string retStr = text;
+            if(text.StartsWith("\"", System.StringComparison.InvariantCulture) == false)
+            {
+                retStr = "\"" + retStr;
+            }
+            if(text.EndsWith("\"", System.StringComparison.InvariantCulture) == false)
+            {
+                retStr = retStr + "\"";
+            }
+            return retStr;
+        }
+
+        static RemoteSettingsKeyValueType MakeRSJSONObject (string key, string value)
+        {
+            return new RemoteSettingsKeyValueType(key, value, "string");
         }
     }
 }

@@ -30,13 +30,13 @@ public class TMModelToJsonInterpreterTests
     const string t2step1Text = "Here is text for tutorial two step one";
     const string t2step2Text = "Here is text for tutorial two step two";
 
-    const string expectedT1S1C0 = @"""remoteSettings"":{""tutorials"":""[tutorial]"",""tutorial"":""[tutorial-step]""}";
-    const string expectedT1S1C1 = @"""remoteSettings"":{""tutorials"":""[tutorial]"",""tutorial"":""[tutorial-step]"",""tutorial-step-text"":""Here is text for tutorial one step one""}";
-    const string expectedT1S2C0 = @"""remoteSettings"":{""tutorials"":""[tutorial]"",""tutorial"":""[tutorial-step,tutorial-step2]""}";
+    const string expectedT1S1C0 = @"{""genre"":""Adventure"",""remoteSettings"":[{""key"":""tutorials"",""value"":""[\""tutorial\""]"",""type"":""string""},{""key"":""tutorial"",""value"":""[\""tutorial-step\""]"",""type"":""string""}]}";
+    const string expectedT1S1C1 = @"{""genre"":""Adventure"",""remoteSettings"":[{""key"":""tutorials"",""value"":""[\""tutorial\""]"",""type"":""string""},{""key"":""tutorial"",""value"":""[\""tutorial-step\""]"",""type"":""string""},{""key"":""tutorial-step-text"",""value"":""Here is text for tutorial one step one"",""type"":""string""}]}";
+    const string expectedT1S2C0 = @"{""genre"":""Adventure"",""remoteSettings"":[{""key"":""tutorials"",""value"":""[\""tutorial\""]"",""type"":""string""},{""key"":""tutorial"",""value"":""[\""tutorial-step\"",\""tutorial-step2\""]"",""type"":""string""}]}";
 
-    const string expectedT2S1C0 = @"""remoteSettings"":{""tutorials"":""[tutorial,tutorial2]"",""tutorial"":""[tutorial-step]"",""tutorial2"":""[tutorial2-step]""}";
-    const string expectedT2S1C1 = @"""remoteSettings"":{""tutorials"":""[tutorial,tutorial2]"",""tutorial"":""[tutorial-step]"",""tutorial2"":""[tutorial2-step]"",""tutorial-step-text"":""Here is text for tutorial one step one"",""tutorial2-step-text"":""Here is text for tutorial two step one""}";
-    const string expectedT2S2C1 = @"""remoteSettings"":{""tutorials"":""[tutorial,tutorial2]"",""tutorial"":""[tutorial-step,tutorial-step2]"",""tutorial2"":""[tutorial2-step,tutorial2-step2]"",""tutorial-step-text"":""Here is text for tutorial one step one"",""tutorial-step2-text"":""Here is text for tutorial one step two"",""tutorial2-step-text"":""Here is text for tutorial two step one"",""tutorial2-step2-text"":""Here is text for tutorial two step two""}";
+    const string expectedT2S1C0 = @"{""genre"":""Adventure"",""remoteSettings"":[{""key"":""tutorials"",""value"":""[\""tutorial\"",\""tutorial2\""]"",""type"":""string""},{""key"":""tutorial"",""value"":""[\""tutorial-step\""]"",""type"":""string""},{""key"":""tutorial2"",""value"":""[\""tutorial2-step\""]"",""type"":""string""}]}";
+    const string expectedT2S1C1 = @"{""genre"":""Adventure"",""remoteSettings"":[{""key"":""tutorials"",""value"":""[\""tutorial\"",\""tutorial2\""]"",""type"":""string""},{""key"":""tutorial"",""value"":""[\""tutorial-step\""]"",""type"":""string""},{""key"":""tutorial2"",""value"":""[\""tutorial2-step\""]"",""type"":""string""},{""key"":""tutorial-step-text"",""value"":""Here is text for tutorial one step one"",""type"":""string""},{""key"":""tutorial2-step-text"",""value"":""Here is text for tutorial two step one"",""type"":""string""}]}";
+    const string expectedT2S2C1 = @"{""genre"":""Adventure"",""remoteSettings"":[{""key"":""tutorials"",""value"":""[\""tutorial\"",\""tutorial2\""]"",""type"":""string""},{""key"":""tutorial"",""value"":""[\""tutorial-step\"",\""tutorial-step2\""]"",""type"":""string""},{""key"":""tutorial2"",""value"":""[\""tutorial2-step\"",\""tutorial2-step2\""]"",""type"":""string""},{""key"":""tutorial-step-text"",""value"":""Here is text for tutorial one step one"",""type"":""string""},{""key"":""tutorial-step2-text"",""value"":""Here is text for tutorial one step two"",""type"":""string""},{""key"":""tutorial2-step-text"",""value"":""Here is text for tutorial two step one"",""type"":""string""},{""key"":""tutorial2-step2-text"",""value"":""Here is text for tutorial two step two"",""type"":""string""}]}";
 
 
 
@@ -48,9 +48,10 @@ public class TMModelToJsonInterpreterTests
 
         modelMiddleware.CreateTutorialEntity(tutorialName1);
         modelMiddleware.CreateStepEntity(t1step1, tutorialName1);
+        modelMiddleware.SaveGenre("Adventure");
 
         string output = TMModelToJsonInterpreter.ProcessModelToJson(modelMiddleware.TMData);
-        Assert.That(expectedT1S1C0, Is.EqualTo(output));
+        Assert.That(output, Is.EqualTo(expectedT1S1C0));
     }
 
     [Test]
@@ -62,9 +63,10 @@ public class TMModelToJsonInterpreterTests
         modelMiddleware.CreateTutorialEntity(tutorialName1);
         modelMiddleware.CreateStepEntity(t1step1, tutorialName1);
         modelMiddleware.CreateContentEntity(t1Step1LookupID, ContentType.text, t1step1Text);
+        modelMiddleware.SaveGenre("Adventure");
 
         string output = TMModelToJsonInterpreter.ProcessModelToJson(modelMiddleware.TMData);
-        Assert.That(expectedT1S1C1, Is.EqualTo(output));
+        Assert.That(output, Is.EqualTo(expectedT1S1C1));
     }
 
     [Test]
@@ -76,9 +78,10 @@ public class TMModelToJsonInterpreterTests
         modelMiddleware.CreateTutorialEntity(tutorialName1);
         modelMiddleware.CreateStepEntity(t1step1, tutorialName1);
         modelMiddleware.CreateStepEntity(t1step2, tutorialName1);
+        modelMiddleware.SaveGenre("Adventure");
 
         string output = TMModelToJsonInterpreter.ProcessModelToJson(modelMiddleware.TMData);
-        Assert.That(expectedT1S2C0, Is.EqualTo(output));
+        Assert.That(output, Is.EqualTo(expectedT1S2C0));
     }
 
     [Test]
@@ -91,9 +94,10 @@ public class TMModelToJsonInterpreterTests
         modelMiddleware.CreateStepEntity(t1step1, tutorialName1);
         modelMiddleware.CreateTutorialEntity(tutorialName2);
         modelMiddleware.CreateStepEntity(t2step1, tutorialName2);
+        modelMiddleware.SaveGenre("Adventure");
 
         string output = TMModelToJsonInterpreter.ProcessModelToJson(modelMiddleware.TMData);
-        Assert.That(expectedT2S1C0, Is.EqualTo(output));
+        Assert.That(output, Is.EqualTo(expectedT2S1C0));
     }
 
     [Test]
@@ -109,9 +113,10 @@ public class TMModelToJsonInterpreterTests
         modelMiddleware.CreateTutorialEntity(tutorialName2);
         modelMiddleware.CreateStepEntity(t2step1, tutorialName2);
         modelMiddleware.CreateContentEntity(t2Step1LookupID, ContentType.text, t2step1Text);
+        modelMiddleware.SaveGenre("Adventure");
 
         string output = TMModelToJsonInterpreter.ProcessModelToJson(modelMiddleware.TMData);
-        Assert.That(expectedT2S1C1, Is.EqualTo(output));
+        Assert.That(output, Is.EqualTo(expectedT2S1C1));
     }
 
     [Test]
@@ -131,9 +136,9 @@ public class TMModelToJsonInterpreterTests
         modelMiddleware.CreateContentEntity(t2Step1LookupID, ContentType.text, t2step1Text);
         modelMiddleware.CreateStepEntity(t2step2, tutorialName2);
         modelMiddleware.CreateContentEntity(t2Step2LookupID, ContentType.text, t2step2Text);
+        modelMiddleware.SaveGenre("Adventure");
 
         string output = TMModelToJsonInterpreter.ProcessModelToJson(modelMiddleware.TMData);
-
-        Assert.That(expectedT2S2C1, Is.EqualTo(output));
+        Assert.That(output, Is.EqualTo(expectedT2S2C1));
     }
 }

@@ -15,11 +15,19 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         public string key;
         public string value;
         public string type;
+
+        public RemoteSettingsKeyValueType (string k, string v, string t)
+        {
+            key = k;
+            value = v;
+            type = t;
+        }
     }
 
     [Serializable]
     public struct RemoteSettingsData
     {
+        public string genre;
         public List<RemoteSettingsKeyValueType> remoteSettings;
     }
 
@@ -328,7 +336,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         {
             //TODO: Figure out write flow
             TutorialManagerEditorWebHandler.TMRSWriteResponseReceived += WriteResponseReceived;
-            m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Write(m_AppId);
+            m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Write(m_AppId, TMModel.TMData);
         }
 
         void WriteResponseReceived(bool succes)

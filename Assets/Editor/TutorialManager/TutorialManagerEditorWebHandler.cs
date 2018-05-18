@@ -54,54 +54,10 @@ namespace UnityEngine.Analytics
             LoadRemoteSettings(remoteSettingsJson);
         }
 
-        public static IEnumerator<AsyncOperation> Write(string appId)
+        public static IEnumerator<AsyncOperation> Write(string appId, TutorialManagerModel model)
         {
-            var model = TutorialManagerModelMiddleware.GetInstance().TMData;
-            //TODO: Remove when endpoint is live
-            var tutorialName = "tutorial 1";
-            var stepName = "step 1";
-            var stepLookupName = ConstructID(tutorialName, stepName);
-            var textLookupName = ConstructID(stepLookupName, "text");
-            var tutorial = new TutorialEntity(tutorialName);
-            tutorial.steps.Add(stepName);
-            var step = new StepEntity(stepLookupName);
-            step.messaging.isActive = true;
-            var text = new ContentEntity(textLookupName, "text", "yooo what's up! I work!");
-            step.messaging.content.Add(text.id);
-            model.tutorials.Add(tutorial);
-            model.steps.Add(step);
-            model.content.Add(text);
-            //END REMOVE CODE
-
-            var tutsArr = model.tutorials.Select(t => t.id).ToArray();
-
-            var tutorials = new TutorialJSON(tutsArr);
-
-            var stepsArr = model.tutorials.Select(t => t.steps).ToArray();
-            var stepObj = new StepsJSON(stepsArr[0].ToArray());
-
-            var tutsJson = JsonUtility.ToJson(tutorials);
-            Debug.Log(tutsJson);
-            tutsJson = RemoveWrappingBracesFromString(tutsJson);
-            var stepObjJson = JsonUtility.ToJson(stepObj);
-            stepObjJson = RemoveWrappingBracesFromString(stepObjJson);
-
-            var contentsArr = model.content.Select(c => c.text).ToArray();
-            var contentObj = new TextJSON(contentsArr[0]);
-            var contentJson = JsonUtility.ToJson(contentObj);
-            contentJson = contentJson.Replace("TMContent", model.content[0].id);
-
-            Debug.Log(contentJson);
-
-            Debug.Log(tutsJson);
-            stepObjJson = stepObjJson.Replace("TMStep", tutsArr[0]);
-            Debug.Log(stepObjJson);
-            var stringList = new List<string>();
-            stringList.Add(tutsJson);
-            stringList.Add(stepObjJson);
-            string jsonData = CreateWritePayload(stringList);
-            Debug.Log(jsonData);
-            var settingsRequest = Authorize(UnityWebRequest.Post(appId, "test payload"));
+            var json = TMModelToJsonInterpreter.ProcessModelToJson(model);
+            var settingsRequest = Authorize(UnityWebRequest.Post(appId, json));
             if(IsAuthError(settingsRequest))
             {
                 WriteEvent(false);
@@ -234,36 +190,6 @@ namespace UnityEngine.Analytics
             {
                 TMRSDataReceived(null);
             }
-        }
-    }
-
-    public struct TutorialJSON 
-    {
-        public string[] tutorials;
-
-        public TutorialJSON (string[] tuts)
-        {
-            tutorials = tuts;
-        }
-    }
-
-    public struct StepsJSON 
-    {
-        public string[] TMStep;
-
-        public StepsJSON (string [] s)
-        {
-            TMStep = s;
-        }
-    }
-
-    public struct TextJSON
-    {
-        public string TMContent;
-
-        public TextJSON (string contentid)
-        {
-            TMContent = contentid;
         }
     }
 }
