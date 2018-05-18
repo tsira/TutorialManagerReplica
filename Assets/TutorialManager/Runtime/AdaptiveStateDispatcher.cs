@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-namespace UnityEngine.Analytics.TutorialManagerRuntime {
+namespace UnityEngine.Analytics {
     public class AdaptiveStateDispatcher : IFSMDispatcher
 	{
         public delegate void OnEnterStateHandler(string id);
@@ -11,6 +11,17 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime {
         public event OnExitStateHandler OnExitState;
 
         static AdaptiveStateDispatcher m_Instance;
+
+        string m_State;
+        public string state {
+            get {
+                return m_State;
+            }
+            private set {
+                m_State = value;
+            }
+        }
+
         public static AdaptiveStateDispatcher GetInstance()
         {
             if (m_Instance == null)
@@ -22,6 +33,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime {
 
         public void DispatchEnterState(string id)
         {
+            state = id;
             if (OnEnterState != null) {
                 OnEnterState(id);
             }
@@ -29,6 +41,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime {
 
         public void DispatchExitState(string id)
         {
+            state = string.Empty;
             if (OnExitState != null) {
                 OnExitState(id);
             }
