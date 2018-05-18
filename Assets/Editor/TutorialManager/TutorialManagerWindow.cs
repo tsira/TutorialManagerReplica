@@ -125,6 +125,11 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
                 DestroyTutorial(tutorialMarkedForDeletion);
                 tutorialMarkedForDeletion = string.Empty;
             }
+
+            if(GUILayout.Button("Write"))
+            {
+                PushData();
+            }
         }
 
         void Update()
@@ -334,7 +339,6 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
         private void PushData()
         {
-            //TODO: Figure out write flow
             TutorialManagerEditorWebHandler.TMRSWriteResponseReceived += WriteResponseReceived;
             m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Write(m_AppId, TMModel.TMData);
         }
