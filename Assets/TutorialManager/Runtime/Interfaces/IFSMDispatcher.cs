@@ -1,10 +1,12 @@
 using UnityEngine;
 using System.Collections;
 
-namespace UnityEngine.Analytics.TutorialManagerRuntime
+namespace UnityEngine.Analytics
 {
     public interface IFSMDispatcher
     {
+        string state { get; }
+
         event AdaptiveStateDispatcher.OnEnterStateHandler OnEnterState;
         event AdaptiveStateDispatcher.OnExitStateHandler OnExitState;
 

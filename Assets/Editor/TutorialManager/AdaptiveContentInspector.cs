@@ -1,5 +1,6 @@
 using UnityEditor;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace UnityEngine.Analytics.TutorialManagerRuntime
 {
@@ -20,7 +21,6 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         {
             AdaptiveContent myTarget = (AdaptiveContent)target;
 
-
             TutorialManagerModel manifest = TutorialManagerModelMiddleware.GetInstance().TMData;
 
             if (CachedStepsAreStillValid(manifest) == false) {
@@ -32,25 +32,10 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
             // If changed, make the new connection
             if (bindingIndex != lastKnownBindingIndex && bindingIndex > -1) {
-                BindTo(stepIds[bindingIndex]);
+                BindTo(myTarget, stepIds[bindingIndex]);
             }
 
             lastKnownBindingIndex = bindingIndex;
-
-            EditorGUILayout.LabelField("My GUID");
-            EditorGUILayout.TextField(myTarget.bindingId);
-        }
-
-        static string FindTutorialByStepId(Dictionary<string, TutorialEntity> table, string stepId)
-        {
-            foreach (KeyValuePair<string, TutorialEntity> kv in table) {
-                foreach (string s in kv.Value.steps) {
-                    if (s == stepId) {
-                        return kv.Value.id;
-                    }
-                }
-            }
-            return null;
         }
 
 
@@ -58,17 +43,22 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         {
             stepIds = new List<string>();
             bindingContent = new GUIContent[manifest.steps.Count];
-            // Build list
-            int aa = 0;
-            foreach (KeyValuePair<string, StepEntity> t in manifest.stepTable) {
-                var stepId = t.Value.id;
-                stepIds.Add(stepId);
-                var tutorialName = FindTutorialByStepId(manifest.tutorialTable, stepId);
-                var contentString = string.Format("{0}: {1}", tutorialName, stepId);
-                bindingContent[aa] = new GUIContent(contentString);
 
-                aa++;
-            }
+            int a = 0;
+            manifest.stepTable.ToList().ForEach(x => {
+                var stepId = x.Value.id;
+                stepIds.Add(stepId);
+                // FIXME : Do we need this? Might lose, depending on Sean's design. -- MAT, May 17, 2018
+                //var tutorialName = FindTutorialByStepId(manifest.tutorialTable, stepId);
+                var contentString = string.Format("{0}", stepId);
+                bindingContent[a] = new GUIContent(contentString);
+                a++;
+            });
+        }
+
+        static string FindTutorialByStepId(Dictionary<string, TutorialEntity> table, string stepId)
+        {
+            return table.Where(x => x.Value.steps.Contains(stepId)).First().Value.id;
         }
 
         private bool CachedStepsAreStillValid(TutorialManagerModel manifest)
@@ -87,12 +77,10 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             return isValid;
         }
 
-        protected void BindTo(string id)
+        protected void BindTo(AdaptiveContent myTarget, string id)
         {
-
+            myTarget.bindingId = id;
         }
     }
-
-
 }
 

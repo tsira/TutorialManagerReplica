@@ -235,6 +235,12 @@ namespace UnityEngine.Analytics
                 if (OnExitState != null)
                     OnExitState(id);
             }
+
+            public string state {
+                get {
+                    return lastEnterFired;
+                }
+            }
         }
     }
 

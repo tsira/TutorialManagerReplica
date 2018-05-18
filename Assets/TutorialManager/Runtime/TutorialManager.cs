@@ -43,6 +43,8 @@ namespace UnityEngine.Analytics
         [RuntimeInitializeOnLoadMethod]
         private static void InitializeTutorialManager()
         {
+            BootstrapAdaptiveContent();
+
             string analyticsLocation = GetAnalyticsValuesLocation();
             if (File.Exists(analyticsLocation))
             {
@@ -204,6 +206,21 @@ namespace UnityEngine.Analytics
                 return tutorialStep = PlayerPrefs.GetInt(tutorialStepPlayerPrefsKey);
             }
             return 0;
+        }
+
+        static void BootstrapAdaptiveContent()
+        {
+            var modelMiddleware = TutorialManagerModelMiddleware.GetInstance();
+            var dispatcher = AdaptiveStateDispatcher.GetInstance();
+
+            var fsm = new TutorialManagerFSM();
+            // TODO: this is a default case...but we need to address again if a user is not at the start.
+            fsm.stateList = modelMiddleware.TMData.tutorials[0].steps;
+            fsm.dispatcher = dispatcher;
+
+            var provider = StateSystemProvider.GetInstance();
+            provider.SetDispatcher(dispatcher);
+            provider.SetDataStore(modelMiddleware);
         }
 
     }
