@@ -166,34 +166,4 @@ namespace UnityEngine.Analytics
             }
         }
     }
-
-    public struct TutorialJSON 
-    {
-        public string[] tutorials;
-
-        public TutorialJSON (string[] tuts)
-        {
-            tutorials = tuts;
-        }
-    }
-
-    public struct StepsJSON 
-    {
-        public string[] TMStep;
-
-        public StepsJSON (string [] s)
-        {
-            TMStep = s;
-        }
-    }
-
-    public struct TextJSON
-    {
-        public string TMContent;
-
-        public TextJSON (string contentid)
-        {
-            TMContent = contentid;
-        }
-    }
 }
