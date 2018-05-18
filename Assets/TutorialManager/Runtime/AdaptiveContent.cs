@@ -5,22 +5,21 @@ using UnityEngine.Analytics.TutorialManagerRuntime;
 namespace UnityEngine.Analytics {
 	public class AdaptiveContent : MonoBehaviour, IStateSystemSubject
 	{
+        [SerializeField]
 		public string bindingId;
 
         public IFSMDispatcher dispatcher { get; set; }
 
         public IDataStore dataStore { get; set; }
 
-        void Awake()
+        protected virtual void Start()
         {
             StateSystemProvider.GetInstance().Provide(this);
 
             dispatcher.OnEnterState += OnEnterState;
             dispatcher.OnExitState += OnExitState;
 
-            if (dispatcher.state == bindingId) {
-                OnEnterState(dispatcher.state);
-            }
+            OnEnterState(dispatcher.state);
         }
 
         void OnDestroy()
@@ -32,9 +31,7 @@ namespace UnityEngine.Analytics {
 
         void OnEnterState(string id)
         {
-            if (id == bindingId) {
-                gameObject.SetActive(true);
-            }
+            gameObject.SetActive(id == bindingId);
         }
 
         void OnExitState(string id)
