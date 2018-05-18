@@ -10,6 +10,8 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
         GUIContent bindingLabel = new GUIContent("Binding");
 
+        const string k_TMSettingsRequiredMessage = "Adaptive content keys must be set up in the Tutorial Manager window.\nGo to Window > Unity Analytics > TutorialManager";
+
         int bindingIndex = 0;
         int lastKnownBindingIndex = -1;
         GUIContent[] bindingContent;
@@ -21,14 +23,21 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         {
             AdaptiveContent myTarget = (AdaptiveContent)target;
 
-            TutorialManagerModel manifest = TutorialManagerModelMiddleware.GetInstance().TMData;
+            TutorialManagerModel model = TutorialManagerModelMiddleware.GetInstance().TMData;
 
-            if (CachedStepsAreStillValid(manifest) == false) {
-                ConstructBindings(manifest);
+            if (CachedStepsAreStillValid(model) == false) {
+                ConstructBindings(model);
             }
 
-            // Display popup
-            bindingIndex = EditorGUILayout.Popup(bindingLabel, bindingIndex, bindingContent);
+            if (bindingContent.Count() == 0) {
+                // Display warning
+                EditorGUILayout.HelpBox(k_TMSettingsRequiredMessage, MessageType.Warning, true);
+
+            } else {
+                // Display popup
+                bindingIndex = stepIds.IndexOf(myTarget.bindingId);
+                bindingIndex = EditorGUILayout.Popup(bindingLabel, bindingIndex, bindingContent);
+            }
 
             // If changed, make the new connection
             if (bindingIndex != lastKnownBindingIndex && bindingIndex > -1) {
