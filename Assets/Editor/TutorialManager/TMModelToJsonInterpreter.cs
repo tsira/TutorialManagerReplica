@@ -1,5 +1,3 @@
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
 using UnityEngine.Analytics.TutorialManagerRuntime;
 using UnityEngine.Analytics.TutorialManagerEditor;

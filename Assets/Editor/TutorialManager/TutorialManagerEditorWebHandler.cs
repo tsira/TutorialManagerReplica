@@ -1,4 +1,6 @@
 using System;
+using UnityEngine;
+using UnityEditor;
 using UnityEngine.Networking;
 using System.Collections.Generic;
 using UnityEngine.Analytics.TutorialManagerRuntime;
