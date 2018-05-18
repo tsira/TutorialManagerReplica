@@ -16,10 +16,10 @@ namespace UnityEngine.Analytics
         private const string k_RemoteSettingsPath = k_APIPath + "{0}/tutorial/remote_settings";
 
         //Event for receiving RS data
-        public delegate void TMRSReceivedHandler(List<TutorialManagerEditor.RemoteSettingsKeyValueType> remoteSettings);
-        public static event TMRSReceivedHandler TMRSDataReceived;
+        public delegate void TMRSReadResponseHandler(List<TutorialManagerEditor.RemoteSettingsKeyValueType> remoteSettings);
+        public static event TMRSReadResponseHandler TMRSReadResponseReceived;
 
-        public delegate void TMRSWriteResponseHandler(bool succes);
+        public delegate void TMRSWriteResponseHandler(bool success);
         public static event TMRSWriteResponseHandler TMRSWriteResponseReceived;
 
         public static IEnumerator<AsyncOperation> Read(string appId)
@@ -146,9 +146,9 @@ namespace UnityEngine.Analytics
                 return;
             }
 
-            if (TMRSDataReceived != null)
+            if (TMRSReadResponseReceived != null)
             {
-                TMRSDataReceived(remoteSettings);
+                TMRSReadResponseReceived(remoteSettings);
             }
         }
 
@@ -162,9 +162,9 @@ namespace UnityEngine.Analytics
 
         static void ReadErrorEvent()
         {
-            if (TMRSDataReceived != null)
+            if (TMRSReadResponseReceived != null)
             {
-                TMRSDataReceived(null);
+                TMRSReadResponseReceived(null);
             }
         }
     }

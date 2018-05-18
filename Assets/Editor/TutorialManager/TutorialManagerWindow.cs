@@ -1,36 +1,11 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
-using UnityEngine.Networking;
-using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine.Analytics.TutorialManagerRuntime;
 
 namespace UnityEngine.Analytics.TutorialManagerEditor
 {
-    [Serializable]
-    public struct RemoteSettingsKeyValueType
-    {
-        public string key;
-        public string value;
-        public string type;
-
-        public RemoteSettingsKeyValueType (string k, string v, string t)
-        {
-            key = k;
-            value = v;
-            type = t;
-        }
-    }
-
-    [Serializable]
-    public struct RemoteSettingsData
-    {
-        public string genre;
-        public List<RemoteSettingsKeyValueType> remoteSettings;
-    }
-
     public class TutorialManagerWindow : EditorWindow
     {
         private const string m_TabTitle = "Tutorial Manager";
@@ -350,13 +325,13 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
         private void PullData()
         {
-            TutorialManagerEditorWebHandler.TMRSDataReceived += RemoteSettingsReadDataReceived;
+            TutorialManagerEditorWebHandler.TMRSReadResponseReceived += RemoteSettingsReadDataReceived;
             m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Read(m_AppId);
         }
 
         private void RemoteSettingsReadDataReceived(List<RemoteSettingsKeyValueType> remoteSettings)
         {
-            TutorialManagerEditorWebHandler.TMRSDataReceived -= RemoteSettingsReadDataReceived;
+            TutorialManagerEditorWebHandler.TMRSReadResponseReceived -= RemoteSettingsReadDataReceived;
 
             if(m_WebRequestEnumerator != null)
             {
