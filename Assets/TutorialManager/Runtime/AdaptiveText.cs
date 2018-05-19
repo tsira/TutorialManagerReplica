@@ -5,15 +5,16 @@ using UnityEngine.UI;
 namespace UnityEngine.Analytics {
     public class AdaptiveText : AdaptiveContent
     {
-        string qualifiedBindingId {
-            get {
-                return string.Format("{0}-text", bindingId);
-            }
-        }
 
         override protected void Start()
         {
             base.Start();
+            SyncTextToTextField();
+        }
+
+        protected override void OnDataUpdate()
+        {
+            base.OnDataUpdate();
             SyncTextToTextField();
         }
 
@@ -51,14 +52,14 @@ namespace UnityEngine.Analytics {
         protected void SyncToTextMesh()
         {
             string existingText = GetComponent<TextMesh>().text;
-            string newText = dataStore.GetString(qualifiedBindingId, existingText);
+            string newText = dataStore.GetString(bindingId, existingText);
             GetComponent<TextMesh>().text = newText;
         }
 
         protected void SyncToUIText()
         {
             string existingText = GetComponent<Text>().text;
-            string newText = dataStore.GetString(qualifiedBindingId, existingText);
+            string newText = dataStore.GetString(bindingId, existingText);
             GetComponent<Text>().text = newText;
         }
 

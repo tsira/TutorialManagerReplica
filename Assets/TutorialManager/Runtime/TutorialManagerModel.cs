@@ -26,6 +26,9 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
     public class TutorialManagerModelMiddleware : IDataStore
     {
+
+        public event OnDataUpdateHandler OnDataUpdate;
+
         private static TutorialManagerModelMiddleware m_Instance;
         public static TutorialManagerModelMiddleware GetInstance()
         {
@@ -66,7 +69,6 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         {
             TMData.genre = id;
         }
-
 
         public string CreateTutorialEntity(string id)
         {
@@ -323,6 +325,9 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
         void Save()
         {
+            if (OnDataUpdate != null) {
+                OnDataUpdate();
+            }
             TMSerializer.WriteToDisk(ref m_TMData);
         }
 

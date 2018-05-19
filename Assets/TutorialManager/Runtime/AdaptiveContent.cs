@@ -18,6 +18,7 @@ namespace UnityEngine.Analytics {
 
             dispatcher.OnEnterState += OnEnterState;
             dispatcher.OnExitState += OnExitState;
+            dataStore.OnDataUpdate += OnDataUpdate;
 
             OnEnterState(dispatcher.state);
         }
@@ -26,8 +27,12 @@ namespace UnityEngine.Analytics {
         {
             dispatcher.OnEnterState -= OnEnterState;
             dispatcher.OnExitState -= OnExitState;
+            dataStore.OnDataUpdate -= OnDataUpdate;
         }
 
+        protected virtual void OnDataUpdate()
+        {
+        }
 
         void OnEnterState(string id)
         {
