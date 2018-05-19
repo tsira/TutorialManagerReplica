@@ -13,11 +13,13 @@ public class FSMTest : MonoBehaviour
 
 
 	// Use this for initialization
-	void Awake()
+	void Start()
 	{
         modelMiddleware = TutorialManagerModelMiddleware.GetInstance();
         dispatcher = AdaptiveStateDispatcher.GetInstance();
         provider = StateSystemProvider.GetInstance();
+
+        modelMiddleware.UpdateContentEntity("Tutorial1-Step1-text", "Text Step one has different text");
 
 
         fsm = new TutorialManagerFSM();
