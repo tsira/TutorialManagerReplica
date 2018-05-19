@@ -4,9 +4,6 @@ using System.Collections;
 namespace UnityEngine.Analytics {
     public class AdaptiveStateDispatcher : IFSMDispatcher
 	{
-        public delegate void OnEnterStateHandler(string id);
-        public delegate void OnExitStateHandler(string id);
-
         public event OnEnterStateHandler OnEnterState;
         public event OnExitStateHandler OnExitState;
 

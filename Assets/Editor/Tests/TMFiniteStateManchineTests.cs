@@ -217,8 +217,8 @@ namespace UnityEngine.Analytics
             public string lastExitFired;
             public int fireCount = 0;
 
-            public event AdaptiveStateDispatcher.OnEnterStateHandler OnEnterState;
-            public event AdaptiveStateDispatcher.OnExitStateHandler OnExitState;
+            public event OnEnterStateHandler OnEnterState;
+            public event OnExitStateHandler OnExitState;
             
             public void DispatchEnterState(string id)
             {

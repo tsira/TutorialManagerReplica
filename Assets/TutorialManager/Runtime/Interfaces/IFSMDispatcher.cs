@@ -3,12 +3,15 @@ using System.Collections;
 
 namespace UnityEngine.Analytics
 {
+    public delegate void OnEnterStateHandler(string id);
+    public delegate void OnExitStateHandler(string id);
+
     public interface IFSMDispatcher
     {
         string state { get; }
 
-        event AdaptiveStateDispatcher.OnEnterStateHandler OnEnterState;
-        event AdaptiveStateDispatcher.OnExitStateHandler OnExitState;
+        event OnEnterStateHandler OnEnterState;
+        event OnExitStateHandler OnExitState;
 
         void DispatchEnterState(string id);
 
