@@ -1,3 +1,5 @@
+//#define TEXTMESHPRO_PRESENT
+
 using UnityEngine;
 using System.Collections;
 using UnityEngine.Analytics;

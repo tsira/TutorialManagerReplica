@@ -1,8 +1,12 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+#if TEXTMESHPRO_PRESENT
+using TMPro;
+#endif
 
-namespace UnityEngine.Analytics {
+namespace UnityEngine.Analytics
+{
     public class AdaptiveText : AdaptiveContent
     {
 
@@ -20,14 +24,17 @@ namespace UnityEngine.Analytics {
 
         public string GetCurrentText()
         {
-            if (GetComponent<TextMesh>() != null) {
-                return GetComponent<TextMesh>().text;
-            } else if (GetComponent<Text>() != null) {
+#if TEXTMESHPRO_PRESENT
+            if (GetComponent<TMP_Text>() != null) {
+                return GetComponent<TMP_Text>().text;
+            } else
+#endif
+            if (GetComponent<Text>() != null) {
                 return GetComponent<Text>().text;
             }
-            //else if (GetComponent<TextMeshProUGUI>() != null) {
-            //    return GetComponent<TextMeshProUGUI>().text;
-            //}
+            else if (GetComponent<TextMesh>() != null) {
+                return GetComponent<TextMesh>().text;
+            }
 
             return null;
         }
@@ -38,16 +45,27 @@ namespace UnityEngine.Analytics {
                 return;
             }
 
-            if (GetComponent<TextMesh>() != null) {
+#if TEXTMESHPRO_PRESENT
+            if (GetComponent<TMP_Text>() != null) {
+                SyncToTextMeshProUGUI();
+            } else
+#endif
+            if (GetComponent<Text>() != null) {
+                SyncToUIText();
+            }
+            else if (GetComponent<TextMesh>() != null) {
                 SyncToTextMesh();
             } 
-            else if (GetComponent<Text>() != null) {
-                SyncToUIText();
-            } 
-            //else if (GetComponent<TextMeshProUGUI>() != null) {
-            //    SyncToTextMeshProUGUI();
-            //}
         }
+
+#if TEXTMESHPRO_PRESENT
+        protected void SyncToTextMeshProUGUI()
+        {
+            string existingText = GetComponent<TMP_Text>().text;
+            string newText = dataStore.GetString(bindingId, existingText);
+            GetComponent<TMP_Text>().text = newText;
+        }
+#endif
 
         protected void SyncToTextMesh()
         {
@@ -62,13 +80,6 @@ namespace UnityEngine.Analytics {
             string newText = dataStore.GetString(bindingId, existingText);
             GetComponent<Text>().text = newText;
         }
-
-        //protected void SyncToTextMeshProUGUI()
-        //{
-        //    string existingText = GetComponent<SyncToTextMeshProUGUI>().text;
-        //    string newText = dataStore.GetString(bindingId, existingText);
-        //    GetComponent<SyncToTextMeshProUGUI>().text = newText;
-        //}
     }
 }
 
