@@ -1,3 +1,8 @@
+/// <summary>
+/// This is a manual runtime integration test, intended to demonstrate that – absent the porcelain
+/// of the TutorialManager class – the underlying state machine, dispatcher, and components work.
+/// </summary>
+
 using UnityEngine;
 using System.Collections;
 using UnityEngine.Analytics.TutorialManagerRuntime;

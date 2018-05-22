@@ -3,10 +3,10 @@ using System.Collections;
 using UnityEngine.Analytics.TutorialManagerRuntime;
 
 namespace UnityEngine.Analytics {
-	public class AdaptiveContent : MonoBehaviour, IStateSystemSubject
-	{
+    public class AdaptiveContent : MonoBehaviour, IStateSystemSubject
+    {
         [SerializeField]
-		public string bindingId;
+        public string bindingId;
 
         public IFSMDispatcher dispatcher { get; set; }
 
