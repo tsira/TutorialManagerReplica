@@ -17,9 +17,10 @@ public class FSMTest : MonoBehaviour
     StateSystemProvider provider;
 
 
-	// Use this for initialization
-	void Start()
-	{
+    // Use this for initialization
+    void Start()
+    {
+        
         modelMiddleware = TutorialManagerModelMiddleware.GetInstance();
         dispatcher = AdaptiveStateDispatcher.GetInstance();
         provider = StateSystemProvider.GetInstance();
@@ -34,7 +35,7 @@ public class FSMTest : MonoBehaviour
 
         provider.SetDispatcher(dispatcher);
         provider.SetDataStore(modelMiddleware);
-	}
+    }
 
     public void Next()
     {

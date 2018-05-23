@@ -142,7 +142,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                 m_NextState = cueUpNext;
             }
             dispatcher.DispatchExitState(state);
-            m_State = String.Empty;
+            m_State = null;
         }
     }
 }
