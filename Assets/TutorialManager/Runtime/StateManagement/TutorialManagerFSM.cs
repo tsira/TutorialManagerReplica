@@ -42,11 +42,15 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         }
 
         int m_Index;
-        public int index
-        {
-            get
-            {
+        public int index {
+            get {
                 return stateList.IndexOf(state);
+            }
+        }
+
+        public int length {
+            get {
+                return stateList.Count;
             }
         }
 
@@ -113,7 +117,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             {
                 if (string.IsNullOrEmpty(m_NextState) == false) {
                     GoToState(m_NextState);
-                    m_NextState = String.Empty;
+                    m_NextState = null;
                 }
                 else if (autoAdvance || index == -1) {
                     GoToState(stateList[index + 1]);
@@ -125,9 +129,16 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             else
             {
                 // If not move out. We're done.
-                ExitState(state);
                 m_Complete = true;
+                ExitState(state);
             }
+        }
+
+        public void Reset()
+        {
+            m_State = null;
+            m_NextState = null;
+            m_StateList = new List<string>();
         }
 
         protected void EnterState(string id)
