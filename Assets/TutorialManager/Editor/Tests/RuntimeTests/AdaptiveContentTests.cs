@@ -14,7 +14,7 @@ using UnityEngine.UI;
 
 namespace UnityEngine.Analytics
 {
-    public class AdaptiveContentTests : MonoBehaviour
+    public class AdaptiveContentTests
     {
 
         IDataStore store;
