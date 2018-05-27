@@ -328,7 +328,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             if (OnDataUpdate != null) {
                 OnDataUpdate();
             }
-            TMSerializer.WriteToDisk(ref m_TMData);
+            TMSerializer.WriteToDisk<TutorialManagerModel>(ref m_TMData);
         }
 
         string GetStepId (string stepId, string tutorialId)
