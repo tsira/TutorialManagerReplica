@@ -9,10 +9,10 @@ public class TMIntegratedManualTest : MonoBehaviour
 
     public void Next()
     {
-        if (string.IsNullOrEmpty(TutorialManager.state.tutorialId)) {
-            TutorialManager.TutorialStart("Tutorial1");
-        } else if (TutorialManager.state.complete == false){
-            TutorialManager.TutorialStep();
+        if (string.IsNullOrEmpty(TutorialManager.tutorialId)) {
+            TutorialManager.Start("Tutorial1");
+        } else if (TutorialManager.complete == false){
+            TutorialManager.StepComplete();
         }
     }
 }

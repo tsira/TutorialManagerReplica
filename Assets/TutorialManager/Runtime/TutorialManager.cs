@@ -19,15 +19,81 @@ namespace UnityEngine.Analytics
     /// </remarks>
     public class TutorialManager
     {
-
-        static TutorialManagerState m_State;
         /// <summary>
-        /// The current state of the Tutorial Manager.
+        /// [Read Only] A flag indicating whether the tutorial should automatically progress from one step to the next.
         /// </summary>
-        /// <value>A reference to the <c>TutorialManagerState</c> object.</value>
-        public static TutorialManagerState state {
+        /// <remarks>
+        /// By default, the Tutorial Manager will progress from one step to the next automatically. This is often
+        /// desirable, but not every tutorial works this way. If your game's tutorial has steps interspersed with
+        /// gameplay, you might want more precise control. By calling <c>Start(tutorialId, false)</c>, this flag
+        /// will be set to <c>false</c>. The result is that calling <c>Step()</c> will complete a step,
+        /// but not automatically start the next one. This allows gameplay to proceed with the tutorial "paused" between
+        /// states. You will need to call <c>Step()</c> again to start the next step.
+        /// </remarks>
+        /// <value><c>true</c> if auto advance; otherwise, <c>false</c>.</value>
+        public static bool autoAdvance {
             get {
-                return m_State;
+                return state.autoAdvance;
+            }
+        }
+
+        /// <summary>
+        /// [Read Only] A flag indicating whether the current tutorial is complete.
+        /// </summary>
+        /// <value><c>true</c> if the current tutorial is marked as complete; otherwise, <c>false</c>.</value>
+        public static bool complete {
+            get {
+                return state.fsm.complete;
+            }
+        }
+
+        /// <summary>
+        /// [Read Only] The binding ID of the current tutorial step.
+        /// </summary>
+        /// <value>A string representing the binding ID of the current step.</value>
+        public static string currentStep {
+            get {
+                return state.currentStep;
+            }
+        }
+
+        /// <summary>
+        /// [Read Only] Reflects the server recommendation as to whether the player should see the tutorial.
+        /// </summary>
+        /// <value><c>true</c> if the tutorial should be shown; otherwise, <c>false</c>.</value>
+        public static bool showTutorial {
+            get {
+                return state.showTutorial;
+            }
+        }
+
+        /// <summary>
+        /// [Read Only] The index of the step in the currently running tutorial.
+        /// </summary>
+        /// <value>The index of the step.</value>
+        public static int stepIndex {
+            get {
+                return state.stepIndex;
+            }
+        }
+
+        /// <summary>
+        /// [ReadOnly] The ID of the current tutorial, as set by <c>TutorialManager.Start(tutorialId)</c>
+        /// </summary>
+        /// <value>The tutorial identifier.</value>
+        public static string tutorialId {
+            get {
+                return state.tutorialId;
+            }
+        }
+
+        /// <summary>
+        /// [ReadOnly] The number of steps in the current tutorial.
+        /// </summary>
+        /// <value>The length of the tutorial.</value>
+        public static int tutorialLength {
+            get {
+                return state.tutorialLength;
             }
         }
 
@@ -40,7 +106,7 @@ namespace UnityEngine.Analytics
         /// and informs the server that this recommendation has been acted upon.
         ///     <code>
         ///     if (TutorialManager.GetDecision()) {
-        ///         TutorialManager.TutorialStart("Tutorial1");
+        ///         TutorialManager.Start("Tutorial1");
         ///         // Any other code required by your tutorial
         ///     } else {
         ///         // skip the tutorial
@@ -60,7 +126,7 @@ namespace UnityEngine.Analytics
         /// <remarks>
         ///     <code>
         ///     if (TutorialManager.GetDecision()) {
-        ///         TutorialManager.TutorialStart("Tutorial1");
+        ///         TutorialManager.Start("Tutorial1");
         ///     } else {
         ///         // skip the tutorial
         ///     }
@@ -69,9 +135,9 @@ namespace UnityEngine.Analytics
         /// <param name="tutorialId">The binding id representing the current tutorial</param>
         /// <param name="autoAdvance">If 'true' (default) ending one tutorial step will automatically advance to the next step</param>
         /// <returns><c>true</c>, if tutorial should be shown, <c>false</c> otherwise.</returns>
-        public static bool TutorialStart(string tutorialId, bool autoAdvance = true)
+        public static bool Start(string tutorialId, bool autoAdvance = true)
         {
-            return TutorialStart(tutorialId, autoAdvance, m_State.showTutorial);
+            return Start(tutorialId, autoAdvance, m_State.showTutorial);
         }
 
         /// <summary>
@@ -80,10 +146,10 @@ namespace UnityEngine.Analytics
         /// <remarks>
         /// This version takes a boolean <c>toShow</c> parameter, which forces either true or false.
         /// This is useful for testing and QA, when you want to ensure a specific outcome. To use the server
-        /// recommendation, call <c>ShowTutorial(id)</c>
+        /// recommendation, call <c>GetDecision()</c>
         ///     <code>
         ///     if (TutorialManager.GetDecision()) {
-        ///         TutorialManager.TutorialStart("Tutorial1", true, true);
+        ///         TutorialManager.Start("Tutorial1", true, true);
         ///     } else {
         ///         // skip the tutorial (since the override in this example is 'true', this code is unreachable)
         ///     }
@@ -93,7 +159,7 @@ namespace UnityEngine.Analytics
         /// <param name="autoAdvance">If <c>true</c> (default) ending one tutorial step will automatically advance to the next step</param>
         /// <param name="toShow"><c>true</c> to force the tutorial to start, <c>false</c> to force it to skip</param>
         /// <returns><c>true</c>, if tutorial should be shown, <c>false</c> otherwise.</returns>
-        public static bool TutorialStart(string tutorialId, bool autoAdvance, bool toShow)
+        public static bool Start(string tutorialId, bool autoAdvance, bool toShow)
         {
             SetupState(tutorialId, autoAdvance, toShow);
             SaveState();
@@ -104,12 +170,12 @@ namespace UnityEngine.Analytics
         }
 
         /// <summary>
-        /// Call this if the player skips the tutorial.
+        /// Call this if the player opts to skip the tutorial (in the case you have a skip option in your game).
         /// </summary>
         /// <remarks>
         /// This will clear the current tutorial state
         /// </remarks>
-        public static void TutorialSkip()
+        public static void Skip()
         {
             Analytics.CustomEvent(tutorialSkipName, new Dictionary<string, object> {
                 { tutorialIdKey, m_State.tutorialId },
@@ -119,27 +185,35 @@ namespace UnityEngine.Analytics
         }
 
         /// <summary>
-        /// Call this each time the player starts or completes a step in the tutorial.
+        /// Call this each time the player begins a step in the tutorial.
         /// </summary>
         /// <remarks>
-        /// If <c>autoAdvance</c> is true, call this ONLY at the completion of a step. The next step, if one exists, will
-        /// start automatically.
+        /// It is unnecessary to call this method when <c>autoAdvance</c> is set to <c>true</c>. Under that condition,
+        /// <c>StepComplete()</c> will start the next step automatically. If you provide a specific <c>stepId</c>, the
+        /// named step will start.
         /// </remarks>
-        public static void TutorialStep()
+        /// <param name="stepId">(optional) The step of the current tutorial to start.</param>
+        public static void StepStart(string stepId = null)
         {
-            m_State.fsm.NextState();
-            SaveState();
+            if (string.IsNullOrEmpty(stepId) == false) {
+                m_State.fsm.GoToState(stepId);
+                SaveState();
+            }
+            else if (autoAdvance) {
+                Debug.LogWarning("StepStart does nothing if autoAdvance is false. You may call it safely, but nothing" +
+                                 "(other than this warning) will happen.");
+            } else {
+                m_State.fsm.NextState();
+                SaveState();
+            }
         }
 
         /// <summary>
-        /// Call this method if you need to go to a state out of sequential order.
+        /// Call this each time the player completes a step in the tutorial.
         /// </summary>
-        /// <remarks>
-        /// This method is supplied as a convenience, but may have negative effects on your tracking funnel.
-        /// </remarks>
-        public static void GotoTutorialStep(string state)
+        public static void StepComplete()
         {
-            m_State.fsm.GoToState(state);
+            m_State.fsm.NextState();
             SaveState();
         }
 
@@ -150,7 +224,7 @@ namespace UnityEngine.Analytics
         /// This method is provided for QA and testing purposes only. Calling it will null out all prior decisions and
         /// runtime progress on the current device.
         /// </remarks>
-        public static void ResetState()
+        public static void Reset()
         {
             var fsm = m_State.fsm;
             fsm.Reset();
@@ -177,6 +251,16 @@ namespace UnityEngine.Analytics
         const string stepIdKey = "step_id";
         const string stepIndexKey = "step_index";
 
+        static TutorialManagerState m_State;
+        /// <summary>
+        /// The current state of the Tutorial Manager.
+        /// </summary>
+        /// <value>A reference to the <c>TutorialManagerState</c> object.</value>
+        protected static TutorialManagerState state {
+            get {
+                return m_State;
+            }
+        }
 
         /// <summary>
         /// Retrieve recommendation/settings from server. Called automatically on startup.
