@@ -54,13 +54,16 @@ namespace UnityEngine.Analytics
         public static IEnumerator<AsyncOperation> Write(string appId, TutorialManagerModel model)
         {
             var json = TMModelToJsonInterpreter.ProcessModelToJson(model);
-            var settingsRequest = Authorize(UnityWebRequest.Post(appId, json));
-            if(IsAuthError(settingsRequest))
+
+            //Given UnityWebRequest applies URL encoding to POST message payloads, we're using a PUT instead
+            var settingsRequest = Authorize(UnityWebRequest.Put(GetUrl(appId), json));
+
+            if (IsAuthError(settingsRequest))
             {
                 WriteEvent(false);
                 yield break;
             }
-            #if UNITY_2017_2_OR_NEWER
+#if UNITY_2017_2_OR_NEWER
             yield return settingsRequest.SendWebRequest();
 #else
             yield return settingsRequest.Send();
@@ -80,14 +83,14 @@ namespace UnityEngine.Analytics
             WriteEvent(true);
         }
 
-        private static string RemoveWrappingBracesFromString (string stringToParse)
+        private static string RemoveWrappingBracesFromString(string stringToParse)
         {
             return stringToParse.Substring(1, stringToParse.Length - 2);
         }
 
         private static bool IsAuthError(UnityWebRequest request)
         {
-            if(request == null)
+            if (request == null)
             {
                 Debug.LogError("Failed getting authentication token. In editor versions before 2018.1, this is done through internal APIs which may be subject to undocumented changes, thus your plugin may need to be updated. Please contact tutorialmanager@unity3d.com for help.");
                 return true;
@@ -95,7 +98,7 @@ namespace UnityEngine.Analytics
             return false;
         }
 
-        private static string GetUrl (string appId)
+        private static string GetUrl(string appId)
         {
             return string.Format(k_RemoteSettingsPath, appId);
         }
@@ -129,26 +132,33 @@ namespace UnityEngine.Analytics
 
         static void LoadRemoteSettings(string remoteSettingsResult)
         {
-            //TODO: Fix this
-            Debug.Log(remoteSettingsResult);
-            //string remoteSettingsJson = "{ \"list\": " + remoteSettingsResult + "}";
+            string emptyRS = "{\"remoteSettings\":[]}";
 
-            List<TutorialManagerEditor.RemoteSettingsKeyValueType> remoteSettings;
-            try
+            // Check for empty Remote Settings response
+            if (emptyRS.Contains(remoteSettingsResult))
             {
-                remoteSettings = JsonUtility.FromJson<TutorialManagerEditor.RemoteSettingsData>(remoteSettingsResult).remoteSettings;
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarningFormat("Remote Settings response was not valid JSON:\n {0} \n {1}", remoteSettingsResult, e);
+                Debug.LogWarningFormat("No Remote Settings were found:\n {0}", remoteSettingsResult);
                 ReadErrorEvent();
                 return;
             }
+            else {
+                List<TutorialManagerEditor.RemoteSettingsKeyValueType> remoteSettings;
+                try
+                {
+                    remoteSettings = JsonUtility.FromJson<TutorialManagerEditor.RemoteSettingsData>(remoteSettingsResult).remoteSettings;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarningFormat("Remote Settings response was not valid JSON:\n {0} \n {1}", remoteSettingsResult, e);
+                    ReadErrorEvent();
+                    return;
+                }
 
-            if (TMRSReadResponseReceived != null)
-            {
-                TMRSReadResponseReceived(remoteSettings);
-            }
+                if (TMRSReadResponseReceived != null)
+                {
+                    TMRSReadResponseReceived(remoteSettings);
+                }  
+            };
         }
 
         static void WriteEvent (bool success)
