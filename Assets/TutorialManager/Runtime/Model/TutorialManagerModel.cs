@@ -29,6 +29,8 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
         public event OnDataUpdateHandler OnDataUpdate;
 
+        public const int k_MaxTextlength = 1024;
+
         private static TutorialManagerModelMiddleware m_Instance;
         public static TutorialManagerModelMiddleware GetInstance()
         {
@@ -222,7 +224,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                 TMData.steps.Remove(step);
                 TMData.stepTable.Remove(id);
                 Save();
-		    }
+            }
         }
 #endif
         private IEnumerable<TutorialEntity> GetTutorialsThatContainStepWithId (string id)
@@ -388,7 +390,31 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
     public class ContentEntity : Entity
     {
         public string type;
-        public string text;
+
+        string m_Text;
+        public string text {
+            get {
+                return m_Text;
+            }
+            set {
+                string rawValue = value;
+                if (rawValue.Length > TutorialManagerModelMiddleware.k_MaxTextlength) {
+                    m_ViolationText = value;
+                    m_Text = rawValue.Substring(0, TutorialManagerModelMiddleware.k_MaxTextlength);
+                    Debug.LogWarning("Your text is too long. Tutorial Manager text values may not exceed 1024 characters.");
+                } else {
+                    m_Text = value;
+                    m_ViolationText = null;
+                }
+            }
+        }
+
+        string m_ViolationText;
+        public string violationText {
+            get {
+                return m_ViolationText;
+            }
+        }
 
         public ContentEntity(string entityId, string contentType, string contentText) : base(entityId)
         {
