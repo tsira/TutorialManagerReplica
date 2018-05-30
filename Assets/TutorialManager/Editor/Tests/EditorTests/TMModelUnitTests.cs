@@ -654,6 +654,36 @@ namespace UnityEngine.Analytics
         }
 
         [Test]
+        public void ContentTextTooLong()
+        {
+            var modelMiddleware = TutorialManagerModelMiddleware.GetInstance();
+            modelMiddleware.Clear();
+            SetupTutorial();
+            SetupSteps();
+            SetupContent();
+
+            string lookupId = ConstructID(t1Step1LookupID, "text");
+
+            const string textThatsNotTooLong = "This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters. This text is exactly 1024 characters";
+            const string textThatsTooLong = "This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters. This text is over 1024 characters.";
+
+            Assert.IsNull(modelMiddleware.TMData.contentTable[lookupId].violationText, "there should be no violation text");
+           
+            modelMiddleware.UpdateContentEntity(lookupId, textThatsTooLong);
+
+            Assert.IsNotNull(modelMiddleware.TMData.contentTable[lookupId].violationText, "there should be violation text");
+            Assert.That(textThatsTooLong, Is.EqualTo(modelMiddleware.TMData.contentTable[lookupId].violationText), "violation text should be the complete string");
+            Assert.AreEqual(TutorialManagerModelMiddleware.k_MaxTextlength, modelMiddleware.TMData.contentTable[lookupId].text.Length, "regular text should be equal to max text length");
+
+
+            modelMiddleware.UpdateContentEntity(lookupId, textThatsNotTooLong);
+
+            Assert.IsNull(modelMiddleware.TMData.contentTable[lookupId].violationText, "there should be no violation text");
+            Assert.That(textThatsNotTooLong, Is.EqualTo(modelMiddleware.TMData.contentTable[lookupId].text), "text should be the complete string");
+            Assert.AreEqual(textThatsNotTooLong.Length, modelMiddleware.TMData.contentTable[lookupId].text.Length, "text should be equal to provided length");
+        }
+
+        [Test]
         public void Clear()
         {
             var modelMiddleware = TutorialManagerModelMiddleware.GetInstance();

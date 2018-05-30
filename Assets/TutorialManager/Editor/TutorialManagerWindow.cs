@@ -31,6 +31,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         const string k_GoToDashboardTooltip = "Go to the Tutorial Manager page on the Analytics dashboard, where you can remotely control this game's tutorials and view reports.";
         const string k_PullDataTooltip = "Retrieve the latest tutorial data from the server.";
         const string k_PushDataTooltip = "Upload local tutorial data to the server. This operation also informs the server that Tutorial Manager integration is complete.";
+        const string k_TMTextTooLongMessage = "Some step text is too long; these fields will be truncated! Max text length is {0}. The following text should be shortened: {1}";
 
         GUIContent genreGUIContent = new GUIContent("Genre", k_GenreTooltip);
         GUIContent tutorialIdGUIContent = new GUIContent("ID", k_TutorialIdTooltip);
@@ -93,6 +94,8 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
             GUILayout.Space(10f);
 
+            RenderWarnings();
+
             RenderFooter();
 
             if (string.IsNullOrEmpty(tutorialMarkedForDeletion) == false)
@@ -135,6 +138,18 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         {
             using (new GUILayout.HorizontalScope()) {
                 RenderGenre();
+            }
+        }
+
+        private void RenderWarnings()
+        {
+            // Text too long
+            var tooLongStepText = TestIfStepTextTooLong();
+            if (tooLongStepText.Count > 0) {
+                string stringiFiedList = string.Join(", ", tooLongStepText.ToArray());
+                string message = string.Format(k_TMTextTooLongMessage, 
+                                               TutorialManagerModelMiddleware.k_MaxTextlength, stringiFiedList);
+                EditorGUILayout.HelpBox(message, MessageType.Warning, true);
             }
         }
 
@@ -235,6 +250,17 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         string ConstructStepIdFromDisplayName(string tutorialId, string stepId)
         {
             return string.Format("{0}-{1}", tutorialId, stepId);
+        }
+
+        List<string> TestIfStepTextTooLong()
+        {
+            List<string> tooLongStepText = new List<string>();
+            foreach (ContentEntity c in TMModel.TMData.content) {
+                if (string.IsNullOrEmpty(c.violationText) == false) {
+                    tooLongStepText.Add(c.id);
+                }
+            }
+            return tooLongStepText;
         }
 
         void RestrictInputCharacters()
