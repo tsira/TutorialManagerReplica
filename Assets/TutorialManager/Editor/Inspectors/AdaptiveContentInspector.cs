@@ -66,9 +66,22 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             TutorialManagerModel model = TutorialManagerModelMiddleware.GetInstance().TMData;
             using (new GUILayout.HorizontalScope()) {
                 var labelRect = EditorGUILayout.GetControlRect();
+
+                labelRect.width = EditorGUIUtility.labelWidth;
+                var buttonRect = new Rect(
+                    labelRect.x + labelRect.width,
+                    labelRect.y,
+                    EditorGUIUtility.currentViewWidth - (labelRect.width + (labelRect.x * 2f)),
+                    EditorGUIUtility.singleLineHeight
+                );
+
                 EditorGUI.LabelField(labelRect, bindingLabel);
-                var buttonRect = EditorGUILayout.GetControlRect();
-                string id = model.steps[bindingIndex].id;
+
+                string id = "Binding lost";
+                if (bindingIndex >= 0 && bindingIndex < model.steps.Count) {
+                     id = model.steps[bindingIndex].id;
+                }
+
                 string bindingDisplayName = Regex.Replace(id, "-", ", ");
                 if (GUI.Button(buttonRect, new GUIContent(bindingIndex < 0 ? blankBinding : new GUIContent(bindingDisplayName)), EditorStyles.popup)) {
                     BuildBindingsMenu(bindingIndex);
@@ -110,4 +123,3 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         }
     }
 }
-

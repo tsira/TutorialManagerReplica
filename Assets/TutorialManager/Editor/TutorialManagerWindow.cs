@@ -224,12 +224,13 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
                     var prevColor = GUI.backgroundColor;
                     GUI.backgroundColor = Color.clear;
                     EditorGUI.BeginDisabledGroup(deleteDisabled);
-                    if (GUILayout.Button(deleteTutorialButtonGUIContent, addButtonStyle)) {
+                    if (GUILayout.Button(deleteTutorialButtonGUIContent, addButtonStyle, GUILayout.MaxWidth(20f))) {
                         MarkTutorialForDeletion(tutorialId);
                     }
                     EditorGUI.EndDisabledGroup();
                     GUI.backgroundColor = prevColor;
                 }
+                GUILayout.Space(3f);
 
                 for (int a = 0; a < tutorial.steps.Count; a++) {
                     string stepId = tutorial.steps[a];
@@ -237,6 +238,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
                         RenderStep(tutorial, a, TMModel.TMData.stepTable[stepId]);
                     }
                 }
+                GUILayout.Space(3f);
             }
         }
 
@@ -263,12 +265,12 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
                     GUI.backgroundColor = Color.clear;
                     EditorGUI.BeginDisabledGroup(!plusEnabled);
 
-                    if (GUILayout.Button(addStepButtonGUIContent, addButtonStyle)) {
+                    if (GUILayout.Button(addStepButtonGUIContent, addButtonStyle, GUILayout.MaxWidth(20f))) {
                         CreateStep(tutorial.id);
                     }
                     EditorGUI.EndDisabledGroup();
                     EditorGUI.BeginDisabledGroup(!minusEnabled);
-                    if (GUILayout.Button(deleteStepButtonGUIContent, addButtonStyle)) {
+                    if (GUILayout.Button(deleteStepButtonGUIContent, addButtonStyle, GUILayout.MaxWidth(20f))) {
                         DestroyStep(step.id);
                     }
                     EditorGUI.EndDisabledGroup();
@@ -422,7 +424,8 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             addButtonStyle = new GUIStyle(GUI.skin.button);
             addButtonStyle.normal.background = null;
             addButtonStyle.fontStyle = FontStyle.Bold;
-            addButtonStyle.fixedWidth = 20f;
+            addButtonStyle.alignment = TextAnchor.MiddleLeft;
+            addButtonStyle.fixedWidth = 30f;
         }
     }
 }
