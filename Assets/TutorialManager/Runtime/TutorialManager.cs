@@ -53,7 +53,11 @@ namespace UnityEngine.Analytics
         /// <value>A string representing the binding ID of the current step.</value>
         public static string currentStep {
             get {
-                return state.currentStep;
+                string fqStep = state.currentStep;
+                if (string.IsNullOrEmpty(fqStep)) {
+                    return null;
+                }
+                return state.currentStep.Split('-')[1];
             }
         }
 
@@ -132,8 +136,8 @@ namespace UnityEngine.Analytics
         ///     }
         ///     </code>
         /// </remarks>
-        /// <param name="tutorialId">The binding id representing the current tutorial</param>
-        /// <param name="autoAdvance">If 'true' (default) ending one tutorial step will automatically advance to the next step</param>
+        /// <param name="tutorialId">The binding id representing the current tutorial.</param>
+        /// <param name="autoAdvance">If 'true' (default) ending one tutorial step will automatically advance to the next step.</param>
         /// <returns><c>true</c>, if tutorial should be shown, <c>false</c> otherwise.</returns>
         public static bool Start(string tutorialId, bool autoAdvance = true)
         {
@@ -196,7 +200,8 @@ namespace UnityEngine.Analytics
         public static void StepStart(string stepId = null)
         {
             if (string.IsNullOrEmpty(stepId) == false) {
-                m_State.fsm.GoToState(stepId);
+                string fqStepId = string.Format("{0}-{1}", tutorialId, stepId); 
+                m_State.fsm.GoToState(fqStepId);
                 SaveState();
             }
             else if (autoAdvance) {
@@ -206,6 +211,18 @@ namespace UnityEngine.Analytics
                 m_State.fsm.NextState();
                 SaveState();
             }
+        }
+
+        /// <summary>
+        /// Call this each to start a step in some tutorial other than the current one.
+        /// </summary>
+        /// <param name="tutorialId">The tutorial to go to.</param>
+        /// <param name="stepId">The step of the new tutorial to start.</param>
+        /// <param name="autoAdvance">If 'true' (default) ending one tutorial step will automatically advance to the next step.</param>
+        public static void StepStart(string tutorialId, string stepId, bool autoAdvance = false)
+        {
+            Start(tutorialId);
+            StepStart(stepId);
         }
 
         /// <summary>

@@ -24,9 +24,9 @@ namespace UnityEngine.Analytics
         protected const string stepBaseID2 = "step2";
         protected const string stepBaseID3 = "step3";
 
-        protected string t1step1 = stepBaseID;
-        protected string t1step2 = stepBaseID2;
-        protected string t1step3 = stepBaseID3;
+        protected string t1Step1 = stepBaseID;
+        protected string t1Step2 = stepBaseID2;
+        protected string t1Step3 = stepBaseID3;
 
         protected string t1Step1LookupID = string.Format("{0}-{1}", tutorialName1, stepBaseID);
         protected string t1Step2LookupID = string.Format("{0}-{1}", tutorialName1, stepBaseID2);
@@ -37,7 +37,7 @@ namespace UnityEngine.Analytics
         protected const string t1step2v3 = "anotherstepname3";
 
         protected const string t2step1 = "t2sname1";
-        protected const string t2step2 = "t2sname2";
+        protected const string t2Step2 = "t2sname2";
 
         protected const string t2step1LookupID = "tutorial2-stepname";
         protected const string t2step2LookupID = "tutorial2-stepname2";
@@ -109,11 +109,11 @@ namespace UnityEngine.Analytics
             var tutorial2 = model.TMData.tutorials[1];
             var tutorial3 = model.TMData.tutorials[2];
 
-            model.CreateStepEntity(t1step1, tutorial1.id);
-            model.CreateStepEntity(t1step2, tutorial1.id);
-            model.CreateStepEntity(t1step3, tutorial1.id);
+            model.CreateStepEntity(t1Step1, tutorial1.id);
+            model.CreateStepEntity(t1Step2, tutorial1.id);
+            model.CreateStepEntity(t1Step3, tutorial1.id);
             model.CreateStepEntity(t2step1, tutorial2.id);
-            model.CreateStepEntity(t2step2, tutorial2.id);
+            model.CreateStepEntity(t2Step2, tutorial2.id);
 
             Assert.AreEqual(3, tutorial1.steps.Count, "tutorial 1 should have 3 steps");
             Assert.AreEqual(2, tutorial2.steps.Count, "tutorial 2 should have 2 steps");
