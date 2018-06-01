@@ -89,12 +89,12 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
         private void OnGUI()
         {
+            bool markCreateFirst = false;
+            if (TMModel.TMData.tutorials.Count == 0 && Event.current.type == EventType.Repaint) {
+                markCreateFirst = true;
+            }
             if (!Analytics.enabled) {
                 EditorGUILayout.HelpBox(k_MustHaveAnalyticsMessage, MessageType.Warning, true);
-                return;
-            }
-            if (TMModel.TMData.tutorials.Count == 0) {
-                CreateTutorial();
                 return;
             }
             if (addButtonStyle == null) {
@@ -122,6 +122,9 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             {
                 DestroyTutorial(tutorialMarkedForDeletion);
                 tutorialMarkedForDeletion = string.Empty;
+            }
+            if (markCreateFirst && Event.current.type == EventType.Repaint) {
+                CreateTutorial();
             }
         }
 
