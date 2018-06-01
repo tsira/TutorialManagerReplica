@@ -30,7 +30,7 @@ namespace UnityEngine.Analytics {
             dataStore.OnDataUpdate -= OnDataUpdate;
         }
 
-        protected virtual void OnDataUpdate()
+        public virtual void OnDataUpdate()
         {
         }
 

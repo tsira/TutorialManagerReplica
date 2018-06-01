@@ -16,7 +16,7 @@ namespace UnityEngine.Analytics
             SyncTextToTextField();
         }
 
-        protected override void OnDataUpdate()
+        override public void OnDataUpdate()
         {
             base.OnDataUpdate();
             SyncTextToTextField();

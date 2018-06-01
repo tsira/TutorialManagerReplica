@@ -420,6 +420,8 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             //Temp logging to ensure it worked
             Debug.Log(remoteSettings.Count);
             Debug.Log(remoteSettings.First().key);
+
+            TMUpdaterUtility.ForceUpdate();
         }
 
         private void DefineStyles()

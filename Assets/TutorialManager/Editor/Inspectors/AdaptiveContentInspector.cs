@@ -17,6 +17,12 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         int bindingIndex;
         List<string> stepIds = new List<string>();
 
+        private void Awake()
+        {
+            AdaptiveContent myTarget = (AdaptiveContent)target;
+            myTarget.OnDataUpdate();
+        }
+
         public override void OnInspectorGUI()
         {
             AdaptiveContent myTarget = (AdaptiveContent)target;
