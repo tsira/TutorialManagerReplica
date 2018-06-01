@@ -40,7 +40,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             }
         }
 
-        bool m_ShowTutorial;
+        bool m_ShowTutorial = true;
         /// <summary>
         /// Reflects the server recommendation as to whether the player should see the tutorial.
         /// </summary>

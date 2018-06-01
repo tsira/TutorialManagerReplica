@@ -331,13 +331,13 @@ namespace UnityEngine.Analytics
         public IEnumerator TM_ResetState()
         {
             Setup();
-            TutorialManager.Start(tutorialName1, true, true);
+            TutorialManager.Start(tutorialName1, true, false);
             yield return null;
 
             TutorialManager.StepComplete();
             yield return null;
 
-            Assert.IsTrue(TutorialManager.showTutorial, "showTutorial was forced to true");
+            Assert.IsFalse(TutorialManager.showTutorial, "showTutorial was forced to false");
             Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
             Assert.That(TutorialManager.currentStep, Is.EqualTo(t1Step2), string.Format("currentStep should be {0}", t1Step2));
             Assert.AreEqual(3, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 3));
@@ -347,7 +347,7 @@ namespace UnityEngine.Analytics
             TutorialManager.Reset();
             yield return null;
 
-            Assert.IsFalse(TutorialManager.showTutorial, "showTutorial should be reset to false");
+            Assert.IsTrue(TutorialManager.showTutorial, "showTutorial should be reset to true");
             Assert.IsNull(TutorialManager.tutorialId, "tutorialId should be null");
             Assert.IsNull(TutorialManager.currentStep, "currentStep should be null");
             Assert.AreEqual(0, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 0));
