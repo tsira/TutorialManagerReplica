@@ -59,6 +59,49 @@ namespace UnityEngine.Analytics
         }
 
         [UnityTest]
+        public IEnumerator AdaptiveContent_ContentRespectsAndIgnoresOff()
+        {
+            SetupWorld();
+            (store as TestDataStore).remoteDecision = false;
+            SetupContentWithRespect();
+            yield return null;
+
+            dispatcher.DispatchEnterState(bindingId1);
+            yield return null;
+            TestGameObjectListWithRespect(bindingId1);
+
+            dispatcher.DispatchEnterState(bindingId2);
+            yield return null;
+            TestGameObjectListWithRespect(bindingId2);
+
+            dispatcher.DispatchEnterState(bindingId3);
+            yield return null;
+            TestGameObjectListWithRespect(bindingId3);
+
+            dispatcher.DispatchEnterState(bindingId4);
+            yield return null;
+            TestGameObjectListWithRespect(bindingId4);
+        }
+
+        void TestGameObjectListWithRespect(string id)
+        {
+            for (int a = 0; a < gameObjectList.Count; a++) {
+                if (gameObjectList[a].name == id) {
+                    if (gameObjectList[a].GetComponent<AdaptiveContent>().respectRemoteIsActive) {
+                        // Tutorial is off, this component should be off
+                        Assert.IsFalse(gameObjectList[a].activeSelf, string.Format("{0} should be inactive", id));
+                    } else {
+                        // This component doesn't respect the decision, and will always show when in state
+                        Assert.IsTrue(gameObjectList[a].activeSelf, string.Format("{0} should be active", id));
+                    }
+                } else {
+                    Assert.IsFalse(gameObjectList[a].activeSelf, string.Format("{0} should be inactive", id));
+                }
+            }
+        }
+
+
+        [UnityTest]
         public IEnumerator AdaptiveText_ReceivesExistingText()
         {
             SetupWorld();
@@ -127,6 +170,21 @@ namespace UnityEngine.Analytics
             }
         }
 
+        void SetupContentWithRespect()
+        {
+            gameObjectList = new List<GameObject>();
+            List<string> bindings = new List<string> { bindingId1, bindingId2, bindingId3, bindingId4 };
+            for (int a = 0; a < bindings.Count; a++) {
+                GameObject gameObject = new GameObject();
+                gameObject.name = bindings[a];
+                gameObjectList.Add(gameObject);
+
+                AdaptiveContent adaptiveContent = gameObject.AddComponent<AdaptiveContent>();
+                adaptiveContent.bindingId = bindings[a];
+                adaptiveContent.respectRemoteIsActive = (a % 2 == 0);
+            }
+        }
+
         void SetupText()
         {
             (store as TestDataStore).m_Data = new Dictionary<string, string> {
@@ -181,9 +239,16 @@ namespace UnityEngine.Analytics
 
         public event OnDataUpdateHandler OnDataUpdate;
 
+        public bool remoteDecision = true;
+
         public string GetString(string id, string defaultValue = null)
         {
             return m_Data[id];
+        }
+
+        public bool GetBool(string id, bool defaultValue = false)
+        {
+            return remoteDecision;
         }
 
         public void UpdateData(string key, string value)

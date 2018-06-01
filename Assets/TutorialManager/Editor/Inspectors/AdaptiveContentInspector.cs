@@ -6,41 +6,49 @@ using System.Text.RegularExpressions;
 namespace UnityEngine.Analytics.TutorialManagerRuntime
 {
     [CustomEditor(typeof(AdaptiveContent))]
+    [CanEditMultipleObjects]
     public class AdaptiveContentInspector : Editor
     {
 
+        SerializedProperty bindingIdProperty;
+        SerializedProperty respectRemoteProperty;
+
         GUIContent bindingLabel = new GUIContent("Binding ID", "The tutorial and step ID to which this component will be bound.");
+        GUIContent respectRemoteLabel = new GUIContent("Respect 'off' decision", "This GameObject will appear when the bound step starts, " +
+                                                       "AND TutorialManager decides to show the tutorial. Uncheck this box " +
+                                                       "to force the object to appear, regardless of that decision.");
         GUIContent blankBinding = new GUIContent("Select a binding...");
         const string k_TMSettingsRequiredMessage = "Adaptive content keys must be set up in the Tutorial Manager window.\nGo to Window > Unity Analytics > TutorialManager";
 
         GenericMenu bindingsMenu;
-        int bindingIndex;
         List<string> stepIds = new List<string>();
 
-        private void Awake()
+
+        private void OnEnable()
         {
-            AdaptiveContent myTarget = (AdaptiveContent)target;
-            myTarget.OnDataUpdate();
+            bindingIdProperty = serializedObject.FindProperty("bindingId");
+            respectRemoteProperty = serializedObject.FindProperty("respectRemoteIsActive");
         }
 
         public override void OnInspectorGUI()
         {
-            AdaptiveContent myTarget = (AdaptiveContent)target;
+            serializedObject.Update();
             TutorialManagerModel model = TutorialManagerModelMiddleware.GetInstance().TMData;
             if (model.steps.Count() == 0) {
                 // Display warning
                 EditorGUILayout.HelpBox(k_TMSettingsRequiredMessage, MessageType.Warning, true);
 
             } else {
-                bindingIndex = GetCurrentIndex(model, myTarget);
-                RenderBindingPopup(myTarget);
+                RenderBindingPopup();
+                RenderOptOutCheckbox();
             }
+            serializedObject.ApplyModifiedProperties();
         }
 
-        static int GetCurrentIndex(TutorialManagerModel model, AdaptiveContent myTarget)
+        int GetCurrentIndex(TutorialManagerModel model)
         {
             return model.steps.Select((value, index) => new { value, index })
-                        .Where(pair => pair.value.id == myTarget.bindingId)
+                        .Where(pair => pair.value.id == bindingIdProperty.stringValue)
                         .Select(pair => pair.index + 1)
                         .FirstOrDefault() - 1;
         }
@@ -61,15 +69,16 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             return isValid;
         }
 
-        protected void BindTo(AdaptiveContent myTarget, string id, int index)
+        protected void BindTo(string id, int index)
         {
-            bindingIndex = index;
-            myTarget.bindingId = id;
+            bindingIdProperty.stringValue = id;
+            serializedObject.ApplyModifiedProperties();
         }
 
-        protected void RenderBindingPopup(AdaptiveContent myTarget)
+        protected void RenderBindingPopup()
         {
             TutorialManagerModel model = TutorialManagerModelMiddleware.GetInstance().TMData;
+            int bindingIndex = GetCurrentIndex(model);
             using (new GUILayout.HorizontalScope()) {
                 var labelRect = EditorGUILayout.GetControlRect();
 
@@ -96,6 +105,22 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             }
         }
 
+        protected void RenderOptOutCheckbox()
+        {
+            var labelRect = EditorGUILayout.GetControlRect();
+
+            labelRect.width = EditorGUIUtility.labelWidth;
+            var checkBoxRect = new Rect(
+                labelRect.x + labelRect.width,
+                labelRect.y,
+                EditorGUIUtility.currentViewWidth - (labelRect.width + (labelRect.x * 2f)),
+                EditorGUIUtility.singleLineHeight
+            );
+            EditorGUI.LabelField(labelRect, respectRemoteLabel);
+
+            respectRemoteProperty.boolValue = EditorGUI.Toggle(checkBoxRect, respectRemoteProperty.boolValue);
+        }
+
         void BuildBindingsMenu(int selectedIndex = -1)         {
             TutorialManagerModel model = TutorialManagerModelMiddleware.GetInstance().TMData;             bindingsMenu = new GenericMenu();
             int index = 0;
@@ -113,7 +138,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         void SetSelectedBinding(object info)
         {
             var selectedBindingInfo = (SelectedBindingInfo)info;
-            BindTo(target as AdaptiveContent, selectedBindingInfo.bindingId, selectedBindingInfo.bindingIndex);
+            BindTo(selectedBindingInfo.bindingId, selectedBindingInfo.bindingIndex);
         }
     }
 

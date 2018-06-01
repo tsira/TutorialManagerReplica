@@ -5,8 +5,9 @@ using UnityEngine.Analytics.TutorialManagerRuntime;
 namespace UnityEngine.Analytics {
     public class AdaptiveContent : MonoBehaviour, IStateSystemSubject
     {
-        [SerializeField]
         public string bindingId;
+
+        public bool respectRemoteIsActive = true;
 
         public IFSMDispatcher dispatcher { get; set; }
 
@@ -36,7 +37,11 @@ namespace UnityEngine.Analytics {
 
         void OnEnterState(string id)
         {
-            gameObject.SetActive(id == bindingId);
+            bool toShow = (id == bindingId);
+            if (toShow) {
+                toShow = respectRemoteIsActive ? dataStore.GetBool(bindingId) : true;
+            }
+            gameObject.SetActive(toShow);
         }
 
         void OnExitState(string id)

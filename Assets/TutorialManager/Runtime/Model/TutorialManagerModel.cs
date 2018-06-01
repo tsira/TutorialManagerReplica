@@ -66,6 +66,13 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             return defaultValue;
         }
 
+        public bool GetBool(string id, bool defaultValue = false)
+        {
+            // FIXME: For now, used as a proxy for showTutorial
+            // In future, can use to reference other boolean valyes
+            return TutorialManager.showTutorial;
+        }
+
 #if UNITY_EDITOR
         public void SaveGenre(string id)
         {
