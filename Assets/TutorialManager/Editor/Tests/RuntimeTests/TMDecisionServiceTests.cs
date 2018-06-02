@@ -9,8 +9,10 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 {
     public class TMDecisionServiceIntegrationTests
     {
+#pragma warning disable 414
         static TutorialWebResponse webResponse;
         static bool testComplete = false;
+#pragma warning restore 414
         /*
         [UnityTest]
         [PrebuildSetup(typeof(SetupNewUser))]
