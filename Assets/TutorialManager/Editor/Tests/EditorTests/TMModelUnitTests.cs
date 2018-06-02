@@ -798,7 +798,9 @@ namespace UnityEngine.Analytics
 
         string GetModelSavePath()
         {
-            return Path.Combine(Application.persistentDataPath, "unity_tutorial_manager.dat");
+            string path = Path.Combine("Assets", "Resources");
+            path = Path.Combine(path, "unity_tutorial_manager.dat");
+            return path;
         }
 
         void SetupTutorial()
