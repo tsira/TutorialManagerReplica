@@ -8,7 +8,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 {
     public class TutorialManagerWindow : EditorWindow
     {
-        private const string k_TabTitle = "Tutorial Manager";
+        private const string k_TabTitle = "Tutorial Editor";
 
         // Actual state
         private string m_AppId = "";
@@ -49,15 +49,26 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         GUIContent pushButtonGUIContent = new GUIContent("Push Data", k_PushDataTooltip);
 
         const string k_NeedsGenre = "Please select a genre before attempting to push.";
+        const string k_TransactionError = "Error when pushing/pulling data. Please try again.";
+        const string k_TransactionSuccess = "Success!";
+        const string k_TransactionMessage = "In progress...";
 
-        bool isGenreProblem;
+        bool isGenreProblem = false;
+        bool isTransacting = false;
+        bool isTransactionSuccess = false;
+        bool isTransactionError = false;
+
+
+
+        int transactionTimeoutCounter = 0;
+        const int transactionTimeoutMax = 300;
 
         int genreId;
         string tutorialMarkedForDeletion;
         GUIStyle addButtonStyle;
         Vector2 m_ScrollPosition;
 
-        [MenuItem("Window/Unity Analytics/Tutorial Manager")]
+        [MenuItem("Window/Unity Analytics/Tutorial Editor")]
         static void TutorialManagerMenuOption()
         {
             EditorWindow.GetWindow(typeof(TutorialManagerWindow), false, k_TabTitle);
@@ -172,6 +183,23 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
             if (isGenreProblem) {
                 EditorGUILayout.HelpBox(k_NeedsGenre, MessageType.Warning, true);
+            }
+
+            if (isTransacting) {
+                EditorGUILayout.HelpBox(k_TransactionMessage, MessageType.Info, true);
+            }
+
+            if (isTransactionSuccess) {
+                EditorGUILayout.HelpBox(k_TransactionSuccess, MessageType.Info, true);
+
+                transactionTimeoutCounter ++;
+                if (transactionTimeoutCounter > transactionTimeoutMax) {
+                    isTransactionSuccess = false;
+                }
+            }
+
+            if (isTransactionError) {
+                EditorGUILayout.HelpBox(k_TransactionError, MessageType.Error, true);
             }
         }
 
@@ -384,44 +412,60 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
         private void PushData()
         {
+            isTransactionSuccess = false;
+            isTransactionError = false;
             if (genreId == 0) {
                 isGenreProblem = true;
             } else {
+                isTransacting = true;
                 TutorialManagerEditorWebHandler.TMRSWriteResponseReceived += WriteResponseReceived;
                 m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Write(m_AppId, TMModel.TMData);
             }
         }
 
-        void WriteResponseReceived(bool succes)
+        void WriteResponseReceived(bool success)
         {
-            return;
+            isTransacting = false;
+            if (success) {
+                isTransactionSuccess = true;
+                transactionTimeoutCounter = 0;
+            } else {
+                isTransactionError = true;
+            }
         }
 
         private void PullData()
         {
+            isTransacting = true;
+            isTransactionError = false;
+            isTransactionSuccess = false;
+
+
             TutorialManagerEditorWebHandler.TMRSReadResponseReceived += RemoteSettingsReadDataReceived;
             m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Read(m_AppId);
         }
 
         private void RemoteSettingsReadDataReceived(List<RemoteSettingsKeyValueType> remoteSettings)
         {
+            isTransacting = false;
             TutorialManagerEditorWebHandler.TMRSReadResponseReceived -= RemoteSettingsReadDataReceived;
 
             if(m_WebRequestEnumerator != null)
             {
                 m_WebRequestEnumerator = null;
             }
-            if (remoteSettings == null)
-            {
-                //something went wrong - do nothing
+            if (remoteSettings == null) {
+                isTransactionError = true;
                 return;
+            } else {
+                isTransactionSuccess = true;
+                transactionTimeoutCounter = 0;
+
+                if (remoteSettings.Count > 0) {
+                    //TMUpdaterUtility.ConvertRemoteSettingsToModel(TMModel, remoteSettings);
+                    TMUpdaterUtility.ForceUpdate();
+                }
             }
-
-            //Temp logging to ensure it worked
-            Debug.Log(remoteSettings.Count);
-            Debug.Log(remoteSettings.First().key);
-
-            TMUpdaterUtility.ForceUpdate();
         }
 
         private void DefineStyles()
