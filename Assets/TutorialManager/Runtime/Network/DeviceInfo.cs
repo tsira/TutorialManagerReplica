@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -45,6 +46,17 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         public string screen_orientation;
         public string userid;
 
+        // PGE additions
+        public string bundle_identifier;
+        public string bundle_version;
+        public string sdk_version_name;
+        public int sdk_version;
+        public string time_zone;
+        public string time_zone_offset;
+
+
+        public bool rooted;
+
         internal DeviceInfo()
         {
             this.appid = Application.cloudProjectId;
@@ -77,6 +89,24 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 #if UNITY_5_6_OR_NEWER
             this.build_guid = Application.buildGUID;
 #endif
+
+            // PGE additions
+            this.bundle_version = Application.version;
+            this.sdk_version_name = TutorialManager.k_PluginVersion;
+            this.sdk_version = TutorialManager.k_VersionNumber;
+            this.time_zone = TimeZone.CurrentTimeZone.StandardName;
+            this.time_zone_offset = TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.Now).ToString();
+
+
+            this.rooted = Application.sandboxType == ApplicationSandboxType.SandboxBroken;
+
+#if UNITY_5_6_OR_NEWER
+            this.bundle_identifier = Application.identifier;
+#else
+            this.bundle_identifier = Application.bundleIdentifier;
+#endif
+
+
             this.app_install_mode = Application.installMode.ToString();
             this.app_install_store = Application.installerName;
 

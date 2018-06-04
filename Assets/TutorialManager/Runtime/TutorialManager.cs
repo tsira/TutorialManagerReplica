@@ -251,7 +251,8 @@ namespace UnityEngine.Analytics
 
         // End public methods /// /////////////////////////////////
 
-        public readonly static string k_PluginVersion = "0.1.0";
+        public readonly static string k_PluginVersion = "0.1.0-tm";
+        public readonly static int k_VersionNumber = 10;
 
         // Event names
         const string adaptiveOnboardingEventName = "adaptive_onboarding";
