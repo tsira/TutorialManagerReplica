@@ -52,7 +52,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         public string sdk_version_name;
         public int sdk_version;
         public string time_zone;
-        public string time_zone_offset;
+        public int time_zone_offset;
 
 
         public bool rooted;
@@ -95,8 +95,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             this.sdk_version_name = TutorialManager.k_PluginVersion;
             this.sdk_version = TutorialManager.k_VersionNumber;
             this.time_zone = TimeZone.CurrentTimeZone.StandardName;
-            this.time_zone_offset = TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.Now).ToString();
-
+            this.time_zone_offset = (int)TimeZoneInfo.Local.GetUtcOffset(DateTime.Now).TotalMinutes;
 
             this.rooted = Application.sandboxType == ApplicationSandboxType.SandboxBroken;
 
