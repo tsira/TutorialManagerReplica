@@ -462,7 +462,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
                 transactionTimeoutCounter = 0;
 
                 if (remoteSettings.Count > 0) {
-                    //TMUpdaterUtility.ConvertRemoteSettingsToModel(TMModel, remoteSettings);
+                    TMUpdaterUtility.ConvertRemoteSettingsToModel(TMModel, remoteSettings);
                     TMUpdaterUtility.ForceUpdate();
                 }
             }
