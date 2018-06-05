@@ -66,7 +66,6 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         [RuntimeInitializeOnLoadMethod]
         public static void ListenForDecision()
         {
-            Debug.Log("ListenForDecision");
             DecisionRequestService.OnDecisionReceived -= TestResponseCaching;
             DecisionRequestService.OnDecisionReceived += TestResponseCaching;
             webResponse = null;

@@ -20,7 +20,7 @@ namespace UnityEngine.Analytics
         private const string k_RemoteSettingsPath = k_APIPath + "{0}/tutorial/remote_settings";
 
         //Event for receiving RS data
-        public delegate void TMRSReadResponseHandler(List<TutorialManagerEditor.RemoteSettingsKeyValueType> remoteSettings);
+        public delegate void TMRSReadResponseHandler(List<RemoteSettingsKeyValueType> remoteSettings);
         public static event TMRSReadResponseHandler TMRSReadResponseReceived;
 
         public delegate void TMRSWriteResponseHandler(bool success);
@@ -139,7 +139,7 @@ namespace UnityEngine.Analytics
         static void LoadRemoteSettings(string remoteSettingsResult)
         {
             string emptyRS = "{\"remoteSettings\":[]}";
-            List<TutorialManagerEditor.RemoteSettingsKeyValueType> remoteSettings = new List<TutorialManagerEditor.RemoteSettingsKeyValueType>();
+            List<RemoteSettingsKeyValueType> remoteSettings = new List<RemoteSettingsKeyValueType>();
 
             // Check for empty Remote Settings response
             if (emptyRS.Contains(remoteSettingsResult))
@@ -153,7 +153,7 @@ namespace UnityEngine.Analytics
             else {
                 try
                 {
-                    remoteSettings = JsonUtility.FromJson<TutorialManagerEditor.RemoteSettingsData>(remoteSettingsResult).remoteSettings;
+                    remoteSettings = JsonUtility.FromJson<RemoteSettingsData>(remoteSettingsResult).remoteSettings;
                 }
                 catch (Exception e)
                 {

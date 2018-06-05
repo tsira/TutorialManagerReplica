@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UnityEngine.Analytics.TutorialManagerEditor
+namespace UnityEngine.Analytics.TutorialManagerRuntime
 {
     [Serializable]
     public struct RemoteSettingsKeyValueType
