@@ -10,7 +10,12 @@ namespace UnityEngine.Analytics
     {
         //Web variables
         //REST API paths
+
+        // Staging
+        // private const string k_BasePath = "https://cloud-staging.uca.cloud.unity3d.com/";
+        // Production
         private const string k_BasePath = "https://analytics.cloud.unity3d.com/";
+
         private const string k_APIPath = k_BasePath + "api/v2/projects/";
         private const string k_RemoteSettingsPath = k_APIPath + "{0}/tutorial/remote_settings";
 
@@ -76,6 +81,7 @@ namespace UnityEngine.Analytics
 #endif
             {
                 Debug.LogWarningFormat("Failed to write remote settings: {0}: {1}", settingsRequest.responseCode, settingsRequest.error);
+
                 WriteEvent(false);
                 yield break;
             }
@@ -133,18 +139,21 @@ namespace UnityEngine.Analytics
         static void LoadRemoteSettings(string remoteSettingsResult)
         {
             string emptyRS = "{\"remoteSettings\":[]}";
+            List<TutorialManagerEditor.RemoteSettingsKeyValueType> remoteSettings = new List<TutorialManagerEditor.RemoteSettingsKeyValueType>();
 
             // Check for empty Remote Settings response
             if (emptyRS.Contains(remoteSettingsResult))
             {
                 Debug.LogWarningFormat("No Remote Settings were found:\n {0}", remoteSettingsResult);
-                ReadErrorEvent();
+                if (TMRSReadResponseReceived != null) {
+                    TMRSReadResponseReceived(remoteSettings);
+                }
                 return;
             }
             else {
-                List<TutorialManagerEditor.RemoteSettingsKeyValueType> remoteSettings;
                 try
                 {
+                    Debug.Log(remoteSettingsResult);
                     remoteSettings = JsonUtility.FromJson<TutorialManagerEditor.RemoteSettingsData>(remoteSettingsResult).remoteSettings;
                 }
                 catch (Exception e)

@@ -14,6 +14,9 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
     public static class DecisionRequestService
     {
+        // Staging
+        // const string adaptiveOnboardingUrl = "https://stg-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
+        // Production
         const string adaptiveOnboardingUrl = "https://prd-adaptive-onboarding.uca.cloud.unity3d.com/tutorial";
         static GameObject webHandlerGO;
 
