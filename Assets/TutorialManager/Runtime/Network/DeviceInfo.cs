@@ -24,6 +24,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
         public string adsid;
         public string appid;
+        public bool debug_device;
         public string app_install_mode;
         public string app_install_store;
         public string app_ver;
@@ -47,6 +48,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         internal DeviceInfo()
         {
             this.appid = Application.cloudProjectId;
+            this.debug_device = Debug.isDebugBuild;
             this.app_ver = Application.version;
             this.model = GetDeviceModel();
             this.deviceid = SystemInfo.deviceUniqueIdentifier;

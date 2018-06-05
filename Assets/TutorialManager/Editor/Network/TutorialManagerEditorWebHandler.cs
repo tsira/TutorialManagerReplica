@@ -153,7 +153,6 @@ namespace UnityEngine.Analytics
             else {
                 try
                 {
-                    Debug.Log(remoteSettingsResult);
                     remoteSettings = JsonUtility.FromJson<TutorialManagerEditor.RemoteSettingsData>(remoteSettingsResult).remoteSettings;
                 }
                 catch (Exception e)
