@@ -53,6 +53,8 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         public int sdk_version;
         public string time_zone;
         public int time_zone_offset;
+        public int screen_width;
+        public int screen_height;
 
 
         public bool rooted;
@@ -96,6 +98,8 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             this.sdk_version = TutorialManager.k_VersionNumber;
             this.time_zone = TimeZone.CurrentTimeZone.StandardName;
             this.time_zone_offset = (int)TimeZoneInfo.Local.GetUtcOffset(DateTime.Now).TotalMinutes;
+            this.screen_width = Screen.currentResolution.width;
+            this.screen_height = Screen.currentResolution.height;
 
             this.rooted = Application.sandboxType == ApplicationSandboxType.SandboxBroken;
 
