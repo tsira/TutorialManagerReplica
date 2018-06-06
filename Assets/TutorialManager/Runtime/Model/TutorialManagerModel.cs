@@ -279,11 +279,11 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             }
         }
 
-        public void UpdateContentEntityValues(Dictionary<string, string> contentTable)
+        public void UpdateContentEntityValues(List<RemoteSettingsKeyValueType> contentTable)
         {
-            foreach (KeyValuePair<string, string> kv in contentTable) {
-                if (TMData.contentTable.ContainsKey(kv.Key)) {
-                    TMData.contentTable[kv.Key].text = kv.Value;
+            foreach (RemoteSettingsKeyValueType kv in contentTable) {
+                if (TMData.contentTable.ContainsKey(kv.key)) {
+                    TMData.contentTable[kv.key].text = kv.value;
                 }
             }
         }

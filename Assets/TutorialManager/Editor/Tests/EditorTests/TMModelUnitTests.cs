@@ -571,13 +571,15 @@ namespace UnityEngine.Analytics
             string textId2 = ConstructID(t1Step2LookupID, ContentType.text.ToString());
             string textValue1 = modelMiddleware.TMData.contentTable[textId1].text;
             string textValue2 = modelMiddleware.TMData.contentTable[textId2].text;
-            Dictionary<string, string> dict = new Dictionary<string, string>();
-            dict[textId1] = t1step1Textv2;
+
+            List<RemoteSettingsKeyValueType> list = new List<RemoteSettingsKeyValueType>();
+            var item1 = new RemoteSettingsKeyValueType(textId1, t1step1Textv2, "string");
+            list.Add(item1);
 
             Assert.That(t1step1Text, Is.EqualTo(textValue1), "textValue1 should be default");
             Assert.That(t1step2Text, Is.EqualTo(textValue2), "textValue2 should be default");
 
-            modelMiddleware.UpdateContentEntityValues(dict);
+            modelMiddleware.UpdateContentEntityValues(list);
             string textValue1v2 = modelMiddleware.TMData.contentTable[textId1].text;
 
             Assert.That(t1step1Textv2, Is.EqualTo(textValue1v2), "textValue1 should have changed");
@@ -602,13 +604,16 @@ namespace UnityEngine.Analytics
             string textId2 = ConstructID(t1Step2LookupID, ContentType.text.ToString());
             string textValue1 = modelMiddleware.TMData.contentTable[textId1].text;
             string textValue2 = modelMiddleware.TMData.contentTable[textId2].text;
-            Dictionary<string, string> dict = new Dictionary<string, string>();
-            dict[textId2] = t1step2Textv2;
+
+
+            List<RemoteSettingsKeyValueType> list = new List<RemoteSettingsKeyValueType>();
+            var item1 = new RemoteSettingsKeyValueType(textId2, t1step2Textv2, "string");
+            list.Add(item1);
 
             Assert.That(t1step1Text, Is.EqualTo(textValue1), "textValue1 should be default");
             Assert.That(t1step2Text, Is.EqualTo(textValue2), "textValue2 should be default");
 
-            modelMiddleware.UpdateContentEntityValues(dict);
+            modelMiddleware.UpdateContentEntityValues(list);
             string textValue2v2 = modelMiddleware.TMData.contentTable[textId2].text;
 
             Assert.That(t1step1Text, Is.EqualTo(textValue1), "textValue1 should still be default");
@@ -633,14 +638,17 @@ namespace UnityEngine.Analytics
             string textId2 = ConstructID(t1Step2LookupID, ContentType.text.ToString());
             string textValue1 = modelMiddleware.TMData.contentTable[textId1].text;
             string textValue2 = modelMiddleware.TMData.contentTable[textId2].text;
-            Dictionary<string, string> dict = new Dictionary<string, string>();
-            dict[textId1] = t1step1Textv2;
-            dict[textId2] = t1step2Textv2;
+
+            List<RemoteSettingsKeyValueType> list = new List<RemoteSettingsKeyValueType>();
+            var item1 = new RemoteSettingsKeyValueType(textId1, t1step1Textv2, "string");
+            var item2 = new RemoteSettingsKeyValueType(textId2, t1step2Textv2, "string");
+            list.Add(item1);
+            list.Add(item2);
 
             Assert.That(t1step1Text, Is.EqualTo(textValue1), "textValue1 should be default");
             Assert.That(t1step2Text, Is.EqualTo(textValue2), "textValue2 should be default");
 
-            modelMiddleware.UpdateContentEntityValues(dict);
+            modelMiddleware.UpdateContentEntityValues(list);
             string textValue2v1 = modelMiddleware.TMData.contentTable[textId1].text;
             string textValue2v2 = modelMiddleware.TMData.contentTable[textId2].text;
 

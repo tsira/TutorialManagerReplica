@@ -303,7 +303,7 @@ namespace UnityEngine.Analytics
             m_State.showTutorial = response.showTutorial;
             m_State.decisionReceived = true;
             SaveState();
-            TutorialManagerModelMiddleware.GetInstance().UpdateContentEntityValues(response.contentTable);
+            TutorialManagerModelMiddleware.GetInstance().UpdateContentEntityValues(response.tutorials);
         }
 
         /// <summary>

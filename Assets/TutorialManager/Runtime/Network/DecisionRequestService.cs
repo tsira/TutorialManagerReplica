@@ -9,7 +9,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
     public class TutorialWebResponse
     {
         public bool showTutorial;
-        public Dictionary<string, string> contentTable;
+        public List<RemoteSettingsKeyValueType> tutorials;
     }
 
     public static class DecisionRequestService
@@ -75,8 +75,8 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                     {
                         // If web request was successful then proceed with tutorial manager decision
                         string text = webRequest.downloadHandler.text;
-                        response.showTutorial = ParseShowTutorial(text);
-                        response.contentTable = ParseTextStrings(text);
+                        var parsedResponse = JsonUtility.FromJson<TutorialWebResponse>(text);
+                        response = parsedResponse;
                     }
                     catch (System.Exception ex)
                     {
@@ -91,28 +91,6 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                 }
             };
             webHandler.PostJson(adaptiveOnboardingUrl, json);
-        }
-
-        private static bool ParseShowTutorial(string text)
-        {
-            Regex regex = new Regex(@"false(?!showTutorial.{1,3})");
-            // NB: I've deliberately turned this logic "upside down" to ensure
-            // that failover favors showing the tutorial. MAT - 5/15/2018
-            return regex.Match(text).Success ? false : true;
-        }
-
-        private static Dictionary<string, string> ParseTextStrings(string text)
-        {
-            string keyPattern = @"(?:\"")(.*?\-text)(?=\"".{1,3}\"")";
-            MatchCollection keyMatches = Regex.Matches(text, keyPattern);
-            List<string> keys = keyMatches.Cast<Match>().Select(match => match.Groups[1].ToString()).ToList();
-
-            string valuePattern = @"(?:\-text\"".{1,3})\""(.*?)(?=\"",)";
-            MatchCollection valueMatches = Regex.Matches(text, valuePattern);
-            List<string> values = valueMatches.Cast<Match>().Select(match => match.Groups[1].ToString()).ToList();
-
-            var dict = keys.Select((k, i) => new { k, v = values[i] }).ToDictionary(x => x.k, x => x.v);
-            return dict;
         }
     }
 }
