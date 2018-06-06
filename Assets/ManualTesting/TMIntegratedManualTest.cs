@@ -3,6 +3,9 @@ using UnityEngine.Analytics;
 
 public class TMIntegratedManualTest : MonoBehaviour
 {
+
+    public string m_TutorialToStart;
+
     void Start()
     {
     }
@@ -10,7 +13,7 @@ public class TMIntegratedManualTest : MonoBehaviour
     public void Next()
     {
         if (string.IsNullOrEmpty(TutorialManager.tutorialId)) {
-            TutorialManager.Start("Tutorial1");
+            TutorialManager.Start(m_TutorialToStart);
         } else if (TutorialManager.complete == false){
             TutorialManager.StepComplete();
         }
