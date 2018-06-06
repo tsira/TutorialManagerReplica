@@ -301,7 +301,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4af7dd93173b44d15b7febe8906f88cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial1-Step4
+  bindingId: tutorial2-step2
+  respectRemoteIsActive: 1
 --- !u!114 &42284123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -426,6 +427,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bindingId: tutorial1-Step10
+  respectRemoteIsActive: 1
 --- !u!114 &89668517
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -648,6 +650,94 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 165123256}
+--- !u!1 &165318128
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 165318129}
+  - component: {fileID: 165318132}
+  - component: {fileID: 165318131}
+  - component: {fileID: 165318130}
+  m_Layer: 5
+  m_Name: Text T2S2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &165318129
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 165318128}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 327382093}
+  m_RootOrder: 14
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0}
+--- !u!114 &165318130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 165318128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6ea9a79203a04085b746c66f83b001a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bindingId: tutorial2-step2
+  respectRemoteIsActive: 1
+--- !u!114 &165318131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 165318128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: Text step two
+--- !u!222 &165318132
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 165318128}
 --- !u!1 &206394649
 GameObject:
   m_ObjectHideFlags: 0
@@ -697,7 +787,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4af7dd93173b44d15b7febe8906f88cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial1-step2
+  bindingId: tutorial-step2
+  respectRemoteIsActive: 1
 --- !u!114 &206394652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -822,6 +913,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bindingId: tutorial1-Step9
+  respectRemoteIsActive: 1
 --- !u!114 &264148954
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -945,7 +1037,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4af7dd93173b44d15b7febe8906f88cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial1-step3
+  bindingId: tutorial2-step
+  respectRemoteIsActive: 1
 --- !u!114 &310814452
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1204,6 +1297,8 @@ RectTransform:
   - {fileID: 963392028}
   - {fileID: 716999790}
   - {fileID: 1579205146}
+  - {fileID: 1219385737}
+  - {fileID: 165318129}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1372,7 +1467,7 @@ GameObject:
   - component: {fileID: 716999792}
   - component: {fileID: 716999791}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text T1S1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1407,7 +1502,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6ea9a79203a04085b746c66f83b001a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial1-step1
+  bindingId: tutorial-step
+  respectRemoteIsActive: 1
 --- !u!114 &716999792
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1497,6 +1593,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bindingId: tutorial1-Step7
+  respectRemoteIsActive: 1
 --- !u!114 &819691495
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1617,9 +1714,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 963392027}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43dcf7acd15fd4a93a44a95699e5ff5b, type: 3}
+  m_Script: {fileID: 11500000, guid: f14bd56e2a2b245eea670c811f0592c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_TutorialToStart: tutorial
 --- !u!114 &963392030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1910,6 +2008,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bindingId: tutorial1-Step6
+  respectRemoteIsActive: 1
 --- !u!114 &1217951797
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1984,6 +2083,94 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1217951794}
+--- !u!1 &1219385736
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1219385737}
+  - component: {fileID: 1219385740}
+  - component: {fileID: 1219385739}
+  - component: {fileID: 1219385738}
+  m_Layer: 5
+  m_Name: Text T2S1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1219385737
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1219385736}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 327382093}
+  m_RootOrder: 13
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0}
+--- !u!114 &1219385738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1219385736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6ea9a79203a04085b746c66f83b001a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bindingId: tutorial2-step
+  respectRemoteIsActive: 1
+--- !u!114 &1219385739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1219385736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: Text step one
+--- !u!222 &1219385740
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1219385736}
 --- !u!1 &1268799848
 GameObject:
   m_ObjectHideFlags: 0
@@ -2331,7 +2518,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4af7dd93173b44d15b7febe8906f88cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial1-step1
+  bindingId: tutorial-step
+  respectRemoteIsActive: 1
 --- !u!114 &1558593832
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2418,7 +2606,7 @@ GameObject:
   - component: {fileID: 1579205148}
   - component: {fileID: 1579205147}
   m_Layer: 5
-  m_Name: Text (1)
+  m_Name: Text T1S2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2453,7 +2641,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6ea9a79203a04085b746c66f83b001a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial1-step2
+  bindingId: tutorial-step2
+  respectRemoteIsActive: 1
 --- !u!114 &1579205148
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2543,6 +2732,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bindingId: tutorial1-Step5
+  respectRemoteIsActive: 1
 --- !u!114 &1786083551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2667,6 +2857,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bindingId: tutorial1-Step8
+  respectRemoteIsActive: 1
 --- !u!114 &1881049323
 MonoBehaviour:
   m_ObjectHideFlags: 0
