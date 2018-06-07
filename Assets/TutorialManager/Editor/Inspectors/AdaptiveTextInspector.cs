@@ -8,6 +8,7 @@ using TMPro;
 namespace UnityEngine.Analytics.TutorialManagerRuntime
 {
     [CustomEditor(typeof(AdaptiveText))]
+    [CanEditMultipleObjects]
     public class AdaptiveTextInspector : AdaptiveContentInspector
     {
 
@@ -31,9 +32,6 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                 hasText = true;
             }
 #if TEXTMESHPRO_PRESENT
-
-            Debug.Log(myTarget.GetComponent<TMP_Text>());
-
             if (!hasText && myTarget.GetComponent<TMP_Text>() != null) {
                 hasText = true;
             }
