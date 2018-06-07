@@ -55,10 +55,10 @@ public class TMUpdaterUtility
                 var stepId = fqStepId.Split('-')[1];
                 TMModel.CreateStepEntity(stepId, tutorialId);
 
-                var contentKey = stepId = "-text";
+                var contentKey = string.Format("{0}-{1}-text", tutorialId, stepId);
                 if (dictionary.ContainsKey(contentKey)) {
                     var contentValue = dictionary[contentKey].value;
-                    TMModel.CreateContentEntity(stepId, ContentType.text, contentValue);
+                    TMModel.CreateContentEntity(fqStepId, ContentType.text, contentValue);
                 }
             }
         }
