@@ -127,7 +127,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
             RenderHeader();
 
-            //showContent = GUILayout.Toggle(showContent, "Display content");
+            // showContent = GUILayout.Toggle(showContent, "Display content");
 
             m_ScrollPosition = EditorGUILayout.BeginScrollView(m_ScrollPosition);
             int tutorialCount = TMModel.TMData.tutorials.Count;
@@ -236,9 +236,9 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         private void RenderGenre()
         {
             EditorGUILayout.LabelField(genreGUIContent, EditorStyles.miniLabel, GUILayout.Width(k_ColumnWidth));
-            int id = genreId;
+            int id = TMGenre.genres.ToList<string>().IndexOf(TMModel.TMData.genre);
+            id = Mathf.Max(id, 0);
             id = EditorGUILayout.IntPopup(id, TMGenre.genres, TMGenre.genreIds);
-
             if (id != genreId) {
                 SetGenre(id);
             }
