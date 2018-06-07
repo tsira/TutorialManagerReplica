@@ -67,11 +67,22 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         string tutorialMarkedForDeletion;
         GUIStyle addButtonStyle;
         Vector2 m_ScrollPosition;
+        bool showContent;
 
         [MenuItem("Window/Unity Analytics/Tutorial Editor")]
         static void TutorialManagerMenuOption()
         {
             EditorWindow.GetWindow(typeof(TutorialManagerWindow), false, k_TabTitle);
+        }
+
+        private void Awake()
+        {
+            TMModel.OnDataUpdate += OnModelUpdate;
+        }
+
+        private void OnDestroy()
+        {
+            TMModel.OnDataUpdate -= OnModelUpdate;
         }
 
         private void OnEnable()
@@ -115,6 +126,8 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             GUILayout.Space(5f);
 
             RenderHeader();
+
+            //showContent = GUILayout.Toggle(showContent, "Display content");
 
             m_ScrollPosition = EditorGUILayout.BeginScrollView(m_ScrollPosition);
             int tutorialCount = TMModel.TMData.tutorials.Count;
@@ -308,6 +321,18 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
                     GUI.backgroundColor = prevColor;
                 }
             }
+            var textId = step.id + "-text";
+            if (showContent && TMModel.TMData.contentTable.ContainsKey(textId)) {
+                var contentEntity = TMModel.TMData.contentTable[textId];
+                bool wrap = EditorStyles.textField.wordWrap;
+                EditorStyles.textField.wordWrap = true;
+                var options = new GUILayoutOption[]{
+                    GUILayout.ExpandHeight(true),
+                    GUILayout.Width(EditorGUIUtility.currentViewWidth - 15f)
+                };
+                EditorGUILayout.TextArea(contentEntity.text, options);
+                EditorStyles.textField.wordWrap = wrap;
+            }
         }
 
         string ParseDisplayNameFromStep(string tutorialId, string stepId)
@@ -432,6 +457,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             } else {
                 isTransactionError = true;
             }
+            Repaint();
         }
 
         private void PullData()
@@ -466,6 +492,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
                     TMUpdaterUtility.ForceUpdate();
                 }
             }
+            Repaint();
         }
 
         private void DefineStyles()
@@ -475,6 +502,11 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             addButtonStyle.fontStyle = FontStyle.Bold;
             addButtonStyle.alignment = TextAnchor.MiddleLeft;
             addButtonStyle.fixedWidth = 30f;
+        }
+
+        private void OnModelUpdate()
+        {
+            Repaint();
         }
     }
 }
