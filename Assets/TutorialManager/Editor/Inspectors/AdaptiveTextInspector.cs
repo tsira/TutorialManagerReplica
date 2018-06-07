@@ -50,7 +50,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             string qualifiedBindingId = string.Format("{0}-text", myTarget.bindingId);
             if (model.TMData.contentTable.ContainsKey(qualifiedBindingId)) {
                 model.UpdateContentEntity(qualifiedBindingId, myTarget.GetCurrentText());
-            } else {
+            } else if (string.IsNullOrEmpty(myTarget.bindingId) == false){
                 model.CreateContentEntity(myTarget.bindingId, ContentType.text, myTarget.GetCurrentText());
             }
         }
