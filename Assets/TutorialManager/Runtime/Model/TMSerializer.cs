@@ -66,6 +66,9 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         static string GetBundledModelPath()
         {
             string path = Path.Combine("Assets", "Resources");
+            if (Directory.Exists(path) == false) {
+                Directory.CreateDirectory(path);
+            }
             path = Path.Combine(path, k_ModelFileName);
             return path;
         }
