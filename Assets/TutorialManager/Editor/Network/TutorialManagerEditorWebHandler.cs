@@ -257,7 +257,7 @@ namespace UnityEngine.Analytics
                 Debug.LogError("Failed to get \"token\" from UnityConnect class!");
                 return null;
             }
-            return token;
+            return token.ToString();
 #endif
         }
 
