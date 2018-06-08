@@ -127,7 +127,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
             RenderHeader();
 
-            // showContent = GUILayout.Toggle(showContent, "Display content");
+            showContent = GUILayout.Toggle(showContent, "Display content");
 
             m_ScrollPosition = EditorGUILayout.BeginScrollView(m_ScrollPosition);
             int tutorialCount = TMModel.TMData.tutorials.Count;
@@ -223,12 +223,14 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
                 if (GUILayout.Button(addTutorialButtonGUIContent)) {
                     CreateTutorial();
                 }
+                EditorGUI.BeginDisabledGroup(isTransacting);
                 if (GUILayout.Button(pullButtonGUIContent)) {
                     PullData();
                 }
                 if (GUILayout.Button(pushButtonGUIContent)) {
                     PushData();
                 }
+                EditorGUI.EndDisabledGroup();
                 RenderDashboardLink();
             }
         }
