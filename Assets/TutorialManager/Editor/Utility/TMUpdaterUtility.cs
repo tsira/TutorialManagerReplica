@@ -31,7 +31,11 @@ public class TMUpdaterUtility
 
     public static void ConvertRemoteSettingsToModel(TutorialManagerModelMiddleware TMModel, List<RemoteSettingsKeyValueType> remoteSettings)
     {
+        var genre = TMModel.TMData.genre;
         TMModel.Clear();
+        if (string.IsNullOrEmpty(genre) == false) {
+            TMModel.SaveGenre(genre);
+        }
 
         // Convert to dictionary
         var dictionary = remoteSettings.ToDictionary(x => x.key, x => x);
