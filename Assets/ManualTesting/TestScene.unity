@@ -301,8 +301,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4af7dd93173b44d15b7febe8906f88cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial2-step2
-  respectRemoteIsActive: 1
+  bindingIds: []
+  respectRemoteIsActive: 0
 --- !u!114 &42284123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -426,8 +426,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4af7dd93173b44d15b7febe8906f88cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial1-Step10
-  respectRemoteIsActive: 1
+  bindingIds: []
+  respectRemoteIsActive: 0
 --- !u!114 &89668517
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -697,8 +697,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6ea9a79203a04085b746c66f83b001a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial2-step2
-  respectRemoteIsActive: 1
+  bindingIds: []
+  respectRemoteIsActive: 0
+  ignoreIfModelValueEmpty: 1
 --- !u!114 &165318131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -731,7 +732,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Text step two
+  m_Text: Here is text for tutorial two step two (development)
 --- !u!222 &165318132
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -787,8 +788,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4af7dd93173b44d15b7febe8906f88cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial-step2
-  respectRemoteIsActive: 1
+  bindingIds: []
+  respectRemoteIsActive: 0
 --- !u!114 &206394652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -912,8 +913,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4af7dd93173b44d15b7febe8906f88cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial1-Step9
-  respectRemoteIsActive: 1
+  bindingIds: []
+  respectRemoteIsActive: 0
 --- !u!114 &264148954
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1037,8 +1038,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4af7dd93173b44d15b7febe8906f88cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial2-step
-  respectRemoteIsActive: 1
+  bindingIds: []
+  respectRemoteIsActive: 0
 --- !u!114 &310814452
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1502,8 +1503,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6ea9a79203a04085b746c66f83b001a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial-step
-  respectRemoteIsActive: 1
+  bindingIds:
+  - long-Step2
+  - long-Step4
+  respectRemoteIsActive: 0
+  ignoreIfModelValueEmpty: 1
 --- !u!114 &716999792
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1536,7 +1540,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Text step one
+  m_Text: Here is text for tutorial one step one (I'm in release!!!!)
 --- !u!222 &716999793
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1592,8 +1596,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4af7dd93173b44d15b7febe8906f88cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial1-Step7
-  respectRemoteIsActive: 1
+  bindingIds: []
+  respectRemoteIsActive: 0
 --- !u!114 &819691495
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2007,8 +2011,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4af7dd93173b44d15b7febe8906f88cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial1-Step6
-  respectRemoteIsActive: 1
+  bindingIds: []
+  respectRemoteIsActive: 0
 --- !u!114 &1217951797
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2130,8 +2134,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6ea9a79203a04085b746c66f83b001a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial2-step
-  respectRemoteIsActive: 1
+  bindingIds: []
+  respectRemoteIsActive: 0
+  ignoreIfModelValueEmpty: 1
 --- !u!114 &1219385739
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2164,7 +2169,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Text step one
+  m_Text: Here is text for tutorial two step one (development)
 --- !u!222 &1219385740
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2518,8 +2523,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4af7dd93173b44d15b7febe8906f88cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial-step
-  respectRemoteIsActive: 1
+  bindingIds: []
+  respectRemoteIsActive: 0
 --- !u!114 &1558593832
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2641,8 +2646,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6ea9a79203a04085b746c66f83b001a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial-step2
-  respectRemoteIsActive: 1
+  bindingIds: []
+  respectRemoteIsActive: 0
+  ignoreIfModelValueEmpty: 1
 --- !u!114 &1579205148
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2675,7 +2681,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Text step two
+  m_Text: Here is text for tutorial one step two (development)
 --- !u!222 &1579205149
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2731,8 +2737,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4af7dd93173b44d15b7febe8906f88cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial1-Step5
-  respectRemoteIsActive: 1
+  bindingIds: []
+  respectRemoteIsActive: 0
 --- !u!114 &1786083551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2856,8 +2862,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4af7dd93173b44d15b7febe8906f88cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bindingId: tutorial1-Step8
-  respectRemoteIsActive: 1
+  bindingIds: []
+  respectRemoteIsActive: 0
 --- !u!114 &1881049323
 MonoBehaviour:
   m_ObjectHideFlags: 0

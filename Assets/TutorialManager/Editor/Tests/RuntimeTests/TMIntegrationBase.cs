@@ -161,7 +161,7 @@ namespace UnityEngine.Analytics
             var go = new GameObject();
             go.name = ConstructContentName(bindingId, a);
             var adaptiveContent = go.AddComponent<AdaptiveContent>();
-            adaptiveContent.bindingId = bindingId;
+            adaptiveContent.bindingIds.Add(bindingId);
             return go;
         }
 
@@ -171,7 +171,7 @@ namespace UnityEngine.Analytics
             go.name = ConstructTextName(bindingId);
             go.AddComponent<Text>();
             var adaptiveContent = go.AddComponent<AdaptiveText>();
-            adaptiveContent.bindingId = bindingId;
+            adaptiveContent.bindingIds.Add(bindingId);
             return go;
         }
 

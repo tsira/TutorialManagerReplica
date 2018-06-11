@@ -12,7 +12,9 @@ public class TMUpdaterUtility
     [InitializeOnLoadMethod]
     static void WatchSceneOpens()
     {
+#if UNITY_5_6_OR_NEWER
         EditorSceneManager.sceneOpened += SceneOpenedCallback;
+#endif
     }
 
     static void SceneOpenedCallback(UnityEngine.SceneManagement.Scene scene, OpenSceneMode mode)

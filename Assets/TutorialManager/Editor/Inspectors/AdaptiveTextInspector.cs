@@ -13,18 +13,34 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
     {
 
         const string k_TextRequiredMessage = "Without a Text, TextMesh or TextMeshPro object, this Adaptive Text component has nothing to adapt!";
+        GUIContent ignoreIfEmptyLabel = new GUIContent("Ignore if remote is empty", "When checked, remote text will override local " +
+                                                       "text ONLY when the provided string is non-empty. This can be useful when " +
+                                                       "binding multiple steps to a single Text component (e.g., if your tutorial " +
+                                                       "reuses a single dialog box).");
+
 
         string lastKnownTextValue;
 
+        SerializedProperty ignoreIfModelValueEmptyProperty;
+
+        override protected void OnEnable()
+        {
+            base.OnEnable();
+            ignoreIfModelValueEmptyProperty = serializedObject.FindProperty("ignoreIfModelValueEmpty");
+        }
+
         public override void OnInspectorGUI()
         {
-            base.OnInspectorGUI();
+            serializedObject.Update();
+            RenderContentElements();
 
             AdaptiveText myTarget = (AdaptiveText)target;
             TutorialManagerModelMiddleware model = TutorialManagerModelMiddleware.GetInstance();
 
-            if (lastKnownTextValue != myTarget.GetCurrentText()) {
-                CreateOrUpdateTextEntity(myTarget, model);
+            RenderOverrideOnlyWhenNotEmptyCheckbox();
+
+            if (lastKnownTextValue != myTarget.GetCurrentText() || bindingsHaveChanged) {
+                CreateOrUpdateTextEntities(myTarget, model);
             }
 
             bool hasText = false;
@@ -41,17 +57,38 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                 EditorGUILayout.HelpBox(k_TextRequiredMessage, MessageType.Warning, true);
             }
 
-
+            serializedObject.ApplyModifiedProperties();
             lastKnownTextValue = myTarget.GetCurrentText();
+            bindingsHaveChanged = false;
         }
 
-        private void CreateOrUpdateTextEntity(AdaptiveText myTarget, TutorialManagerModelMiddleware model)
+        protected void RenderOverrideOnlyWhenNotEmptyCheckbox()
         {
-            string qualifiedBindingId = string.Format("{0}-text", myTarget.bindingId);
-            if (model.TMData.contentTable.ContainsKey(qualifiedBindingId)) {
-                model.UpdateContentEntity(qualifiedBindingId, myTarget.GetCurrentText());
-            } else if (string.IsNullOrEmpty(myTarget.bindingId) == false){
-                model.CreateContentEntity(myTarget.bindingId, ContentType.text, myTarget.GetCurrentText());
+            var labelRect = EditorGUILayout.GetControlRect();
+
+            labelRect.width = EditorGUIUtility.labelWidth;
+            var checkBoxRect = new Rect(
+                labelRect.x + labelRect.width,
+                labelRect.y,
+                EditorGUIUtility.currentViewWidth - (labelRect.width + (labelRect.x * 2f)),
+                EditorGUIUtility.singleLineHeight
+            );
+            EditorGUI.LabelField(labelRect, ignoreIfEmptyLabel);
+
+            ignoreIfModelValueEmptyProperty.boolValue = EditorGUI.Toggle(checkBoxRect, ignoreIfModelValueEmptyProperty.boolValue);
+        }
+
+        private void CreateOrUpdateTextEntities(AdaptiveText myTarget, TutorialManagerModelMiddleware model)
+        {
+            SerializedProperty arraySizeProperty = bindingIdsProperty.FindPropertyRelative("Array.size");
+            int listCount = arraySizeProperty.intValue;
+            for (int a = 0; a < listCount; a++) {
+                string qualifiedBindingId = string.Format("{0}-text", bindingIdsProperty.GetArrayElementAtIndex(a).stringValue);
+                if (model.TMData.contentTable.ContainsKey(qualifiedBindingId)) {
+                    model.UpdateContentEntity(qualifiedBindingId, myTarget.GetCurrentText());
+                } else if (string.IsNullOrEmpty(myTarget.bindingIds[a]) == false) {
+                    model.CreateContentEntity(myTarget.bindingIds[a], ContentType.text, myTarget.GetCurrentText());
+                }
             }
         }
 

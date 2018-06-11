@@ -166,7 +166,7 @@ namespace UnityEngine.Analytics
                 gameObjectList.Add(gameObject);
 
                 AdaptiveContent adaptiveContent = gameObject.AddComponent<AdaptiveContent>();
-                adaptiveContent.bindingId = bindings[a];
+                adaptiveContent.bindingIds.Add(bindings[a]);
             }
         }
 
@@ -180,7 +180,7 @@ namespace UnityEngine.Analytics
                 gameObjectList.Add(gameObject);
 
                 AdaptiveContent adaptiveContent = gameObject.AddComponent<AdaptiveContent>();
-                adaptiveContent.bindingId = bindings[a];
+                adaptiveContent.bindingIds.Add(bindings[a]);
                 adaptiveContent.respectRemoteIsActive = (a % 2 == 0);
             }
         }
@@ -203,7 +203,7 @@ namespace UnityEngine.Analytics
 
                 gameObject.AddComponent<Text>();
                 AdaptiveText adaptiveText = gameObject.AddComponent<AdaptiveText>();
-                adaptiveText.bindingId = bindings[a];
+                adaptiveText.bindingIds.Add(bindings[a]);
             }
         }
     }

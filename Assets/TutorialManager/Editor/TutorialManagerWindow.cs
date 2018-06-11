@@ -21,7 +21,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             }
         }
 
-        const string k_MustHaveAnalyticsMessage = "Unity Analytics is not enabled. This toll will not function without it. Please go to Window > Services and enable.";
+        const string k_MustHaveAnalyticsMessage = "Unity Analytics is not enabled. This tool will not function without it. Please go to Window > Services and enable.";
         const string k_GenreTooltip = "Select the genre which best categorizes this game. Analytics uses this information to optimize your tutorial.";
         const string k_TutorialIdTooltip = "The name by which to identify this tutorial. Must be unique. Only alpha-numerics characters are allowed.";
         const string k_StepIdTooltip = "The name by which to identify each step. Each name must be unique within a tutorial. Only alpha-numerics characters are allowed.";
@@ -34,7 +34,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         const string k_PushDataTooltip = "Upload local tutorial data to the server. This operation also informs the server that Tutorial Manager integration is complete.";
         const string k_TMTextTooLongMessage = "Some step text is too long; these fields will be truncated! Max text length is {0}. The following text should be shortened: {1}";
 
-        const int k_MaxSteps = 10;
+        const int k_MaxSteps = 27;
         const float k_ColumnWidth = 100f;
 
         GUIContent genreGUIContent = new GUIContent("Game Genre", k_GenreTooltip);
@@ -97,13 +97,12 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         {
             RestoreAppId();
         }
-       
+
 
         protected void RestoreAppId()
         {
 #if UNITY_5_3_OR_NEWER
-            if (string.IsNullOrEmpty(m_AppId) && !string.IsNullOrEmpty(Application.cloudProjectId) || !m_AppId.Equals(Application.cloudProjectId))
-            {
+            if (string.IsNullOrEmpty(m_AppId) && !string.IsNullOrEmpty(Application.cloudProjectId) || !m_AppId.Equals(Application.cloudProjectId)) {
                 m_AppId = Application.cloudProjectId;
             }
 #endif
@@ -115,33 +114,34 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             if (TMModel.TMData.tutorials.Count == 0 && Event.current.type == EventType.Repaint) {
                 markCreateFirst = true;
             }
-            if (!Analytics.enabled) {
-                EditorGUILayout.HelpBox(k_MustHaveAnalyticsMessage, MessageType.Warning, true);
-                return;
-            }
+
+#if !UNITY_ANALYTICS
+            EditorGUILayout.HelpBox(k_MustHaveAnalyticsMessage, MessageType.Warning, true);
+
+#else
             if (addButtonStyle == null) {
                 DefineStyles();
             }
-
+            
             GUILayout.Space(5f);
-
+            
             RenderHeader();
-
+            
             showContent = GUILayout.Toggle(showContent, "Display content");
-
+            
             m_ScrollPosition = EditorGUILayout.BeginScrollView(m_ScrollPosition);
             int tutorialCount = TMModel.TMData.tutorials.Count;
             for (int a = 0; a < tutorialCount; a++) {
-
+            
                 var tutorial = TMModel.TMData.tutorials[a];
                 RenderTutorial(tutorial, a == 0);
             }
             EditorGUILayout.EndScrollView();
-
+            
             GUILayout.Space(5f);
-
+            
             RenderFooter();
-
+            
             if (string.IsNullOrEmpty(tutorialMarkedForDeletion) == false)
             {
                 DestroyTutorial(tutorialMarkedForDeletion);
@@ -150,6 +150,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             if (markCreateFirst && Event.current.type == EventType.Repaint) {
                 CreateTutorial();
             }
+#endif
         }
 
         void Update()

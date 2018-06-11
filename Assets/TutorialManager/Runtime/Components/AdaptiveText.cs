@@ -10,15 +10,22 @@ namespace UnityEngine.Analytics
     public class AdaptiveText : AdaptiveContent
     {
 
+        public bool ignoreIfModelValueEmpty = true;
+
         override protected void Start()
         {
             base.Start();
             SyncTextToTextField();
         }
 
-        override public void OnDataUpdate()
+        protected override void OnEnterState(string id)
         {
-            base.OnDataUpdate();
+            base.OnEnterState(id);
+            SyncTextToTextField();
+        }
+
+        public override void OnDataUpdate()
+        {
             SyncTextToTextField();
         }
 
@@ -36,13 +43,19 @@ namespace UnityEngine.Analytics
                 return GetComponent<TextMesh>().text;
             }
 
-            return null;
+            return string.Empty;
         }
 
         protected void SyncTextToTextField()
         {
+            // Attempt to resolve a binding id
             if (string.IsNullOrEmpty(bindingId)) {
-                return;
+                if (bindingIds.Count > 0) {
+                    bindingId = bindingIds[0];
+                    if (string.IsNullOrEmpty(bindingId)) {
+                        return;
+                    }
+                }
             }
 
 #if TEXTMESHPRO_PRESENT
@@ -63,6 +76,9 @@ namespace UnityEngine.Analytics
         {
             string existingText = GetComponent<TMP_Text>().text;
             string newText = dataStore.GetString(bindingId, existingText);
+            if (ignoreIfModelValueEmpty && string.IsNullOrEmpty(newText)) {
+                return;
+            }
             GetComponent<TMP_Text>().text = newText;
         }
 #endif
@@ -71,6 +87,9 @@ namespace UnityEngine.Analytics
         {
             string existingText = GetComponent<TextMesh>().text;
             string newText = dataStore.GetString(bindingId, existingText);
+            if (ignoreIfModelValueEmpty && string.IsNullOrEmpty(newText)) {
+                return;
+            }
             GetComponent<TextMesh>().text = newText;
         }
 
@@ -78,6 +97,9 @@ namespace UnityEngine.Analytics
         {
             string existingText = GetComponent<Text>().text;
             string newText = dataStore.GetString(bindingId, existingText);
+            if (ignoreIfModelValueEmpty && string.IsNullOrEmpty(newText)) {
+                return;
+            }
             GetComponent<Text>().text = newText;
         }
     }

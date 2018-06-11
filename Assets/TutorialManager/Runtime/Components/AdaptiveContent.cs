@@ -1,17 +1,19 @@
 using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.Analytics.TutorialManagerRuntime;
 
 namespace UnityEngine.Analytics {
     public class AdaptiveContent : MonoBehaviour, IStateSystemSubject
     {
-        public string bindingId;
+        public List<string> bindingIds = new List<string>();
 
         public bool respectRemoteIsActive = true;
 
         public IFSMDispatcher dispatcher { get; set; }
 
         public IDataStore dataStore { get; set; }
+
+        protected string bindingId;
 
         protected virtual void Start()
         {
@@ -35,11 +37,13 @@ namespace UnityEngine.Analytics {
         {
         }
 
-        void OnEnterState(string id)
+        protected virtual void OnEnterState(string id)
         {
-            bool toShow = (id == bindingId);
+            int index = bindingIds.IndexOf(id);
+            bool toShow = (index > -1);
             if (toShow) {
-                toShow = respectRemoteIsActive ? dataStore.GetBool(bindingId) : true;
+                bindingId = id;
+                toShow = respectRemoteIsActive ? dataStore.GetBool(id) : true;
             }
             gameObject.SetActive(toShow);
         }
