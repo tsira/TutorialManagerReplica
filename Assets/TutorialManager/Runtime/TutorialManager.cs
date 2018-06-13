@@ -221,7 +221,7 @@ namespace UnityEngine.Analytics
                 SaveState();
             }
             else if (autoAdvance) {
-                Debug.LogWarning("StepStart does nothing if autoAdvance is false. You may call it safely, but nothing" +
+                Debug.LogWarning("StepStart does nothing if autoAdvance is true. You may call it safely, but nothing" +
                                  "(other than this warning) will happen.");
             } else {
                 m_State.fsm.NextState();
