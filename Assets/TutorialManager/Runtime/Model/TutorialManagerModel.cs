@@ -78,7 +78,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         {
             TMData.genre = id;
         }
-
+#endif
         public string CreateTutorialEntity(string id)
         {
             string result = null;
@@ -95,7 +95,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             }
             return result;
         }
-#endif
+
         public string UpdateTutorialEntity(string oldId, string newId)
         {
             var result = oldId;
@@ -135,7 +135,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                 Save();
             }
         }
-
+#endif
         public string CreateStepEntity(string id, string tutorialId)
         {
             string result = null;
@@ -165,7 +165,6 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             }
             return result;
         }
-#endif
 
         public string UpdateStepEntity(string oldId, string newId)
         {
@@ -238,7 +237,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         {
             return TMData.tutorials.Select(t => t).Where(t => t.steps.Any(s => s == id));
         }
-#if UNITY_EDITOR
+
         public string CreateContentEntity(string stepId, ContentType contentType, string contentValue = null)
         {
             string result = null;
@@ -268,7 +267,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             }
             return result;
         }
-#endif
+
         public void UpdateContentEntity(string id, string contentInfo)
         {
             if (TMData.contentTable.ContainsKey(id))
@@ -310,7 +309,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                 Save();
             }
         }
-
+#endif
         public void Clear()
         {
             TMData.genre = String.Empty;
@@ -331,7 +330,6 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             TMData.contentTable.Clear();
             Save();
         }
-#endif
 
         void Save()
         {
