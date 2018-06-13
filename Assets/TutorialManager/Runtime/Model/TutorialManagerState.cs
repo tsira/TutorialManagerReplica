@@ -158,5 +158,17 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                 m_AdaptiveOnboardingEventSent = value;
             }
         }
+
+        /// <summary>
+        /// Restore this object to its factory defaults
+        /// </summary>
+        public void Reset()
+        {
+            showTutorial = true;
+            decisionReceived = false;
+            adaptiveOnboardingEventSent = false;
+            tutorialId = null;
+            fsm.Reset();
+        }
     }
 }

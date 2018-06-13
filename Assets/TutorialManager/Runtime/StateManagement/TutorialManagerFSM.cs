@@ -41,7 +41,6 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             }
         }
 
-        int m_Index;
         public int index {
             get {
                 return stateList.IndexOf(state);
@@ -130,12 +129,22 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             {
                 // If not move out. We're done.
                 m_Complete = true;
+                m_NextState = null;
                 ExitState(state);
+                m_State = null;
             }
+        }
+
+        public void SkipAndResolve()
+        {
+            m_NextState = null;
+            m_State = null;
         }
 
         public void Reset()
         {
+            autoAdvance = true;
+            m_Complete = false;
             m_State = null;
             m_NextState = null;
             m_StateList = new List<string>();

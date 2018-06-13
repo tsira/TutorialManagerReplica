@@ -40,7 +40,7 @@ namespace UnityEngine.Analytics
             Assert.IsTrue(TutorialManager.autoAdvance, "autoAdvance should default to true");
 
             Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
-            Assert.That(TutorialManager.currentStep, Is.EqualTo(t1Step1), string.Format("currentStep should be {0}", t1Step1));
+            Assert.That(TutorialManager.stepId, Is.EqualTo(t1Step1), string.Format("currentStep should be {0}", t1Step1));
             Assert.AreEqual(3, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 3));
             Assert.AreEqual(0, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", 0));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");
@@ -49,7 +49,7 @@ namespace UnityEngine.Analytics
             yield return null;
 
             Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
-            Assert.That(TutorialManager.currentStep, Is.EqualTo(t1Step2), string.Format("currentStep should be {0}", t1Step2));
+            Assert.That(TutorialManager.stepId, Is.EqualTo(t1Step2), string.Format("currentStep should be {0}", t1Step2));
             Assert.AreEqual(3, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 3));
             Assert.AreEqual(1, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", 1));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");
@@ -58,18 +58,16 @@ namespace UnityEngine.Analytics
             yield return null;
 
             Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
-            Assert.That(TutorialManager.currentStep, Is.EqualTo(t1Step3), string.Format("currentStep should be {0}", t1Step3));
-            Assert.AreEqual(3, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 3));
+            Assert.That(TutorialManager.stepId, Is.EqualTo(t1Step3), string.Format("currentStep should be {0}", t1Step3));
             Assert.AreEqual(2, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", 2));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");
 
             TutorialManager.StepComplete();
             yield return null;
 
-            // Tutorial resolved. Should be zeroed out
-            Assert.IsNull(TutorialManager.tutorialId, "tutorialId should be null");
-            Assert.IsNull(TutorialManager.currentStep, "currentStep should be null");
-            Assert.AreEqual(0, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 0));
+            // Tutorial resolved. Should be complete
+            Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
+            Assert.IsNull(TutorialManager.stepId, "currentStep should be null");
             Assert.AreEqual(-1, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", -1));
             Assert.IsTrue(TutorialManager.complete, "complete should be true");
         }
@@ -86,7 +84,7 @@ namespace UnityEngine.Analytics
 
             // Step 1
             Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
-            Assert.That(TutorialManager.currentStep, Is.EqualTo(t1Step1), string.Format("currentStep should be {0}", t1Step1));
+            Assert.That(TutorialManager.stepId, Is.EqualTo(t1Step1), string.Format("currentStep should be {0}", t1Step1));
             Assert.AreEqual(3, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 3));
             Assert.AreEqual(0, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", 0));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");
@@ -96,7 +94,7 @@ namespace UnityEngine.Analytics
 
             // Between steps 1 and 2
             Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
-            Assert.IsNull(TutorialManager.currentStep, "currentStep should be null");
+            Assert.IsNull(TutorialManager.stepId, "currentStep should be null");
             Assert.AreEqual(3, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 3));
             Assert.AreEqual(-1, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", -1));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");
@@ -106,7 +104,7 @@ namespace UnityEngine.Analytics
 
             // Step 2
             Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
-            Assert.That(TutorialManager.currentStep, Is.EqualTo(t1Step2), string.Format("currentStep should be {0}", t1Step2));
+            Assert.That(TutorialManager.stepId, Is.EqualTo(t1Step2), string.Format("currentStep should be {0}", t1Step2));
             Assert.AreEqual(3, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 3));
             Assert.AreEqual(1, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", 1));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");
@@ -116,7 +114,7 @@ namespace UnityEngine.Analytics
 
             // Between steps 2 and 3
             Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
-            Assert.IsNull(TutorialManager.currentStep, "currentStep should be null");
+            Assert.IsNull(TutorialManager.stepId, "currentStep should be null");
             Assert.AreEqual(3, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 3));
             Assert.AreEqual(-1, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", -1));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");
@@ -126,7 +124,7 @@ namespace UnityEngine.Analytics
 
             // Step 3
             Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
-            Assert.That(TutorialManager.currentStep, Is.EqualTo(t1Step3), string.Format("currentStep should be {0}", t1Step3));
+            Assert.That(TutorialManager.stepId, Is.EqualTo(t1Step3), string.Format("currentStep should be {0}", t1Step3));
             Assert.AreEqual(3, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 3));
             Assert.AreEqual(2, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", 2));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");
@@ -134,10 +132,10 @@ namespace UnityEngine.Analytics
             TutorialManager.StepComplete();
             yield return null;
 
-            // Tutorial resolved. Should be zeroed out
-            Assert.IsNull(TutorialManager.tutorialId, "tutorialId should be null");
-            Assert.IsNull(TutorialManager.currentStep, "currentStep should be null");
-            Assert.AreEqual(0, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 0));
+            // Tutorial resolved.
+            Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
+            Assert.IsNull(TutorialManager.stepId, "currentStep should be null");
+            Assert.AreEqual(3, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 3));
             Assert.AreEqual(-1, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", -1));
             Assert.IsTrue(TutorialManager.complete, "complete should be true");
         }
@@ -153,7 +151,7 @@ namespace UnityEngine.Analytics
             TutorialManager.Start(tutorialName1);
             yield return null;
 
-            TestIsActive(listOfContent, TutorialManager.currentStep);
+            TestIsActive(listOfContent, TutorialManager.stepId);
 
             var step1GoText = GameObject.Find(ConstructTextName(t1Step1LookupID));
             Assert.That(step1GoText.GetComponent<Text>().text, Is.EqualTo(t1step1Text), string.Format("step one text should be {0}", t1step1Text));
@@ -161,7 +159,7 @@ namespace UnityEngine.Analytics
             TutorialManager.StepComplete();
             yield return null;
 
-            TestIsActive(listOfContent, TutorialManager.currentStep);
+            TestIsActive(listOfContent, TutorialManager.stepId);
 
             var step2GoText = GameObject.Find(ConstructTextName(t1Step2LookupID));
             Assert.That(step2GoText.GetComponent<Text>().text, Is.EqualTo(t1step2Text), string.Format("step two text should be {0}", t1step2Text));
@@ -169,7 +167,7 @@ namespace UnityEngine.Analytics
             TutorialManager.StepComplete();
             yield return null;
 
-            TestIsActive(listOfContent, TutorialManager.currentStep);
+            TestIsActive(listOfContent, TutorialManager.stepId);
 
             var step3GoText = GameObject.Find(ConstructTextName(t1Step3LookupID));
             Assert.That(step3GoText.GetComponent<Text>().text, Is.EqualTo(t1step3Text), string.Format("step three text should be {0}", t1step3Text));
@@ -219,19 +217,18 @@ namespace UnityEngine.Analytics
             yield return null;
 
             Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
-            Assert.That(TutorialManager.currentStep, Is.EqualTo(t1Step1), string.Format("currentStep should be {0}", t1Step1));
+            Assert.That(TutorialManager.stepId, Is.EqualTo(t1Step1), string.Format("currentStep should be {0}", t1Step1));
             Assert.AreEqual(3, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 3));
             Assert.AreEqual(0, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", 0));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");
 
-            Assert.That(TutorialManager.currentStep, Is.EqualTo(t1Step1), string.Format("fsm state should be {0}", t1Step1));
+            Assert.That(TutorialManager.stepId, Is.EqualTo(t1Step1), string.Format("fsm state should be {0}", t1Step1));
 
             TutorialManager.Skip();
             yield return null;
 
-            Assert.IsNull(TutorialManager.tutorialId, "tutorialId should be null");
-            Assert.IsNull(TutorialManager.currentStep, "currentStep should be null");
-            Assert.AreEqual(0, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 0));
+            Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
+            Assert.IsNull(TutorialManager.stepId, "currentStep should be null");
             Assert.AreEqual(-1, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", -1));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");
         }
@@ -245,16 +242,16 @@ namespace UnityEngine.Analytics
             yield return null;
 
             // Step 1
-            Assert.That(TutorialManager.currentStep, Is.EqualTo(t1Step1), string.Format("currentStep should be {0}", t1Step1));
+            Assert.That(TutorialManager.stepId, Is.EqualTo(t1Step1), string.Format("currentStep should be {0}", t1Step1));
             Assert.AreEqual(0, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", 0));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");
-            Assert.That(TutorialManager.currentStep, Is.EqualTo(t1Step1), string.Format("step one, fsm should be in state {0}", t1Step1));
+            Assert.That(TutorialManager.stepId, Is.EqualTo(t1Step1), string.Format("step one, fsm should be in state {0}", t1Step1));
 
             TutorialManager.StepStart(t1Step3);
             yield return null;
 
             // Step 3
-            Assert.That(TutorialManager.currentStep, Is.EqualTo(t1Step3), string.Format("currentStep should be {0}", t1Step3));
+            Assert.That(TutorialManager.stepId, Is.EqualTo(t1Step3), string.Format("currentStep should be {0}", t1Step3));
             Assert.AreEqual(2, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", 2));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");
 
@@ -262,7 +259,7 @@ namespace UnityEngine.Analytics
             yield return null;
 
             // Step 2
-            Assert.That(TutorialManager.currentStep, Is.EqualTo(t1Step2), string.Format("currentStep should be {0}", t1Step2));
+            Assert.That(TutorialManager.stepId, Is.EqualTo(t1Step2), string.Format("currentStep should be {0}", t1Step2));
             Assert.AreEqual(1, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", 1));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");
 
@@ -275,10 +272,9 @@ namespace UnityEngine.Analytics
             TutorialManager.StepComplete();
             yield return null;
 
-            // Tutorial resolved. Should be zeroed out
-            Assert.IsNull(TutorialManager.tutorialId, "tutorialId should be null");
-            Assert.IsNull(TutorialManager.currentStep, "currentStep should be null");
-            Assert.AreEqual(0, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 0));
+            // Tutorial resolved.
+            Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
+            Assert.IsNull(TutorialManager.stepId, "currentStep should be null");
             Assert.AreEqual(-1, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", -1));
             Assert.IsTrue(TutorialManager.complete, "complete should be true");
         }
@@ -293,17 +289,17 @@ namespace UnityEngine.Analytics
 
             // Tutorial 1 Step 1
             Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
-            Assert.That(TutorialManager.currentStep, Is.EqualTo(t1Step1), string.Format("currentStep should be {0}", t1Step1));
+            Assert.That(TutorialManager.stepId, Is.EqualTo(t1Step1), string.Format("currentStep should be {0}", t1Step1));
             Assert.AreEqual(0, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", 0));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");
-            Assert.That(TutorialManager.currentStep, Is.EqualTo(t1Step1), string.Format("step one, fsm should be in state {0}", t1Step1));
+            Assert.That(TutorialManager.stepId, Is.EqualTo(t1Step1), string.Format("step one, fsm should be in state {0}", t1Step1));
 
             TutorialManager.StepStart(tutorialName2, t2Step2);
             yield return null;
 
             // Tutorial 2 Step 2
             Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName2), string.Format("tutorialId should be {0}", tutorialName2));
-            Assert.That(TutorialManager.currentStep, Is.EqualTo(t2Step2), string.Format("currentStep should be {0}", t2Step2));
+            Assert.That(TutorialManager.stepId, Is.EqualTo(t2Step2), string.Format("currentStep should be {0}", t2Step2));
             Assert.AreEqual(1, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", 1));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");
 
@@ -312,17 +308,15 @@ namespace UnityEngine.Analytics
 
             // Tutorial 1 Step 3
             Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
-            Assert.That(TutorialManager.currentStep, Is.EqualTo(t1Step3), string.Format("currentStep should be {0}", t1Step3));
+            Assert.That(TutorialManager.stepId, Is.EqualTo(t1Step3), string.Format("currentStep should be {0}", t1Step3));
             Assert.AreEqual(2, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", 2));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");
 
             TutorialManager.StepComplete();
             yield return null;
 
-            // Tutorial resolved. Should be zeroed out
-            Assert.IsNull(TutorialManager.tutorialId, "tutorialId should be null");
-            Assert.IsNull(TutorialManager.currentStep, "currentStep should be null");
-            Assert.AreEqual(0, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 0));
+            Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
+            Assert.IsNull(TutorialManager.stepId, "currentStep should be null");
             Assert.AreEqual(-1, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", -1));
             Assert.IsTrue(TutorialManager.complete, "complete should be true");
         }
@@ -341,7 +335,7 @@ namespace UnityEngine.Analytics
 
             Assert.IsFalse(TutorialManager.showTutorial, "showTutorial was forced to false");
             Assert.That(TutorialManager.tutorialId, Is.EqualTo(tutorialName1), string.Format("tutorialId should be {0}", tutorialName1));
-            Assert.That(TutorialManager.currentStep, Is.EqualTo(t1Step2), string.Format("currentStep should be {0}", t1Step2));
+            Assert.That(TutorialManager.stepId, Is.EqualTo(t1Step2), string.Format("currentStep should be {0}", t1Step2));
             Assert.AreEqual(3, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 3));
             Assert.AreEqual(1, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", 1));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");
@@ -351,7 +345,7 @@ namespace UnityEngine.Analytics
 
             Assert.IsTrue(TutorialManager.showTutorial, "showTutorial should be reset to true");
             Assert.IsNull(TutorialManager.tutorialId, "tutorialId should be null");
-            Assert.IsNull(TutorialManager.currentStep, "currentStep should be null");
+            Assert.IsNull(TutorialManager.stepId, "currentStep should be null");
             Assert.AreEqual(0, TutorialManager.tutorialLength, string.Format("tutorial length should be {0}", 0));
             Assert.AreEqual(-1, TutorialManager.stepIndex, string.Format("stepIndex should be {0}", -1));
             Assert.IsFalse(TutorialManager.complete, "complete should be false");

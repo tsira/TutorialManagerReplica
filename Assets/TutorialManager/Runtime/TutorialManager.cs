@@ -51,7 +51,7 @@ namespace UnityEngine.Analytics
         /// [Read Only] The binding ID of the current tutorial step.
         /// </summary>
         /// <value>A string representing the binding ID of the current step.</value>
-        public static string currentStep {
+        public static string stepId {
             get {
                 string fqStep = state.currentStep;
                 if (string.IsNullOrEmpty(fqStep)) {
@@ -201,10 +201,6 @@ namespace UnityEngine.Analytics
         /// </remarks>
         public static void Skip()
         {
-            Analytics.CustomEvent(tutorialSkipName, new Dictionary<string, object> {
-                { tutorialIdKey, m_State.tutorialId },
-                { stepIndexKey, m_State.currentStep }
-            });
             ResolveTutorial(false);
         }
 
@@ -267,7 +263,7 @@ namespace UnityEngine.Analytics
                 var fsm = m_State.fsm;
                 fsm.Reset();
             }
-            m_State = new TutorialManagerState(new TutorialManagerFSM());
+            m_State.Reset();
             SaveState();
         }
 
@@ -481,9 +477,13 @@ namespace UnityEngine.Analytics
                 Analytics.CustomEvent(tutorialCompleteEventName, new Dictionary<string, object> {
                         { tutorialIdKey, m_State.tutorialId }
                     });
+            } else {
+                Analytics.CustomEvent(tutorialSkipName, new Dictionary<string, object> {
+                        { tutorialIdKey, m_State.tutorialId },
+                        { stepIndexKey, m_State.currentStep }
+                    });
+                m_State.fsm.SkipAndResolve();
             }
-            m_State.tutorialId = null;
-            m_State.fsm.Reset();
         }
 
         /// <summary>
