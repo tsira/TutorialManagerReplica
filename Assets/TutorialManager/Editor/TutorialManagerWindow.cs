@@ -23,6 +23,12 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
         const string k_MustHaveAnalyticsMessage = "Unity Analytics is not enabled. This tool will not function without it. Please go to Window > Services and enable.";
         const string k_GenreTooltip = "Select the genre which best categorizes this game. Analytics uses this information to optimize your tutorial.";
+        const string k_DisplayContentTooltip = "When checked, will display the text value related to the step. The text is controlled in the bound Text (or TextMeshPro) " +
+            "component, and can be overridden remotely via the Tutorial Manager dashboard.";
+        const string k_IsForcedDecisionTooltip = "(Editor only) When checked, force a specifc decision for enabling/disabling the tutorial.";
+        const string k_WhichForcedDecisionTooltip = "(Editor only) When checked, force the tutorial to show.";
+
+        const string k_ClearProgressTooltip = "Clear the user's progress in this tutorial. Useful during development and QA.";
         const string k_TutorialIdTooltip = "The name by which to identify this tutorial. Must be unique. Only alpha-numerics characters are allowed.";
         const string k_StepIdTooltip = "The name by which to identify each step. Each name must be unique within a tutorial. Only alpha-numerics characters are allowed.";
         const string k_AddTutorialTooltip = "Add a new tutorial.";
@@ -38,6 +44,10 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         const float k_ColumnWidth = 100f;
 
         GUIContent genreGUIContent = new GUIContent("Game Genre", k_GenreTooltip);
+        GUIContent displayContentContent = new GUIContent("Display content", k_DisplayContentTooltip);
+        GUIContent isForcedDecisionContent = new GUIContent("Force decision", k_IsForcedDecisionTooltip);
+        GUIContent whichForcedDecisionContent = new GUIContent("To True", k_WhichForcedDecisionTooltip);
+        GUIContent clearProgressContent = new GUIContent("Clear progress", k_ClearProgressTooltip);
         GUIContent tutorialIdGUIContent = new GUIContent("Tutorial Key", k_TutorialIdTooltip);
         GUIContent stepIdGUIContent = new GUIContent("Step Keys", k_StepIdTooltip);
         GUIContent addStepButtonGUIContent = new GUIContent("+", k_AddStepTooltip);
@@ -57,8 +67,6 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         bool isTransacting = false;
         bool isTransactionSuccess = false;
         bool isTransactionError = false;
-
-
 
         int transactionTimeoutCounter = 0;
         const int transactionTimeoutMax = 300;
@@ -117,7 +125,6 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
 #if !UNITY_ANALYTICS
             EditorGUILayout.HelpBox(k_MustHaveAnalyticsMessage, MessageType.Warning, true);
-
 #else
             if (addButtonStyle == null) {
                 DefineStyles();
@@ -126,8 +133,25 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             GUILayout.Space(5f);
             
             RenderHeader();
-            
-            showContent = GUILayout.Toggle(showContent, "Display content");
+
+            showContent = GUILayout.Toggle(showContent, displayContentContent);
+            using (new EditorGUILayout.HorizontalScope()) {
+                EditorGUI.BeginChangeCheck();
+                bool isForcedDecision = EditorPrefs.GetBool("unity_tutorial_manager_is_forced_decision", false);
+                isForcedDecision = GUILayout.Toggle(isForcedDecision, isForcedDecisionContent);
+                EditorGUI.BeginDisabledGroup(isForcedDecision == false);
+                bool forceDecisionToTrue = EditorPrefs.GetBool("unity_tutorial_manager_force_decision_to_true", false);
+                forceDecisionToTrue = GUILayout.Toggle(forceDecisionToTrue, whichForcedDecisionContent);
+                EditorGUI.EndDisabledGroup();
+
+                if (EditorGUI.EndChangeCheck()) {
+                    EditorPrefs.SetBool("unity_tutorial_manager_is_forced_decision", isForcedDecision);
+                    EditorPrefs.SetBool("unity_tutorial_manager_force_decision_to_true", forceDecisionToTrue);
+                }
+            }
+            if (GUILayout.Button(clearProgressContent)) {
+                TutorialManager.Reset();
+            }
             
             m_ScrollPosition = EditorGUILayout.BeginScrollView(m_ScrollPosition);
             int tutorialCount = TMModel.TMData.tutorials.Count;
@@ -333,7 +357,9 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
                     GUILayout.ExpandHeight(true),
                     GUILayout.Width(EditorGUIUtility.currentViewWidth - 15f)
                 };
+                EditorGUI.BeginDisabledGroup(true);
                 EditorGUILayout.TextArea(contentEntity.text, options);
+                EditorGUI.EndDisabledGroup();
                 EditorStyles.textField.wordWrap = wrap;
             }
         }
