@@ -331,7 +331,9 @@ namespace UnityEngine.Analytics
         public IEnumerator TM_ResetState()
         {
             Setup();
-            TutorialManager.Start(tutorialName1, true, false);
+            TutorialManager.GetDecision(false);
+            TutorialManager.Start(tutorialName1, true);
+
             yield return null;
 
             TutorialManager.StepComplete();

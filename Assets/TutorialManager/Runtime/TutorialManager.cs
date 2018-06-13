@@ -102,6 +102,16 @@ namespace UnityEngine.Analytics
         }
 
         /// <summary>
+        /// Returns the id of a step at the specified index
+        /// </summary>
+        public static string GetStepIdAtIndex(int index) {
+            if (index < 0 || index > state.fsm.stateList.Count - 1) {
+                return null;
+            }
+            return state.fsm.stateList[index].Split('-')[1];
+        }
+
+        /// <summary>
         /// Retrieves the show/no show recommendation from the Tutorial Manager Server.
         /// </summary>
         /// <remarks>
@@ -120,6 +130,39 @@ namespace UnityEngine.Analytics
         /// <returns><c>true</c>, if the tutorial should be shown, <c>false</c> otherwise.</returns>
         public static bool GetDecision()
         {
+#if UNITY_EDITOR
+            //if (UnityEngine.Analytics.TutorialManagerEditor.TutorialManagerWindow.isForcedDecision) {
+            //    return GetDecision(UnityEngine.Analytics.TutorialManagerEditor.TutorialManagerWindow.forceDecisionToTrue);
+            //}
+            if (UnityEditor.EditorPrefs.GetBool("unity_tutorial_manager_is_forced_decision", false)) {
+                bool decision = UnityEditor.EditorPrefs.GetBool("unity_tutorial_manager_force_decision_to_true", true);
+                return GetDecision(decision);
+            }
+#endif
+            HandleAdaptiveOnboardingEvent(m_State.showTutorial);
+            return m_State.showTutorial;
+        }
+
+        /// <summary>
+        /// Mimics the show/no show recommendation from the Tutorial Manager Server, but overrides with a specific decision.
+        /// </summary>
+        /// <remarks>
+        /// This version takes a boolean <c>forceDecision</c> parameter, which forces either true or false.
+        /// This is useful for testing and QA, when you want to ensure a specific outcome. To use the server
+        /// recommendation, call <c>GetDecision()</c>
+        ///     <code>
+        ///     if (TutorialManager.GetDecision(true)) {
+        ///         TutorialManager.Start("Tutorial1", true);
+        ///     } else {
+        ///         // skip the tutorial (since the override in this example is 'true', this code is unreachable)
+        ///     }
+        ///     </code>
+        /// </remarks>
+        /// <param name="forceDecision"><c>true</c> to force the decision to <c>true</c>, <c>false</c> otherwise</param>
+        /// <returns><c>true</c>, if tutorial should be shown, <c>false</c> otherwise.</returns>
+        public static bool GetDecision(bool forceDecision)
+        {
+            m_State.showTutorial = forceDecision;
             HandleAdaptiveOnboardingEvent(m_State.showTutorial);
             return m_State.showTutorial;
         }
@@ -141,37 +184,14 @@ namespace UnityEngine.Analytics
         /// <returns><c>true</c>, if tutorial should be shown, <c>false</c> otherwise.</returns>
         public static bool Start(string tutorialId, bool autoAdvance = true)
         {
-            return Start(tutorialId, autoAdvance, m_State.showTutorial);
-        }
-
-        /// <summary>
-        /// Starts a tutorial.
-        /// </summary>
-        /// <remarks>
-        /// This version takes a boolean <c>toShow</c> parameter, which forces either true or false.
-        /// This is useful for testing and QA, when you want to ensure a specific outcome. To use the server
-        /// recommendation, call <c>GetDecision()</c>
-        ///     <code>
-        ///     if (TutorialManager.GetDecision()) {
-        ///         TutorialManager.Start("Tutorial1", true, true);
-        ///     } else {
-        ///         // skip the tutorial (since the override in this example is 'true', this code is unreachable)
-        ///     }
-        ///     </code>
-        /// </remarks>
-        /// <param name="tutorialId">The binding id representing the current tutorial</param>
-        /// <param name="autoAdvance">If <c>true</c> (default) ending one tutorial step will automatically advance to the next step</param>
-        /// <param name="toShow"><c>true</c> to force the tutorial to start, <c>false</c> to force it to skip</param>
-        /// <returns><c>true</c>, if tutorial should be shown, <c>false</c> otherwise.</returns>
-        public static bool Start(string tutorialId, bool autoAdvance, bool toShow)
-        {
-            SetupState(tutorialId, autoAdvance, toShow);
+            SetupState(tutorialId, autoAdvance, showTutorial);
             SaveState();
             Analytics.CustomEvent(tutorialStartEventName, new Dictionary<string, object> {
                 { tutorialIdKey, m_State.tutorialId }
             });
             return GetDecision();
         }
+
 
         /// <summary>
         /// Call this if the player opts to skip the tutorial (in the case you have a skip option in your game).
@@ -243,9 +263,11 @@ namespace UnityEngine.Analytics
         /// </remarks>
         public static void Reset()
         {
-            var fsm = m_State.fsm;
-            fsm.Reset();
-            m_State = new TutorialManagerState(fsm);
+            if (m_State != null) {
+                var fsm = m_State.fsm;
+                fsm.Reset();
+            }
+            m_State = new TutorialManagerState(new TutorialManagerFSM());
             SaveState();
         }
 
@@ -316,6 +338,10 @@ namespace UnityEngine.Analytics
             // Do we have a prior recorded decision?
             if (m_State.decisionReceived) {
                 return false;
+            }
+            // If we're playing in the editor, assume we want the decision
+            if (Application.isEditor) {
+                return true;
             }
             // Is this a pre-existing player?
             string analyticsLocation = GetAnalyticsValuesLocation();
