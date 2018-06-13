@@ -286,6 +286,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                     TMData.contentTable[kv.key].text = kv.value;
                 }
             }
+            Save();
         }
 
 #if UNITY_EDITOR
