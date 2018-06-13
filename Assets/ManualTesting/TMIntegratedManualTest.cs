@@ -13,7 +13,9 @@ public class TMIntegratedManualTest : MonoBehaviour
     public void Next()
     {
         if (string.IsNullOrEmpty(TutorialManager.tutorialId)) {
-            TutorialManager.Start(m_TutorialToStart);
+            if (TutorialManager.GetDecision()) {
+                TutorialManager.Start(m_TutorialToStart);
+            }
         } else if (TutorialManager.complete == false){
             TutorialManager.StepComplete();
         }
