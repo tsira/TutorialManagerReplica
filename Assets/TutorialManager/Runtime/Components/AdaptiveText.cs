@@ -7,6 +7,7 @@ using TMPro;
 
 namespace UnityEngine.Analytics
 {
+    [AddComponentMenu("Analytics/Adaptive Text")]
     public class AdaptiveText : AdaptiveContent
     {
 
@@ -50,7 +51,9 @@ namespace UnityEngine.Analytics
         {
             // Attempt to resolve a binding id
             if (string.IsNullOrEmpty(bindingId)) {
-                if (bindingIds.Count > 0) {
+                if (bindingIds.Count == 0) {
+                    return;
+                } else {
                     bindingId = bindingIds[0];
                     if (string.IsNullOrEmpty(bindingId)) {
                         return;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.Analytics.TutorialManagerRuntime;
 
 namespace UnityEngine.Analytics {
+    [AddComponentMenu("Analytics/Adaptive Content")]
     public class AdaptiveContent : MonoBehaviour, IStateSystemSubject
     {
         public List<string> bindingIds = new List<string>();
@@ -28,9 +29,13 @@ namespace UnityEngine.Analytics {
 
         void OnDestroy()
         {
-            dispatcher.OnEnterState -= OnEnterState;
-            dispatcher.OnExitState -= OnExitState;
-            dataStore.OnDataUpdate -= OnDataUpdate;
+            if (dispatcher != null) {
+                dispatcher.OnEnterState -= OnEnterState;
+                dispatcher.OnExitState -= OnExitState;
+            }
+            if (dataStore != null) {
+                dataStore.OnDataUpdate -= OnDataUpdate;
+            }
         }
 
         public virtual void OnDataUpdate()
