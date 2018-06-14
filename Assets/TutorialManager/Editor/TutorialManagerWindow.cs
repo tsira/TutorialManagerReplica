@@ -72,6 +72,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         const int transactionTimeoutMax = 300;
 
         int genreId;
+        int[] genreIds;
         string tutorialMarkedForDeletion;
         GUIStyle addButtonStyle;
         Vector2 m_ScrollPosition;
@@ -262,10 +263,17 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
         private void RenderGenre()
         {
+            if (genreIds == null) {
+                genreIds = new int[TMGenre.genres.Length];
+                for (int a = 0; a < TMGenre.genres.Length; a++) {
+                    genreIds[a] = a;
+                }
+            }
+
             EditorGUILayout.LabelField(genreGUIContent, EditorStyles.miniLabel, GUILayout.Width(k_ColumnWidth));
             int id = TMGenre.genres.ToList<string>().IndexOf(TMModel.TMData.genre);
             id = Mathf.Max(id, 0);
-            id = EditorGUILayout.IntPopup(id, TMGenre.genres, TMGenre.genreIds);
+            id = EditorGUILayout.IntPopup(id, TMGenre.genres, genreIds);
             if (id != genreId) {
                 SetGenre(id);
             }
