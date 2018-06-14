@@ -181,15 +181,13 @@ namespace UnityEngine.Analytics
         /// </remarks>
         /// <param name="tutorialId">The binding id representing the current tutorial.</param>
         /// <param name="autoAdvance">If 'true' (default) ending one tutorial step will automatically advance to the next step.</param>
-        /// <returns><c>true</c>, if tutorial should be shown, <c>false</c> otherwise.</returns>
-        public static bool Start(string tutorialId, bool autoAdvance = true)
+        public static void Start(string tutorialId, bool autoAdvance = true)
         {
             SetupState(tutorialId, autoAdvance, showTutorial);
             SaveState();
             Analytics.CustomEvent(tutorialStartEventName, new Dictionary<string, object> {
                 { tutorialIdKey, m_State.tutorialId }
             });
-            return GetDecision();
         }
 
 

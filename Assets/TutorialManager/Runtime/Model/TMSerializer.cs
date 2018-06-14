@@ -12,50 +12,68 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
         internal static void ReadFromDisk<T>(ref T model)
         {
-            string filePath = GetPath<T>(false);
+            bool isModel = (typeof(T) == typeof(TutorialManagerModel));
+            string filePath = string.Empty;
+
+            if (isModel) {
+                filePath = Application.isPlaying ? GetPersistentModelPath() : GetBundledModelPath();
+                if (ReadBinary<T>(filePath, ref model) == false) {
+                    // If we get here, the model never existed...write it.
+                    WriteToDisk<T>(ref model);
+                }
+            } else {
+                filePath = GetPersistentStatePath();
+                ReadBinary<T>(filePath, ref model);
+            }
+        }
+
+        static bool ReadBinary<T>(string filePath, ref T model) {
             if (File.Exists(filePath)) {
                 try {
                     BinaryFormatter binaryFormatter = new BinaryFormatter();
                     FileStream file = File.Open(filePath, FileMode.Open);
                     model = (T)binaryFormatter.Deserialize(file);
                     file.Close();
-                } catch(Exception e) {
+                    return true;
+                } catch (Exception e) {
                     Debug.LogWarning("Exception at: " + filePath);
                     Debug.LogWarning("            : " + e.ToString());
+                    return false;
                 }
             } else {
-                // If we get here, the model never existed...write it.
-                WriteToDisk<T>(ref model);
+                return false;
             }
         }
 
         internal static void WriteToDisk<T>(ref T model)
         {
-            string filePath = GetPath<T>(true);
+            bool isModel = (typeof(T) == typeof(TutorialManagerModel));
+            if (isModel) {
+                if (Application.isPlaying) {
+                    string filePath = GetPersistentModelPath();
+                    WriteBinary<T>(filePath, ref model);
+
+                } else {
+                    // Write to resources
+                    string filePathEditor = GetBundledModelPath();
+                    WriteBinary<T>(filePathEditor, ref model);
+
+                    // AND write to persistent
+                    string filePathPersistent = GetPersistentModelPath();
+                    WriteBinary<T>(filePathPersistent, ref model);
+                }
+            } else {
+                string filePathPersistent = GetPersistentStatePath();
+                WriteBinary<T>(filePathPersistent, ref model);
+            }
+        }
+
+        static void WriteBinary<T>(string filePath, ref T model)
+        {
             FileStream file = File.Create(filePath);
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             binaryFormatter.Serialize(file, model);
             file.Close();
-        }
-
-        static string GetPath<T>(bool toWrite)
-        {
-            if (typeof(T) == typeof(TutorialManagerModel)) {
-                if (Application.isPlaying) {
-                    string persistentModelPath = GetPersistentModelPath();
-                    if (toWrite) {
-                        return persistentModelPath;
-                    }
-                    if (File.Exists(persistentModelPath)) {
-                        return persistentModelPath;
-                    }
-                    return GetBundledModelPath();
-                } else {
-                    return GetBundledModelPath();
-                }
-            } else {
-                return GetPersistentStatePath();
-            }
         }
 
         static string GetPersistentStatePath()
