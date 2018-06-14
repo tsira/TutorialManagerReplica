@@ -12,9 +12,9 @@ namespace UnityEngine.Analytics
         //REST API paths
 
         // Staging
-        private const string k_BasePath = "https://cloud-staging.uca.cloud.unity3d.com/";
+        // private const string k_BasePath = "https://cloud-staging.uca.cloud.unity3d.com/";
         // Production
-        // private const string k_BasePath = "https://analytics.cloud.unity3d.com/";
+        private const string k_BasePath = "https://analytics.cloud.unity3d.com/";
 
         private const string k_APIPath = k_BasePath + "api/v2/projects/";
         private const string k_RemoteSettingsPath = k_APIPath + "{0}/tutorial/remote_settings";
@@ -158,7 +158,7 @@ namespace UnityEngine.Analytics
     public class AccessToken
     {
 
-        [MenuItem("Access Token/Log Access Token")]
+        //[MenuItem("Access Token/Log Access Token")]
         static void LogAccessToken()
         {
             Debug.LogFormat("Access Token: {0}", GetAccessToken());
@@ -167,7 +167,7 @@ namespace UnityEngine.Analytics
         static string s_CurrentAccessToken = null;
         static double s_RefreshTokenStartTime = 0;
 
-        [MenuItem("Access Token/Refresh Access Token")]
+        //[MenuItem("Access Token/Refresh Access Token")]
         static void RefreshAccessToken()
         {
             Debug.LogFormat("Old Access Token: {0}", GetAccessToken());
