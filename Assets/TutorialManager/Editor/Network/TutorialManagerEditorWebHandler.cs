@@ -109,9 +109,6 @@ namespace UnityEngine.Analytics
         private static UnityWebRequest Authorize(UnityWebRequest request)
         {
             request.SetRequestHeader("Content-Type", "application/json");
-            request.SetRequestHeader("User-Agent", "Unity Editor " + Application.unityVersion + " TM " + TutorialManager.k_PluginVersion);
-
-
             request.SetRequestHeader("Authorization", string.Format("Bearer {0}", AccessToken.GetAccessToken()));
             return request;
         }
