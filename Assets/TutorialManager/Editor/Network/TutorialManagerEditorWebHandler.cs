@@ -26,6 +26,12 @@ namespace UnityEngine.Analytics
         public delegate void TMRSWriteResponseHandler(bool success);
         public static event TMRSWriteResponseHandler TMRSWriteResponseReceived;
 
+        public delegate void TMRSReadRetryHandler();
+        public static event TMRSReadRetryHandler TMRSReadRetry;
+
+        public delegate void TMRSWriteRetryHandler();
+        public static event TMRSWriteRetryHandler TMRSWriteRetry;
+
         public static IEnumerator<AsyncOperation> Read(string appId)
         {
             var settingsRequest = Authorize(UnityWebRequest.Get(GetUrl(appId)));
@@ -47,7 +53,13 @@ namespace UnityEngine.Analytics
 #endif
             {
                 Debug.LogWarningFormat("Failed to fetch remote settings: {0}: {1}", settingsRequest.responseCode, settingsRequest.error);
-                ReadErrorEvent();
+                if (settingsRequest.responseCode >= 400 && TMRSReadRetry != null) {
+                    AccessToken.OnTokenRefresh += OnTokenRefresh;
+                    AccessToken.RefreshAccessToken();
+                    TMRSReadRetry();
+                } else {
+                    ReadErrorEvent();
+                }
                 yield break;
             }
 
@@ -79,12 +91,27 @@ namespace UnityEngine.Analytics
 #endif
             {
                 Debug.LogWarningFormat("Failed to write remote settings: {0}: {1}", settingsRequest.responseCode, settingsRequest.error);
-
-                WriteEvent(false);
+                if (settingsRequest.responseCode >= 400 && TMRSWriteRetry != null) {
+                    AccessToken.OnTokenRefresh += OnTokenRefresh;
+                    AccessToken.RefreshAccessToken();
+                    TMRSWriteRetry();
+                } else {
+                    WriteEvent(false);
+                }
                 yield break;
             }
 
             WriteEvent(true);
+        }
+
+        private static void OnTokenRefresh(bool success)
+        {
+            if (TMRSWriteResponseReceived != null) {
+                TMRSWriteResponseReceived(success);
+            }
+            if (TMRSWriteResponseReceived != null) {
+                TMRSWriteResponseReceived(success);
+            }
         }
 
         private static string RemoveWrappingBracesFromString(string stringToParse)
@@ -153,110 +180,5 @@ namespace UnityEngine.Analytics
                 TMRSReadResponseReceived(null);
             }
         }
-    }
-
-    public class AccessToken
-    {
-
-        //[MenuItem("Access Token/Log Access Token")]
-        static void LogAccessToken()
-        {
-            Debug.LogFormat("Access Token: {0}", GetAccessToken());
-        }
-
-        static string s_CurrentAccessToken = null;
-        static double s_RefreshTokenStartTime = 0;
-
-        //[MenuItem("Access Token/Refresh Access Token")]
-        static void RefreshAccessToken()
-        {
-            Debug.LogFormat("Old Access Token: {0}", GetAccessToken());
-
-            var unityConnectObj = Type.GetType("UnityEditor.Connect.UnityConnect, UnityEditor");
-            if (unityConnectObj == null) {
-                Debug.LogError("Failed to get \"UnityConnect\" class!");
-                return;
-            }
-
-            var instanceProp = unityConnectObj.GetProperty("instance");
-            if (instanceProp == null) {
-                Debug.LogError("Failed to get method \"instance\" on UnityConnect class!");
-                return;
-            }
-
-            var instanceOfConnect = instanceProp.GetValue(null, null);
-            if (instanceOfConnect == null) {
-                Debug.LogError("Failed to get value of \"instance\" on UnityConnect class!");
-                return;
-            }
-
-            var clearAccessTokenMethod = unityConnectObj.GetMethod("ClearAccessToken");
-            if (clearAccessTokenMethod == null) {
-                Debug.LogError("Failed to get method \"ClearAccessToken\" on UnityConnect class!");
-                return;
-            }
-
-            clearAccessTokenMethod.Invoke(instanceOfConnect, null);
-
-            s_RefreshTokenStartTime = EditorApplication.timeSinceStartup;
-            EditorApplication.update += CheckForRefreshedToken;
-        }
-
-        static void CheckForRefreshedToken()
-        {
-            // check for time out
-            if (EditorApplication.timeSinceStartup - s_RefreshTokenStartTime > 10.0f) {
-                Debug.LogErrorFormat("Failed to refresh access token: {0}", GetAccessToken());
-                EditorApplication.update -= CheckForRefreshedToken;
-                return;
-            }
-
-            // still waiting
-            if (s_CurrentAccessToken == GetAccessToken()) {
-                return;
-            }
-
-            Debug.LogFormat("New Access Token: {0}", GetAccessToken());
-            EditorApplication.update -= CheckForRefreshedToken;
-        }
-
-        public static string GetAccessToken()
-        {
-#if UNITY_2018_1_OR_NEWER
-            return CloudProjectSettings.accessToken;
-#else
-            var unityConnectObj = Type.GetType("UnityEditor.Connect.UnityConnect, UnityEditor");
-            if (unityConnectObj == null) {
-                Debug.LogError("Failed to get \"UnityConnect\" class!");
-                return null;
-            }
-
-            var instanceProp = unityConnectObj.GetProperty("instance");
-            if (instanceProp == null) {
-                Debug.LogError("Failed to get method \"instance\" on UnityConnect class!");
-                return null;
-            }
-
-            var instanceOfConnect = instanceProp.GetValue(null, null);
-            if (instanceOfConnect == null) {
-                Debug.LogError("Failed to get value of \"instance\" on UnityConnect class!");
-                return null;
-            }
-
-            var getTokenMethod = unityConnectObj.GetMethod("GetAccessToken");
-            if (getTokenMethod == null) {
-                Debug.LogError("Failed to get method \"GetAccessToken\" on UnityConnect class!");
-                return null;
-            }
-
-            var token = getTokenMethod.Invoke(instanceOfConnect, null);
-            if (token == null) {
-                Debug.LogError("Failed to get \"token\" from UnityConnect class!");
-                return null;
-            }
-            return token.ToString();
-#endif
-        }
-
     }
 }

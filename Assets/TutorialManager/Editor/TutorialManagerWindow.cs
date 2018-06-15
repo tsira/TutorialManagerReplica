@@ -60,6 +60,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
         const string k_NeedsGenre = "Please select a genre before attempting to push.";
         const string k_TransactionError = "Error when pushing/pulling data. Please try again.";
+        const string k_TokenAuthError = "Token has expired. Attempting auto-refresh...";
         const string k_TransactionSuccess = "Success!";
         const string k_TransactionMessage = "In progress...";
 
@@ -67,6 +68,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         bool isTransacting = false;
         bool isTransactionSuccess = false;
         bool isTransactionError = false;
+        bool isTokenAuthError = false;
 
         int transactionTimeoutCounter = 0;
         const int transactionTimeoutMax = 300;
@@ -234,11 +236,16 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
                 transactionTimeoutCounter ++;
                 if (transactionTimeoutCounter > transactionTimeoutMax) {
                     isTransactionSuccess = false;
+                    isTransactionError = false;
+                    isTokenAuthError = false;
                 }
             }
 
             if (isTransactionError) {
                 EditorGUILayout.HelpBox(k_TransactionError, MessageType.Error, true);
+            }
+            if (isTokenAuthError) {
+                EditorGUILayout.HelpBox(k_TokenAuthError, MessageType.Warning, true);
             }
         }
 
@@ -481,18 +488,29 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             } else {
                 isTransacting = true;
                 TutorialManagerEditorWebHandler.TMRSWriteResponseReceived += WriteResponseReceived;
+                TutorialManagerEditorWebHandler.TMRSWriteRetry += RemoteSettingsWriteRetry;
                 m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Write(m_AppId, TMModel.TMData);
             }
         }
 
+        private void RemoteSettingsWriteRetry()
+        {
+            isTokenAuthError = true;
+            TutorialManagerEditorWebHandler.TMRSWriteRetry -= RemoteSettingsWriteRetry;
+            m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Write(m_AppId, TMModel.TMData);
+        }
+
         void WriteResponseReceived(bool success)
         {
+            TutorialManagerEditorWebHandler.TMRSWriteResponseReceived -= WriteResponseReceived;
+            TutorialManagerEditorWebHandler.TMRSWriteRetry -= RemoteSettingsWriteRetry;
             isTransacting = false;
             if (success) {
                 isTransactionSuccess = true;
                 transactionTimeoutCounter = 0;
             } else {
                 isTransactionError = true;
+                isTokenAuthError = false;
             }
             Repaint();
         }
@@ -503,8 +521,15 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             isTransactionError = false;
             isTransactionSuccess = false;
 
-
             TutorialManagerEditorWebHandler.TMRSReadResponseReceived += RemoteSettingsReadDataReceived;
+            TutorialManagerEditorWebHandler.TMRSReadRetry += RemoteSettingsReadRetry;
+            m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Read(m_AppId);
+        }
+
+        private void RemoteSettingsReadRetry()
+        {
+            isTokenAuthError = true;
+            TutorialManagerEditorWebHandler.TMRSReadRetry -= RemoteSettingsReadRetry;
             m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Read(m_AppId);
         }
 
@@ -512,6 +537,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         {
             isTransacting = false;
             TutorialManagerEditorWebHandler.TMRSReadResponseReceived -= RemoteSettingsReadDataReceived;
+            TutorialManagerEditorWebHandler.TMRSReadRetry -= RemoteSettingsReadRetry;
 
             if(m_WebRequestEnumerator != null)
             {
@@ -519,6 +545,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             }
             if (remoteSettings == null) {
                 isTransactionError = true;
+                isTokenAuthError = false;
                 return;
             } else {
                 isTransactionSuccess = true;
