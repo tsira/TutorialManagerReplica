@@ -257,9 +257,11 @@ namespace UnityEngine.Analytics
         /// </remarks>
         public static void Reset()
         {
-            if (m_State != null) {
-                var fsm = m_State.fsm;
-                fsm.Reset();
+            ClearAnalytics();
+            if (m_State == null) {
+                var fsm = new TutorialManagerFSM();
+                m_State = new TutorialManagerState(fsm);
+                ReadState();
             }
             m_State.Reset();
             SaveState();
@@ -338,6 +340,15 @@ namespace UnityEngine.Analytics
                 return true;
             }
             // Is this a pre-existing player?
+            return AnalyticsExists();
+        }
+
+        /// <summary>
+        /// Check that Analytics exists
+        /// </summary>
+        /// <returns><c>true</c>, if we find a record of Unity Analytics, <c>false</c> otherwise.</returns>
+        static bool AnalyticsExists()
+        {
             string analyticsLocation = GetAnalyticsValuesLocation();
             if (File.Exists(analyticsLocation)) {
                 var fileText = File.ReadAllText(analyticsLocation);
@@ -348,6 +359,17 @@ namespace UnityEngine.Analytics
                 }
             }
             return true;
+        }
+
+        /// <summary>
+        /// Clears the analytics file.
+        /// </summary>
+        static void ClearAnalytics()
+        {
+            string analyticsLocation = GetAnalyticsValuesLocation();
+            if (File.Exists(analyticsLocation)) {
+                File.WriteAllText(analyticsLocation, "{}");
+            }
         }
 
         /// <summary>
