@@ -86,11 +86,6 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             EditorWindow.GetWindow(typeof(TutorialManagerWindow), false, k_TabTitle);
         }
 
-        private void Awake()
-        {
-            TMModel.OnDataUpdate += OnModelUpdate;
-        }
-
         private void OnDestroy()
         {
             TMModel.OnDataUpdate -= OnModelUpdate;
@@ -121,6 +116,8 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
         private void OnGUI()
         {
+            EnsureModelListener();
+
             bool markCreateFirst = false;
             if (TMModel.TMData.tutorials.Count == 0 && Event.current.type == EventType.Repaint) {
                 markCreateFirst = true;
@@ -370,6 +367,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
                 EditorStyles.textField.wordWrap = true;
                 var options = new GUILayoutOption[]{
                     GUILayout.ExpandHeight(true),
+                    GUILayout.MaxHeight(50f),
                     GUILayout.Width(EditorGUIUtility.currentViewWidth - 15f)
                 };
                 EditorGUI.BeginDisabledGroup(true);
@@ -566,6 +564,12 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             addButtonStyle.fontStyle = FontStyle.Bold;
             addButtonStyle.alignment = TextAnchor.MiddleLeft;
             addButtonStyle.fixedWidth = 30f;
+        }
+
+        private void EnsureModelListener()
+        {
+            TMModel.OnDataUpdate -= OnModelUpdate;
+            TMModel.OnDataUpdate += OnModelUpdate;
         }
 
         private void OnModelUpdate()
