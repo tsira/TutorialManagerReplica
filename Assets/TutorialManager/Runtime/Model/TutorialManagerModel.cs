@@ -204,6 +204,8 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         {
             if (TMData.stepTable.ContainsKey(id))
             {
+                var step = TMData.stepTable[id];
+
                 // Remove from Tutorial
                 foreach (var tutorialEntity in GetTutorialsThatContainStepWithId(id)) 
                 {
@@ -211,14 +213,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                 }
 
                 // Remove related content entries
-                List<string> contentToRemove = new List<string>();
-                foreach (ContentEntity c in TMData.content)
-                {
-                    if (c.id.IndexOf(c.id, 0, System.StringComparison.Ordinal) > -1)
-                    {
-                        contentToRemove.Add(c.id);
-                    }
-                }
+                List<string> contentToRemove = new List<string>(step.messaging.content);
                 foreach (string s in contentToRemove)
                 {
                     DestroyContentEntity(s);
@@ -226,7 +221,6 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
                 // Remove from stepTable
                 // Remove from steps
-                var step = TMData.stepTable[id];
                 TMData.steps.Remove(step);
                 TMData.stepTable.Remove(id);
                 Save();

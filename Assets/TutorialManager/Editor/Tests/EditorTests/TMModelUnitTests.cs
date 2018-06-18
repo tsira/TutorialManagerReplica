@@ -410,6 +410,7 @@ namespace UnityEngine.Analytics
         {
             SetupTutorial();
             SetupSteps();
+            SetupContent();
 
             var modelMiddleware = TutorialManagerModelMiddleware.GetInstance();
             var tutorial1 = modelMiddleware.TMData.tutorials[0];
@@ -418,6 +419,12 @@ namespace UnityEngine.Analytics
 
             int stepTableCount = modelMiddleware.TMData.stepTable.Count;
             int stepListCount = modelMiddleware.TMData.steps.Count;
+
+            string textId1 = ConstructID(t1Step1LookupID, ContentType.text.ToString());
+            string textId2 = ConstructID(t1Step2LookupID, ContentType.text.ToString());
+
+            Assert.Contains(textId1, modelMiddleware.TMData.contentTable.Keys, string.Format("The contentTable should contain the key {0}", textId1));
+            Assert.Contains(textId2, modelMiddleware.TMData.contentTable.Keys, string.Format("The contentTable should contain the key {0}", textId2));
 
             modelMiddleware.DestroyStepEntity(t1Step1LookupID);
 
@@ -428,6 +435,8 @@ namespace UnityEngine.Analytics
             Assert.IsFalse(modelMiddleware.TMData.stepTable.ContainsKey(t1Step1LookupID), "the step should have been removed from the table");
 
             Assert.IsFalse(FoundKeyInList(t1Step1LookupID, tutorial1.steps), "content should have been removed from step list");
+            Assert.IsFalse(modelMiddleware.TMData.contentTable.ContainsKey(textId1), string.Format("The contentTable should no longer contain the key {0}", textId1));
+            Assert.Contains(textId2, modelMiddleware.TMData.contentTable.Keys, string.Format("The contentTable should still contain the key {0}", textId2));
 
             modelMiddleware.DestroyStepEntity(t1Step2LookupID);
 
@@ -435,6 +444,9 @@ namespace UnityEngine.Analytics
             Assert.AreEqual(2, stepTableCount - modelMiddleware.TMData.stepTable.Count, "stepTable count should have decremented by two");
             Assert.AreEqual(2, stepListCount - modelMiddleware.TMData.steps.Count, "steps count should have decremented by two");
             Assert.IsFalse(modelMiddleware.TMData.stepTable.ContainsKey(t1Step2LookupID), "the step should have been removed from the table");
+
+            Assert.IsFalse(modelMiddleware.TMData.contentTable.ContainsKey(textId1), string.Format("The contentTable should no longer contain the key {0}", textId1));
+            Assert.IsFalse(modelMiddleware.TMData.contentTable.ContainsKey(textId2), string.Format("The contentTable should no longer contain the key {0}", textId2));
 
             EnsureUnaffectedSteps();
 
