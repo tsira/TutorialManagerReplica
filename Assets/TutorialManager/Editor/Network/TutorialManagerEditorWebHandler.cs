@@ -53,7 +53,7 @@ namespace UnityEngine.Analytics
 #endif
             {
                 Debug.LogWarningFormat("Failed to fetch remote settings: {0}: {1}", settingsRequest.responseCode, settingsRequest.error);
-                if (settingsRequest.responseCode >= 400 && TMRSReadRetry != null) {
+                if (SuspectBadToken(settingsRequest) && TMRSReadRetry != null) {
                     AccessToken.OnTokenRefresh += OnTokenRefresh;
                     AccessToken.RefreshAccessToken();
                     TMRSReadRetry();
@@ -91,7 +91,7 @@ namespace UnityEngine.Analytics
 #endif
             {
                 Debug.LogWarningFormat("Failed to write remote settings: {0}: {1}", settingsRequest.responseCode, settingsRequest.error);
-                if (settingsRequest.responseCode >= 400 && TMRSWriteRetry != null) {
+                if (SuspectBadToken(settingsRequest) && TMRSWriteRetry != null) {
                     AccessToken.OnTokenRefresh += OnTokenRefresh;
                     AccessToken.RefreshAccessToken();
                     TMRSWriteRetry();
@@ -102,6 +102,13 @@ namespace UnityEngine.Analytics
             }
 
             WriteEvent(true);
+        }
+
+        private static bool SuspectBadToken(UnityWebRequest settingsRequest)
+        {
+            return (settingsRequest.responseCode == 400 ||
+                    settingsRequest.responseCode == 401 ||
+                    settingsRequest.responseCode == 403);
         }
 
         private static void OnTokenRefresh(bool success)
