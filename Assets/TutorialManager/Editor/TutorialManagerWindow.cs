@@ -194,7 +194,8 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
                         return;
                     }
                 }
-                if (m_WebRequestEnumerator.Current.isDone && !m_WebRequestEnumerator.MoveNext())
+
+                if (m_WebRequestEnumerator.Current == null || m_WebRequestEnumerator.Current.isDone && !m_WebRequestEnumerator.MoveNext())
                 {
                     m_WebRequestEnumerator = null;
                 }
@@ -255,10 +256,10 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
                 }
                 EditorGUI.BeginDisabledGroup(isTransacting);
                 if (GUILayout.Button(pullButtonGUIContent)) {
-                    PullData();
+                    PullData(true);
                 }
                 if (GUILayout.Button(pushButtonGUIContent)) {
-                    PushData();
+                    PushData(true);
                 }
                 EditorGUI.EndDisabledGroup();
                 RenderDashboardLink();
@@ -477,7 +478,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             TMModel.DestroyStepEntity(id);
         }
 
-        private void PushData()
+        private void PushData(bool withRetry)
         {
             isTransactionSuccess = false;
             isTransactionError = false;
@@ -486,16 +487,24 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             } else {
                 isTransacting = true;
                 TutorialManagerEditorWebHandler.TMRSWriteResponseReceived += WriteResponseReceived;
-                TutorialManagerEditorWebHandler.TMRSWriteRetry += RemoteSettingsWriteRetry;
+                if (withRetry) {
+                    TutorialManagerEditorWebHandler.TMRSWriteRetry += RemoteSettingsWriteRetry;
+                }
                 m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Write(m_AppId, TMModel.TMData);
             }
         }
 
-        private void RemoteSettingsWriteRetry()
+        private void RemoteSettingsWriteRetry(bool success)
         {
-            isTokenAuthError = true;
             TutorialManagerEditorWebHandler.TMRSWriteRetry -= RemoteSettingsWriteRetry;
-            m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Write(m_AppId, TMModel.TMData);
+            TutorialManagerEditorWebHandler.TMRSWriteResponseReceived -= WriteResponseReceived;
+            if (success) {
+                Debug.LogWarning("Token refreshed. Retrying push.");
+                isTokenAuthError = true;
+                PushData(false);
+            } else {
+                Debug.LogWarning("Token refresh failed.");
+            }
         }
 
         void WriteResponseReceived(bool success)
@@ -513,27 +522,37 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             Repaint();
         }
 
-        private void PullData()
+        private void PullData(bool withRetry)
         {
             isTransacting = true;
             isTransactionError = false;
             isTransactionSuccess = false;
 
             TutorialManagerEditorWebHandler.TMRSReadResponseReceived += RemoteSettingsReadDataReceived;
-            TutorialManagerEditorWebHandler.TMRSReadRetry += RemoteSettingsReadRetry;
+            if (withRetry) {
+                TutorialManagerEditorWebHandler.TMRSReadRetry += RemoteSettingsReadRetry;
+            }
             m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Read(m_AppId);
         }
 
-        private void RemoteSettingsReadRetry()
+        private void RemoteSettingsReadRetry(bool success)
         {
-            isTokenAuthError = true;
             TutorialManagerEditorWebHandler.TMRSReadRetry -= RemoteSettingsReadRetry;
-            m_WebRequestEnumerator = TutorialManagerEditorWebHandler.Read(m_AppId);
+            TutorialManagerEditorWebHandler.TMRSReadResponseReceived -= RemoteSettingsReadDataReceived;
+
+            if (success) {
+                Debug.LogWarning("Token refreshed. Retrying pull.");
+                isTokenAuthError = true;
+                PullData(false);
+            } else {
+                Debug.LogWarning("Token refresh failed.");
+            }
         }
 
         private void RemoteSettingsReadDataReceived(List<RemoteSettingsKeyValueType> remoteSettings)
         {
             isTransacting = false;
+            isTokenAuthError = false;
             TutorialManagerEditorWebHandler.TMRSReadResponseReceived -= RemoteSettingsReadDataReceived;
             TutorialManagerEditorWebHandler.TMRSReadRetry -= RemoteSettingsReadRetry;
 
@@ -543,7 +562,6 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             }
             if (remoteSettings == null) {
                 isTransactionError = true;
-                isTokenAuthError = false;
                 return;
             } else {
                 isTransactionSuccess = true;

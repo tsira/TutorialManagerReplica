@@ -26,10 +26,10 @@ namespace UnityEngine.Analytics
         public delegate void TMRSWriteResponseHandler(bool success);
         public static event TMRSWriteResponseHandler TMRSWriteResponseReceived;
 
-        public delegate void TMRSReadRetryHandler();
+        public delegate void TMRSReadRetryHandler(bool success);
         public static event TMRSReadRetryHandler TMRSReadRetry;
 
-        public delegate void TMRSWriteRetryHandler();
+        public delegate void TMRSWriteRetryHandler(bool success);
         public static event TMRSWriteRetryHandler TMRSWriteRetry;
 
         public static IEnumerator<AsyncOperation> Read(string appId)
@@ -55,8 +55,9 @@ namespace UnityEngine.Analytics
                 Debug.LogWarningFormat("Failed to fetch remote settings: {0}: {1}", settingsRequest.responseCode, settingsRequest.error);
                 if (SuspectBadToken(settingsRequest) && TMRSReadRetry != null) {
                     AccessToken.OnTokenRefresh += OnTokenRefresh;
-                    AccessToken.RefreshAccessToken();
-                    TMRSReadRetry();
+                    IEnumerator<AsyncOperation> innerLoopEnumerator = AccessToken.RefreshAccessToken().GetEnumerator();
+                    while (innerLoopEnumerator.MoveNext())
+                        yield return innerLoopEnumerator.Current;
                 } else {
                     ReadErrorEvent();
                 }
@@ -93,8 +94,9 @@ namespace UnityEngine.Analytics
                 Debug.LogWarningFormat("Failed to write remote settings: {0}: {1}", settingsRequest.responseCode, settingsRequest.error);
                 if (SuspectBadToken(settingsRequest) && TMRSWriteRetry != null) {
                     AccessToken.OnTokenRefresh += OnTokenRefresh;
-                    AccessToken.RefreshAccessToken();
-                    TMRSWriteRetry();
+                    IEnumerator<AsyncOperation> innerLoopEnumerator = AccessToken.RefreshAccessToken().GetEnumerator();
+                    while (innerLoopEnumerator.MoveNext())
+                        yield return innerLoopEnumerator.Current;
                 } else {
                     WriteEvent(false);
                 }
@@ -109,16 +111,6 @@ namespace UnityEngine.Analytics
             return (settingsRequest.responseCode == 400 ||
                     settingsRequest.responseCode == 401 ||
                     settingsRequest.responseCode == 403);
-        }
-
-        private static void OnTokenRefresh(bool success)
-        {
-            if (TMRSWriteResponseReceived != null) {
-                TMRSWriteResponseReceived(success);
-            }
-            if (TMRSWriteResponseReceived != null) {
-                TMRSWriteResponseReceived(success);
-            }
         }
 
         private static string RemoveWrappingBracesFromString(string stringToParse)
@@ -172,6 +164,16 @@ namespace UnityEngine.Analytics
                     TMRSReadResponseReceived(remoteSettings);
                 }
             };
+        }
+
+        static void OnTokenRefresh(bool success)
+        {
+            if (TMRSReadRetry != null) {
+                TMRSReadRetry(success);
+            }
+            if (TMRSWriteRetry != null) {
+                TMRSWriteRetry(success);
+            }
         }
 
         static void WriteEvent(bool success)
