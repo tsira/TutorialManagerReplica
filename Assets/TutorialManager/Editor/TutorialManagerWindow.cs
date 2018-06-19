@@ -40,7 +40,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         const string k_PushDataTooltip = "Upload local tutorial data to the server. This operation also informs the server that Tutorial Manager integration is complete.";
         const string k_TMTextTooLongMessage = "Some step text is too long; these fields will be truncated! Max text length is {0}. The following text should be shortened: {1}";
 
-        const int k_MaxSteps = 27;
+        const int k_MaxSteps = 50;
         const float k_ColumnWidth = 100f;
 
         GUIContent genreGUIContent = new GUIContent("Game Genre", k_GenreTooltip);
