@@ -180,6 +180,14 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         void Update()
         {
             EnumerateWebRequest();
+
+            if (transactionTimeoutCounter > transactionTimeoutMax) {
+                isTransactionSuccess = false;
+                isTransactionError = false;
+                isTokenAuthError = false;
+            } else {
+                transactionTimeoutCounter++;
+            }
         }
 
         void EnumerateWebRequest()
@@ -230,13 +238,6 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
             if (isTransactionSuccess) {
                 EditorGUILayout.HelpBox(k_TransactionSuccess, MessageType.Info, true);
-
-                transactionTimeoutCounter ++;
-                if (transactionTimeoutCounter > transactionTimeoutMax) {
-                    isTransactionSuccess = false;
-                    isTransactionError = false;
-                    isTokenAuthError = false;
-                }
             }
 
             if (isTransactionError) {
@@ -369,7 +370,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
                 var options = new GUILayoutOption[]{
                     GUILayout.ExpandHeight(true),
                     GUILayout.MaxHeight(50f),
-                    GUILayout.Width(EditorGUIUtility.currentViewWidth - 15f)
+                    GUILayout.Width(EditorGUIUtility.currentViewWidth - 30f)
                 };
                 EditorGUI.BeginDisabledGroup(true);
                 EditorGUILayout.TextArea(contentEntity.text, options);
