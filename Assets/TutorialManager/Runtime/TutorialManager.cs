@@ -26,9 +26,9 @@ namespace UnityEngine.Analytics
         /// By default, the Tutorial Manager will progress from one step to the next automatically. This is often
         /// desirable, but not every tutorial works this way. If your game's tutorial has steps interspersed with
         /// gameplay, you might want more precise control. By calling <c>Start(tutorialId, false)</c>, this flag
-        /// will be set to <c>false</c>. The result is that calling <c>Step()</c> will complete a step,
+        /// will be set to <c>false</c>. The result is that calling <c>StepComplete()</c> will complete a step,
         /// but not automatically start the next one. This allows gameplay to proceed with the tutorial "paused" between
-        /// states. You will need to call <c>Step()</c> again to start the next step.
+        /// states. You will need to call <c>StepStart()</c> to start the next step.
         /// </remarks>
         /// <value><c>true</c> if auto advance; otherwise, <c>false</c>.</value>
         public static bool autoAdvance {
@@ -118,6 +118,9 @@ namespace UnityEngine.Analytics
         /// This method is the lynchpin of the TutorialManager system. It should be called when the player arrives
         /// at the first tutorial. Calling it lets you know what recommendation the server has for this player,
         /// and informs the server that this recommendation has been acted upon.
+        ///
+        /// If you need to know the decision at any point other than the moment that the player arrives at the
+        /// decision point, use <c>showTutorial</c>.
         ///     <code>
         ///     if (TutorialManager.GetDecision()) {
         ///         TutorialManager.Start("Tutorial1");
@@ -228,14 +231,14 @@ namespace UnityEngine.Analytics
         }
 
         /// <summary>
-        /// Call this each to start a step in some tutorial other than the current one.
+        /// Call this to start a step in some tutorial other than the current one.
         /// </summary>
         /// <param name="tutorialId">The tutorial to go to.</param>
         /// <param name="stepId">The step of the new tutorial to start.</param>
         /// <param name="autoAdvance">If 'true' (default) ending one tutorial step will automatically advance to the next step.</param>
-        public static void StepStart(string tutorialId, string stepId, bool autoAdvance = false)
+        public static void StepStart(string tutorialId, string stepId, bool autoAdvance = true)
         {
-            Start(tutorialId);
+            Start(tutorialId, autoAdvance);
             StepStart(stepId);
         }
 
