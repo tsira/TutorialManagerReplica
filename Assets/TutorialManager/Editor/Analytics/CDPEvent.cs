@@ -1,3 +1,10 @@
+
+// TODO:
+// Staging endpoint
+// Escape characters
+// Retries
+
+
 using System;
 using System.Collections.Generic;
 using UnityEngine.Networking;
@@ -48,8 +55,8 @@ namespace UnityEditor.CDP
             string eventName = string.Format("{0}{1}{2}", eventPrefix, tMEvent.ToString(), eventVersion);
             string msg = DictToJson(dict);
             string payload = string.Format(payloadPattern, eventName, msg);
+            Debug.Log(payload);
 
-            // Debug.Log(payload);
             UnityWebRequest request = UnityWebRequest.Post(endpointUrl, payload);
             var uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(payload));
             uploadHandler.contentType = "application/json";
@@ -71,7 +78,7 @@ namespace UnityEditor.CDP
             string projectId = Application.cloudProjectId;
 #endif
 
-            dictionary.Add("ts", (double)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds);
+            dictionary.Add("ts", (double)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds);
             dictionary.Add("cloud_user_id", userId);
             dictionary.Add("app_id", projectId);
             dictionary.Add("unity_version_name", Application.unityVersion);
@@ -92,7 +99,9 @@ namespace UnityEditor.CDP
                 string kvs = string.Empty;
                 Type t = kv.Value.GetType();
                 if (t == typeof(string)) {
-                    kvs = string.Format(stringPattern, kv.Key, kv.Value);
+                    string value = kv.Value.ToString();
+                    value = value.Replace("\"", "\\\"");
+                    kvs = string.Format(stringPattern, kv.Key, value);
                 } else if (t == typeof(bool)) {
                     kvs = string.Format(nonStringPattern, kv.Key, kv.Value.ToString().ToLower());
                 } else {
