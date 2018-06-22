@@ -55,27 +55,32 @@ namespace UnityEditor.CDP
             uploadHandler.contentType = "application/json";
             request.uploadHandler = uploadHandler;
 
+#if UNITY_2018_1_OR_NEWER
             request.SendWebRequest();
+#else
+            request.Send();
+#endif
         }
 
         static void AddCommonValues(ref Dictionary<string, object> dictionary)
         {
-            string userId = String.Empty;
-            string projectId = String.Empty;
-
+            string userId = GetUserId();
 #if UNITY_2018_1_OR_NEWER
-            userId = CloudProjectSettings.userId;
-            projectId = CloudProjectSettings.projectId;
+            string projectId = CloudProjectSettings.projectId;
 #else
-            //userId = CloudProjectSettings.userId;
-            projectId = Application.cloudProjectId;
+            string projectId = Application.cloudProjectId;
 #endif
 
             dictionary.Add("ts", (double)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds);
             dictionary.Add("cloud_user_id", userId);
             dictionary.Add("app_id", projectId);
             dictionary.Add("unity_version_name", Application.unityVersion);
-            dictionary.Add("analytics_enabled", UnityEngine.Analytics.Analytics.enabled);
+#if UNITY_ANALYTICS
+            bool isAnalyticsEnabled = true;
+#else
+            bool isAnalyticsEnabled = false;
+#endif
+            dictionary.Add("analytics_enabled", isAnalyticsEnabled);
             dictionary.Add("tm_version", TutorialManager.k_VersionNumber);
         }
 
@@ -95,12 +100,45 @@ namespace UnityEditor.CDP
                 }
                 s += kvs;
 
-                if (a < dictionary.Count-1) {
+                if (a < dictionary.Count - 1) {
                     s += ",";
                 }
                 a++;
             }
             return string.Concat("{", s, "}");
+        }
+
+        static string GetUserId()
+        {
+#if UNITY_2018_1_OR_NEWER
+            return CloudProjectSettings.userId;
+#else
+            var unityConnectObj = Type.GetType("UnityEditor.Connect.UnityConnect, UnityEditor");
+            if (unityConnectObj == null) {
+                Debug.LogError("Failed to get \"UnityConnect\" class!");
+                return null;
+            }
+
+            var instanceProp = unityConnectObj.GetProperty("instance");
+            if (instanceProp == null) {
+                Debug.LogError("Failed to get method \"instance\" on UnityConnect class!");
+                return null;
+            }
+
+            var instanceOfConnect = instanceProp.GetValue(null, null);
+            if (instanceOfConnect == null) {
+                Debug.LogError("Failed to get value of \"instance\" on UnityConnect class!");
+                return null;
+            }
+
+            var getUserIdMethod = unityConnectObj.GetMethod("GetUserId");
+            if (getUserIdMethod == null) {
+                Debug.LogError("Failed to get method \"GetUserId\" on UnityConnect class!");
+                return null;
+            }
+
+            return (string)getUserIdMethod.Invoke(instanceOfConnect, null);
+#endif
         }
     }
 }
