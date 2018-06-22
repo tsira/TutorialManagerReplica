@@ -2,6 +2,8 @@
 /// These automated runtime integration tests demonstrate that the frontend Tutorial Manager porcelain works.
 /// </summary>
 
+#if UNITY_5_6_OR_NEWER
+
 using System;
 using System.Collections;
 using UnityEngine.Analytics.TutorialManagerRuntime;
@@ -352,3 +354,4 @@ namespace UnityEngine.Analytics
         }
     }
 }
+#endif

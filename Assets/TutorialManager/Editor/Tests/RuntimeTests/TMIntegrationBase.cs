@@ -1,3 +1,5 @@
+#if UNITY_5_6_OR_NEWER
+
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -186,3 +188,4 @@ namespace UnityEngine.Analytics
         }
     }
 }
+#endif

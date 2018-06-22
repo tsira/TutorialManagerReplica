@@ -3,6 +3,7 @@
 /// of the TutorialManager class – the underlying state machine, dispatcher, and components work.
 /// </summary>
 
+#if UNITY_5_6_OR_NEWER
 using System;
 using System.Collections;
 using UnityEngine.Analytics.TutorialManagerRuntime;
@@ -258,3 +259,4 @@ namespace UnityEngine.Analytics
         }
     }
 }
+#endif

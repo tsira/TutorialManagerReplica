@@ -893,5 +893,6 @@ namespace UnityEngine.Analytics
             return false;
         }
     }
-#endif
+
 }
+#endif

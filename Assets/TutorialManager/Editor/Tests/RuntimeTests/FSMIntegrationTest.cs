@@ -1,3 +1,4 @@
+#if UNITY_5_6_OR_NEWER
 using System.Collections;
 using UnityEngine.Analytics.TutorialManagerRuntime;
 using UnityEngine.TestTools;
@@ -169,5 +170,5 @@ namespace UnityEngine.Analytics
             Assert.That(step3GoText.GetComponent<Text>().text, Is.EqualTo(t1step3Text), string.Format("step three text should be {0}", t1step3Text));
         }
     }
-
 }
+#endif
