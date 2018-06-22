@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using UnityEditor.CDP;
 
 namespace UnityEngine.Analytics.TutorialManagerRuntime
 {
@@ -37,6 +38,8 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         {
             bindingIdsProperty = serializedObject.FindProperty("bindingIds");
             respectRemoteProperty = serializedObject.FindProperty("respectRemoteIsActive");
+
+            CheckToSendAddedEvent();
         }
 
         public override void OnInspectorGUI()
@@ -140,11 +143,15 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
                         if (GUILayout.Button(addBindingButtonGUIContent, addButtonStyle, GUILayout.MaxWidth(20f))) {
                             arraySizeProperty.intValue++;
                             bindingsHaveChanged = true;
+
+                            SendAddBindingEvent(arraySizeProperty.intValue);
                         }
                         EditorGUI.BeginDisabledGroup(isFirst);
                         if (GUILayout.Button(deleteBindingButtonGUIContent, addButtonStyle, GUILayout.MaxWidth(20f))) {
                             arraySizeProperty.intValue = Mathf.Max(1, arraySizeProperty.intValue - 1);
                             bindingsHaveChanged = true;
+
+                            SendRemoveBindingEvent(arraySizeProperty.intValue);
                         }
                         EditorGUI.EndDisabledGroup();
                     }
@@ -211,6 +218,36 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             addButtonStyle.fontStyle = FontStyle.Bold;
             addButtonStyle.alignment = TextAnchor.MiddleLeft;
             addButtonStyle.fixedWidth = 30f;
+        }
+
+        protected virtual void SendAddBindingEvent(int count)
+        {
+            CDPEvent.Send(TMEditorEvent.addBinding, new Dictionary<string, object>{
+                { "binding_count", count },
+                { "component_type", "Content" }
+            });
+        }
+
+        protected virtual void SendRemoveBindingEvent(int count)
+        {
+            CDPEvent.Send(TMEditorEvent.removeBinding, new Dictionary<string, object>{
+                { "binding_count", count },
+                { "component_type", "Content" }
+            });
+        }
+
+        void CheckToSendAddedEvent()
+        {
+            AdaptiveContent myTarget = (AdaptiveContent)target;
+            if (myTarget.hasBeenReset) {
+                myTarget.hasBeenReset = false;
+                SendAddedEvent();
+            }
+        }
+
+        protected virtual void SendAddedEvent()
+        {
+            CDPEvent.Send(TMEditorEvent.addAdaptiveContent);
         }
     }
 

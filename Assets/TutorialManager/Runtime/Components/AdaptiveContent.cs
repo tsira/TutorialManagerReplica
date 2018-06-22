@@ -16,6 +16,15 @@ namespace UnityEngine.Analytics {
 
         protected string bindingId;
 
+        // Set to true when component is added in Inspector.
+        // Used for gathering analytics.
+        public bool hasBeenReset = false;
+
+        void Reset()
+        {
+            hasBeenReset = true;
+        }
+
         protected virtual void Start()
         {
             StateSystemProvider.GetInstance().Provide(this);

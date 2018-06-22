@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.UI;
+using UnityEditor.CDP;
+using System.Collections.Generic;
 #if TEXTMESHPRO_PRESENT
 using TMPro;
 #endif
@@ -95,6 +97,43 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         private void DestroyTextEntity(string id)
         {
             // TODO: How do we reliably prune orphans?
+        }
+
+        override protected void SendAddBindingEvent(int count)
+        {
+            CDPEvent.Send(TMEditorEvent.addBinding, new Dictionary<string, object>{
+                { "binding_count", count },
+                { "component_type", "Text" }
+            });
+        }
+
+        override protected void SendRemoveBindingEvent(int count)
+        {
+            CDPEvent.Send(TMEditorEvent.removeBinding, new Dictionary<string, object>{
+                { "binding_count", count },
+                { "component_type", "Text" }
+            });
+        }
+
+        override protected void SendAddedEvent()
+        {
+            AdaptiveContent myTarget = (AdaptiveContent)target;
+
+            string textfieldType = "None";
+            if (myTarget.GetComponent<Text>() != null) {
+                textfieldType = myTarget.GetComponent<Text>().GetType().ToString();
+            } else if (myTarget.GetComponent<TextMesh>() != null) {
+                textfieldType = myTarget.GetComponent<TextMesh>().GetType().ToString();
+            }
+#if TEXTMESHPRO_PRESENT
+            else if (!hasText && myTarget.GetComponent<TMP_Text>() != null) {
+                textfieldType = myTarget.GetComponent<TMP_Text>().GetType().ToString();
+            }
+#endif
+
+            CDPEvent.Send(TMEditorEvent.addAdaptiveText, new Dictionary<string, object>{
+                { "textfield_type", textfieldType }
+            });
         }
     }
 }
