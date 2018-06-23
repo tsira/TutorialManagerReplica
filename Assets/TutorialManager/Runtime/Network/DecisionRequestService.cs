@@ -8,8 +8,8 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 {
     public class TutorialWebResponse
     {
-        public bool showTutorial;
-        public List<RemoteSettingsKeyValueType> tutorials;
+        public bool showTutorial = true;
+        public List<RemoteSettingsKeyValueType> tutorials = new List<RemoteSettingsKeyValueType>();
     }
 
     public static class DecisionRequestService
@@ -52,7 +52,6 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         private static void CallTutorialManagerService(DeviceInfo data)
         {
             var json = JsonUtility.ToJson(data);
-
             webHandlerGO = new GameObject();
             var webHandler = webHandlerGO.AddComponent<TutorialManagerWebHandler>();
             webHandler.PostRequestReturned += (webRequest) =>
