@@ -11,7 +11,7 @@ namespace UnityEngine.Analytics
         {
             var rsDataList = new RemoteSettingsData();
             rsDataList.genre = model.genre;
-            rsDataList.remoteSettings = new List<RemoteSettingsKeyValueType>();
+            rsDataList.remoteSettings = new List<TMRemoteSettingsKeyValueType>();
             string tutorialsValue = null;
             if(model.tutorials.Count == 1)
             {
@@ -56,9 +56,9 @@ namespace UnityEngine.Analytics
             return retStr;
         }
 
-        static RemoteSettingsKeyValueType MakeRSJSONObject (string key, string value)
+        static TMRemoteSettingsKeyValueType MakeRSJSONObject (string key, string value)
         {
-            return new RemoteSettingsKeyValueType(key, value, "string");
+            return new TMRemoteSettingsKeyValueType(key, value, "string");
         }
     }
 }

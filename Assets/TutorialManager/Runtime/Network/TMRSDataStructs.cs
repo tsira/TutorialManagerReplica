@@ -6,13 +6,13 @@ using UnityEngine;
 namespace UnityEngine.Analytics.TutorialManagerRuntime
 {
     [Serializable]
-    public struct RemoteSettingsKeyValueType
+    public struct TMRemoteSettingsKeyValueType
     {
         public string key;
         public string value;
         public string type;
 
-        public RemoteSettingsKeyValueType(string k, string v, string t)
+        public TMRemoteSettingsKeyValueType(string k, string v, string t)
         {
             key = k;
             value = v;
@@ -24,6 +24,6 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
     public struct RemoteSettingsData
     {
         public string genre;
-        public List<RemoteSettingsKeyValueType> remoteSettings;
+        public List<TMRemoteSettingsKeyValueType> remoteSettings;
     }
 }

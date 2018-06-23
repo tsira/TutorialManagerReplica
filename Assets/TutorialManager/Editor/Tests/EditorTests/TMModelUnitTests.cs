@@ -584,8 +584,8 @@ namespace UnityEngine.Analytics
             string textValue1 = modelMiddleware.TMData.contentTable[textId1].text;
             string textValue2 = modelMiddleware.TMData.contentTable[textId2].text;
 
-            List<RemoteSettingsKeyValueType> list = new List<RemoteSettingsKeyValueType>();
-            var item1 = new RemoteSettingsKeyValueType(textId1, t1step1Textv2, "string");
+            List<TMRemoteSettingsKeyValueType> list = new List<TMRemoteSettingsKeyValueType>();
+            var item1 = new TMRemoteSettingsKeyValueType(textId1, t1step1Textv2, "string");
             list.Add(item1);
 
             Assert.That(t1step1Text, Is.EqualTo(textValue1), "textValue1 should be default");
@@ -618,8 +618,8 @@ namespace UnityEngine.Analytics
             string textValue2 = modelMiddleware.TMData.contentTable[textId2].text;
 
 
-            List<RemoteSettingsKeyValueType> list = new List<RemoteSettingsKeyValueType>();
-            var item1 = new RemoteSettingsKeyValueType(textId2, t1step2Textv2, "string");
+            List<TMRemoteSettingsKeyValueType> list = new List<TMRemoteSettingsKeyValueType>();
+            var item1 = new TMRemoteSettingsKeyValueType(textId2, t1step2Textv2, "string");
             list.Add(item1);
 
             Assert.That(t1step1Text, Is.EqualTo(textValue1), "textValue1 should be default");
@@ -651,9 +651,9 @@ namespace UnityEngine.Analytics
             string textValue1 = modelMiddleware.TMData.contentTable[textId1].text;
             string textValue2 = modelMiddleware.TMData.contentTable[textId2].text;
 
-            List<RemoteSettingsKeyValueType> list = new List<RemoteSettingsKeyValueType>();
-            var item1 = new RemoteSettingsKeyValueType(textId1, t1step1Textv2, "string");
-            var item2 = new RemoteSettingsKeyValueType(textId2, t1step2Textv2, "string");
+            List<TMRemoteSettingsKeyValueType> list = new List<TMRemoteSettingsKeyValueType>();
+            var item1 = new TMRemoteSettingsKeyValueType(textId1, t1step1Textv2, "string");
+            var item2 = new TMRemoteSettingsKeyValueType(textId2, t1step2Textv2, "string");
             list.Add(item1);
             list.Add(item2);
 

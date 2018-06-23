@@ -550,7 +550,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             }
         }
 
-        private void RemoteSettingsReadDataReceived(List<RemoteSettingsKeyValueType> remoteSettings)
+        private void RemoteSettingsReadDataReceived(List<TMRemoteSettingsKeyValueType> remoteSettings)
         {
             isTransacting = false;
             isTokenAuthError = false;

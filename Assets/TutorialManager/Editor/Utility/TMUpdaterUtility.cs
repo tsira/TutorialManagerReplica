@@ -31,7 +31,7 @@ public class TMUpdaterUtility
         }
     }
 
-    public static void ConvertRemoteSettingsToModel(TutorialManagerModelMiddleware TMModel, List<RemoteSettingsKeyValueType> remoteSettings)
+    public static void ConvertRemoteSettingsToModel(TutorialManagerModelMiddleware TMModel, List<TMRemoteSettingsKeyValueType> remoteSettings)
     {
         var genre = TMModel.TMData.genre;
         TMModel.Clear();

@@ -9,7 +9,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
     public class TutorialWebResponse
     {
         public bool showTutorial = true;
-        public List<RemoteSettingsKeyValueType> tutorials = new List<RemoteSettingsKeyValueType>();
+        public List<TMRemoteSettingsKeyValueType> tutorials = new List<TMRemoteSettingsKeyValueType>();
     }
 
     public static class DecisionRequestService

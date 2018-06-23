@@ -272,9 +272,9 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             }
         }
 
-        public void UpdateContentEntityValues(List<RemoteSettingsKeyValueType> contentTable)
+        public void UpdateContentEntityValues(List<TMRemoteSettingsKeyValueType> contentTable)
         {
-            foreach (RemoteSettingsKeyValueType kv in contentTable) {
+            foreach (TMRemoteSettingsKeyValueType kv in contentTable) {
                 if (TMData.contentTable.ContainsKey(kv.key)) {
                     TMData.contentTable[kv.key].text = kv.value;
                 }
