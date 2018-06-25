@@ -47,5 +47,16 @@ Our hypothesis is that different players need different onboarding experiences. 
     PlayerPrefs.Save();
     ```
     
+## Building a .unitypackage for release
+As of release `toolkit-v1` ONLY the following directories should be *included* in the build:
+TutorialManager
+    > Editor
+    > Runtime
+
+Further, the following directory should be *excluded*:
+TutorialManager
+    > Editor
+        > Tests
+
 ## Still have questions?
 Join the Contextual Data slack channel and hit us with your questions! #contextual-data
