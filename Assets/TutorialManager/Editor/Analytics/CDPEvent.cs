@@ -35,7 +35,8 @@ namespace UnityEditor.CDP
 
     public class CDPEvent
     {
-        const string endpointUrl = "https://prd-lender.cdp.internal.unity3d.com/v1/events";
+        const string endpointUrl = "https://stg-lender.cdp.internal.unity3d.com/v1/events";
+        //const string endpointUrl = "https://prd-lender.cdp.internal.unity3d.com/v1/events";
         const string eventPrefix = "tutorialManager.";
         const string eventVersion = ".v1";
         const string stringPattern = "\"{0}\":\"{1}\"";
