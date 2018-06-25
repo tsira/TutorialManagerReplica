@@ -33,7 +33,6 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         public string build_guid;
         public string cpu;
         public string device_name;
-        public string deviceid;
         public string gfx_name;
         public string gfx_vendor;
         public string gfx_ver;
@@ -65,7 +64,6 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             this.debug_device = Debug.isDebugBuild;
             this.app_ver = Application.version;
             this.model = GetDeviceModel();
-            this.deviceid = SystemInfo.deviceUniqueIdentifier;
             this.ram = SystemInfo.systemMemorySize;
             this.cpu = SystemInfo.processorType;
             this.cpu_count = SystemInfo.processorCount;
