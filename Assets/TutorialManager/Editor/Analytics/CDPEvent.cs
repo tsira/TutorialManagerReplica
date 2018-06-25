@@ -15,36 +15,17 @@ using System.Linq;
 
 namespace UnityEditor.CDP
 {
-    public enum TMEditorEvent
-    {
-        editorOpened,
-        pullData,
-        pushData,
-        addTutorial,
-        addStep,
-        addAdaptiveContent,
-        addAdaptiveText,
-        addBinding,
-        removeTutorial,
-        removeStep,
-        removeBinding,
-        clearProgress,
-        pickGenre,
-        gotoDashboard
-    }
-
     public class CDPEvent
     {
         const string endpointUrl = "https://stg-lender.cdp.internal.unity3d.com/v1/events";
         //const string endpointUrl = "https://prd-lender.cdp.internal.unity3d.com/v1/events";
-        const string eventPrefix = "tutorialManager.";
-        const string eventVersion = ".v1";
+
         const string stringPattern = "\"{0}\":\"{1}\"";
         const string nonStringPattern = "\"{0}\":{1}";
         const string payloadPattern = "{{\"type\":\"{0}\", \"msg\": {1}}}";
 
 
-        public static void Send(TMEditorEvent tMEvent, Dictionary<string, object> dictionary = null)
+        public static void Send(string eventName, Dictionary<string, object> dictionary = null)
         {
             var dict = dictionary;
             if (dict == null) {
@@ -52,8 +33,6 @@ namespace UnityEditor.CDP
             }
 
             AddCommonValues(ref dict);
-
-            string eventName = string.Format("{0}{1}{2}", eventPrefix, tMEvent.ToString(), eventVersion);
             string msg = DictToJson(dict);
             string payload = string.Format(payloadPattern, eventName, msg);
             Debug.Log(payload);
@@ -89,7 +68,6 @@ namespace UnityEditor.CDP
             bool isAnalyticsEnabled = false;
 #endif
             dictionary.Add("analytics_enabled", isAnalyticsEnabled);
-            dictionary.Add("tm_version", TutorialManager.k_VersionNumber);
         }
 
         static string DictToJson(Dictionary<string, object> dictionary)

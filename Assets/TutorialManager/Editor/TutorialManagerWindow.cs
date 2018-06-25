@@ -3,7 +3,6 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.Analytics.TutorialManagerRuntime;
-using UnityEditor.CDP;
 
 namespace UnityEngine.Analytics.TutorialManagerEditor
 {
@@ -85,7 +84,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
         static void TutorialManagerMenuOption()
         {
             EditorWindow.GetWindow(typeof(TutorialManagerWindow), false, k_TabTitle);
-            CDPEvent.Send(TMEditorEvent.editorOpened);
+            TMEditorEvent.Send(TMEditorEventType.editorOpened);
         }
 
         private void OnDestroy()
@@ -153,7 +152,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             }
             if (GUILayout.Button(clearProgressContent)) {
                 TutorialManager.Reset();
-                CDPEvent.Send(TMEditorEvent.clearProgress);
+                TMEditorEvent.Send(TMEditorEventType.clearProgress);
             }
             
             m_ScrollPosition = EditorGUILayout.BeginScrollView(m_ScrollPosition);
@@ -173,7 +172,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             {
                 DestroyTutorial(tutorialMarkedForDeletion);
                 tutorialMarkedForDeletion = string.Empty;
-                CDPEvent.Send(TMEditorEvent.removeTutorial, new Dictionary<string, object> {
+                TMEditorEvent.Send(TMEditorEventType.removeTutorial, new Dictionary<string, object> {
                     {"tutorial_count", TMModel.TMData.tutorialTable.Count}
                 });
             }
@@ -261,18 +260,18 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
                 if (GUILayout.Button(addTutorialButtonGUIContent)) {
                     CreateTutorial();
 
-                    CDPEvent.Send(TMEditorEvent.addTutorial, new Dictionary<string, object> {
+                    TMEditorEvent.Send(TMEditorEventType.addTutorial, new Dictionary<string, object> {
                         {"tutorial_count", TMModel.TMData.tutorialTable.Count}
                     });
                 }
                 EditorGUI.BeginDisabledGroup(isTransacting);
                 if (GUILayout.Button(pullButtonGUIContent)) {
                     PullData(true);
-                    CDPEvent.Send(TMEditorEvent.pullData);
+                    TMEditorEvent.Send(TMEditorEventType.pullData);
                 }
                 if (GUILayout.Button(pushButtonGUIContent)) {
                     PushData(true);
-                    CDPEvent.Send(TMEditorEvent.pushData, new Dictionary<string, object> { { "is_genre_set", genreId > 0 } });
+                    TMEditorEvent.Send(TMEditorEventType.pushData, new Dictionary<string, object> { { "is_genre_set", genreId > 0 } });
                 }
                 EditorGUI.EndDisabledGroup();
                 RenderDashboardLink();
@@ -281,11 +280,13 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
         private void RenderGenre()
         {
+            bool firstPass = false;
             if (genreIds == null) {
                 genreIds = new int[TMGenre.genres.Length];
                 for (int a = 0; a < TMGenre.genres.Length; a++) {
                     genreIds[a] = a;
                 }
+                firstPass = true;
             }
 
             EditorGUILayout.LabelField(genreGUIContent, EditorStyles.miniLabel, GUILayout.Width(k_ColumnWidth));
@@ -294,17 +295,18 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
             id = EditorGUILayout.IntPopup(id, TMGenre.genres, genreIds);
             if (id != genreId) {
                 SetGenre(id);
-
-                CDPEvent.Send(TMEditorEvent.pickGenre, new Dictionary<string, object> {
-                    {"genre_id", TMGenre.genres[genreId].ToString()}
-                });
+                if (!firstPass) {
+                    TMEditorEvent.Send(TMEditorEventType.pickGenre, new Dictionary<string, object> {
+                        {"genre_id", TMGenre.genres[genreId].ToString()}
+                    });
+                }
             }
         }
 
         private void RenderDashboardLink()
         {
             if (GUILayout.Button(goToDashboardButtonGUIContent)) {
-                CDPEvent.Send(TMEditorEvent.gotoDashboard);
+                TMEditorEvent.Send(TMEditorEventType.gotoDashboard);
 
                 string appId = Application.cloudProjectId;
                 string url = "https://analytics.cloud.unity3d.com/projects/" + appId + "/tutorial";
@@ -370,7 +372,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
 
                     if (GUILayout.Button(addStepButtonGUIContent, addButtonStyle, GUILayout.MaxWidth(20f))) {
                         CreateStep(tutorial.id);
-                        CDPEvent.Send(TMEditorEvent.addStep, new Dictionary<string, object> {
+                        TMEditorEvent.Send(TMEditorEventType.addStep, new Dictionary<string, object> {
                             {"tutorial_count", TMModel.TMData.tutorialTable.Count},
                             {"step_count", TMModel.TMData.tutorialTable[tutorial.id].steps.Count}
                         });
@@ -379,7 +381,7 @@ namespace UnityEngine.Analytics.TutorialManagerEditor
                     EditorGUI.BeginDisabledGroup(!minusEnabled);
                     if (GUILayout.Button(deleteStepButtonGUIContent, addButtonStyle, GUILayout.MaxWidth(20f))) {
                         DestroyStep(step.id);
-                        CDPEvent.Send(TMEditorEvent.removeStep, new Dictionary<string, object> {
+                        TMEditorEvent.Send(TMEditorEventType.removeStep, new Dictionary<string, object> {
                             {"tutorial_count", TMModel.TMData.tutorialTable.Count},
                             {"step_count", TMModel.TMData.tutorialTable[tutorial.id].steps.Count}
                         });

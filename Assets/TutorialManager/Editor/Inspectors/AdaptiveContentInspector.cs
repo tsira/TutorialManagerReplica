@@ -1,9 +1,8 @@
 using UnityEditor;
-using UnityEngine;
+using UnityEngine.Analytics.TutorialManagerEditor;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using UnityEditor.CDP;
 
 namespace UnityEngine.Analytics.TutorialManagerRuntime
 {
@@ -222,7 +221,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
         protected virtual void SendAddBindingEvent(int count)
         {
-            CDPEvent.Send(TMEditorEvent.addBinding, new Dictionary<string, object>{
+            TMEditorEvent.Send(TMEditorEventType.addBinding, new Dictionary<string, object>{
                 { "binding_count", count },
                 { "component_type", "Content" }
             });
@@ -230,7 +229,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
         protected virtual void SendRemoveBindingEvent(int count)
         {
-            CDPEvent.Send(TMEditorEvent.removeBinding, new Dictionary<string, object>{
+            TMEditorEvent.Send(TMEditorEventType.removeBinding, new Dictionary<string, object>{
                 { "binding_count", count },
                 { "component_type", "Content" }
             });
@@ -247,7 +246,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
         protected virtual void SendAddedEvent()
         {
-            CDPEvent.Send(TMEditorEvent.addAdaptiveContent);
+            TMEditorEvent.Send(TMEditorEventType.addAdaptiveContent);
         }
     }
 

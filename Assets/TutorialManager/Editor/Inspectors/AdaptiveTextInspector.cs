@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.UI;
-using UnityEditor.CDP;
+using UnityEngine.Analytics.TutorialManagerEditor;
 using System.Collections.Generic;
 #if TEXTMESHPRO_PRESENT
 using TMPro;
@@ -101,7 +101,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
         override protected void SendAddBindingEvent(int count)
         {
-            CDPEvent.Send(TMEditorEvent.addBinding, new Dictionary<string, object>{
+            TMEditorEvent.Send(TMEditorEventType.addBinding, new Dictionary<string, object>{
                 { "binding_count", count },
                 { "component_type", "Text" }
             });
@@ -109,7 +109,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
 
         override protected void SendRemoveBindingEvent(int count)
         {
-            CDPEvent.Send(TMEditorEvent.removeBinding, new Dictionary<string, object>{
+            TMEditorEvent.Send(TMEditorEventType.removeBinding, new Dictionary<string, object>{
                 { "binding_count", count },
                 { "component_type", "Text" }
             });
@@ -131,7 +131,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             }
 #endif
 
-            CDPEvent.Send(TMEditorEvent.addAdaptiveText, new Dictionary<string, object>{
+            TMEditorEvent.Send(TMEditorEventType.addAdaptiveText, new Dictionary<string, object>{
                 { "textfield_type", textfieldType }
             });
         }
