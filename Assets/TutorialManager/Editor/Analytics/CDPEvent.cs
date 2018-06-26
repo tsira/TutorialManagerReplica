@@ -1,52 +1,120 @@
-
-// TODO:
-// Staging endpoint
-// Escape characters
-// Retries
-
-
 using System;
 using System.Collections.Generic;
-using UnityEngine.Networking;
-using UnityEngine.Analytics;
 using UnityEngine;
-using UnityEditor;
-using System.Linq;
+using System.Collections.Specialized;
+using System.Net;
+using System.Timers;
+using UnityEngine.Networking;
+using System.Text;
 
 namespace UnityEditor.CDP
 {
     public class CDPEvent
     {
-        const string endpointUrl = "https://stg-lender.cdp.internal.unity3d.com/v1/events";
-        //const string endpointUrl = "https://prd-lender.cdp.internal.unity3d.com/v1/events";
+        //const string endpointUrl = "https://stg-lender.cdp.internal.unity3d.com/v1/events";
+        const string endpointUrl = "https://prd-lender.cdp.internal.unity3d.com/v1/events";
 
         const string stringPattern = "\"{0}\":\"{1}\"";
         const string nonStringPattern = "\"{0}\":{1}";
         const string payloadPattern = "{{\"type\":\"{0}\", \"msg\": {1}}}";
 
+        const int maxRetries = 3;
 
         public static void Send(string eventName, Dictionary<string, object> dictionary = null)
+        {
+            new CDPEvent(eventName, dictionary);
+        }
+
+        int currentRetries = 0;
+        string payload;
+        private IEnumerator<AsyncOperation> m_WebRequestEnumerator;
+
+        CDPEvent(string eventName, Dictionary<string, object> dictionary = null)
         {
             var dict = dictionary;
             if (dict == null) {
                 dict = new Dictionary<string, object>();
             }
-
             AddCommonValues(ref dict);
             string msg = DictToJson(dict);
-            string payload = string.Format(payloadPattern, eventName, msg);
-            Debug.Log(payload);
+            payload = string.Format(payloadPattern, eventName, msg);
 
-            UnityWebRequest request = UnityWebRequest.Post(endpointUrl, payload);
-            var uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(payload));
-            uploadHandler.contentType = "application/json";
-            request.uploadHandler = uploadHandler;
+            ListenToEditorUpdates();
+            m_WebRequestEnumerator = BeginSendSequence();
+        }
 
-#if UNITY_2018_1_OR_NEWER
-            request.SendWebRequest();
+        void ListenToEditorUpdates()
+        {
+            EditorApplication.update += EditorApplication_Update;
+        }
+
+        void EditorApplication_Update()
+        {
+            if (m_WebRequestEnumerator != null) {
+                if (m_WebRequestEnumerator.Current == null) {
+                    if (m_WebRequestEnumerator.MoveNext() == false) {
+                        CleanUp();
+                        return;
+                    }
+                }
+                if (m_WebRequestEnumerator.Current == null || m_WebRequestEnumerator.Current.isDone && !m_WebRequestEnumerator.MoveNext()) {
+                    CleanUp();
+                }
+            }
+        }
+
+        IEnumerator<AsyncOperation> BeginSendSequence()
+        {
+            IEnumerator<AsyncOperation> innerLoopEnumerator = Flush().GetEnumerator();
+            while (innerLoopEnumerator.MoveNext())
+                yield return innerLoopEnumerator.Current;
+        }
+
+        IEnumerable<AsyncOperation> Flush()
+        {
+            UnityWebRequest request = new UnityWebRequest(endpointUrl);
+            request.uploadHandler = new UploadHandlerRaw(Encoding.ASCII.GetBytes(payload));
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.method = UnityWebRequest.kHttpVerbPOST;
+
+#if UNITY_2017_2_OR_NEWER
+            yield return request.SendWebRequest();
 #else
-            request.Send();
+            yield return request.Send();
 #endif
+
+#if UNITY_2017_1_OR_NEWER
+            if (request.isNetworkError || request.isHttpError)
+#else
+            if (request.isError || request.responseCode >= 400)
+#endif
+            {
+                IEnumerator<AsyncOperation> innerLoopEnumerator = Retry().GetEnumerator();
+                while (innerLoopEnumerator.MoveNext())
+                    yield return innerLoopEnumerator.Current;
+            } else {
+                CleanUp();
+            }
+        }
+
+        IEnumerable<AsyncOperation> Retry()
+        {
+            if (currentRetries < maxRetries) {
+                currentRetries++;
+                Debug.LogWarningFormat("Retrying {0}", currentRetries);
+                IEnumerator<AsyncOperation> innerLoopEnumerator = Flush().GetEnumerator();
+                while (innerLoopEnumerator.MoveNext())
+                    yield return innerLoopEnumerator.Current;
+            } else {
+                Debug.LogWarningFormat("Retries failed...stopping.");
+                CleanUp();
+            }
+        }
+
+        void CleanUp()
+        {
+            EditorApplication.update -= EditorApplication_Update;
+            m_WebRequestEnumerator = null;
         }
 
         static void AddCommonValues(ref Dictionary<string, object> dictionary)
@@ -57,7 +125,6 @@ namespace UnityEditor.CDP
 #else
             string projectId = Application.cloudProjectId;
 #endif
-
             dictionary.Add("ts", (double)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds);
             dictionary.Add("cloud_user_id", userId);
             dictionary.Add("app_id", projectId);
@@ -95,6 +162,7 @@ namespace UnityEditor.CDP
             }
             return string.Concat("{", s, "}");
         }
+
 
         static string GetUserId()
         {
