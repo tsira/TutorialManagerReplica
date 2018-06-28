@@ -51,7 +51,7 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
         public string bundle_version;
         public string sdk_version_name;
         public int sdk_version;
-        public string time_zone;
+        //public string time_zone;
         public int time_zone_offset;
         public int screen_width;
         public int screen_height;
@@ -96,8 +96,8 @@ namespace UnityEngine.Analytics.TutorialManagerRuntime
             this.bundle_version = Application.version;
             this.sdk_version_name = TutorialManager.k_PluginVersion;
             this.sdk_version = TutorialManager.k_VersionNumber;
-            this.time_zone = TimeZone.CurrentTimeZone.StandardName;
-            this.time_zone_offset = (int)TimeZoneInfo.Local.GetUtcOffset(DateTime.Now).TotalMinutes;
+            //this.time_zone = TimeZone.CurrentTimeZone.StandardName;
+            this.time_zone_offset = (int)(DateTime.UtcNow - DateTime.Now).TotalMinutes * -1;
             this.screen_width = Screen.currentResolution.width;
             this.screen_height = Screen.currentResolution.height;
 
